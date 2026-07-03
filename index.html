@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Bengaluru Grid Monitor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
 :root{
   --bg:#08111F;--s1:#0E1D30;--s2:#132338;--border:#1E3352;
@@ -134,14 +133,9 @@ main{max-width:1280px;margin:0 auto;padding:20px 20px 40px;display:grid;gap:14px
 .ncep-tlabel{font-size:9px;color:var(--muted);margin-top:1px}
 
 /* ── INDIA MAP TAB ── */
-.india-layout{display:grid;grid-template-columns:1fr 360px;gap:14px;align-items:start}
 .map-controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .toggle-btn{background:var(--s2);border:1px solid var(--border);color:var(--muted);font-size:11px;padding:5px 14px;border-radius:20px;cursor:pointer;font-family:var(--mono);transition:all .2s}
 .toggle-btn.active{background:rgba(59,130,246,.15);border-color:var(--blue);color:var(--blue)}
-#india-svg-wrap{background:var(--s2);border-radius:10px;border:1px solid var(--border);padding:10px}
-#india-svg{width:100%;height:auto}
-.map-legend-row{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:10px;color:var(--muted);font-family:var(--mono)}
-.legend-grad{height:8px;flex:1;border-radius:4px}
 .state-panel{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px}
 .state-panel-title{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase}
 .state-selected{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
@@ -314,43 +308,32 @@ footer a{color:var(--blue);text-decoration:none}
   </div>
 </div>
 
-<div class="card">
+<div class="card" style="border-color:var(--amber)">
   <div class="sec-head">
-    <div class="sec-title">BESCOM 220kV substation network — live</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span class="badge bb">KPTCL SLDC · updates every 15–30 min</span>
-      <a href="https://kptclsldc.in/bescom.aspx" target="_blank" class="btn" style="text-decoration:none">Open full page ↗</a>
+    <div>
+      <div class="sec-title">BESCOM 220kV substation network</div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Live image is on kptclsldc.in — Chrome blocks cross-site embedding (X-Frame-Options)</div>
     </div>
+    <a href="https://kptclsldc.in/bescom.aspx" target="_blank"
+       style="display:inline-flex;align-items:center;gap:6px;background:var(--amber);color:#08111F;font-size:12px;font-weight:700;padding:8px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;flex-shrink:0">
+      Open live map ↗
+    </a>
   </div>
-  <div style="background:var(--s2);border-radius:8px;overflow:hidden;border:1px solid var(--border);position:relative">
-    <iframe
-      id="bescom-iframe"
-      src="https://kptclsldc.in/bescom.aspx"
-      width="100%"
-      height="500"
-      scrolling="no"
-      frameborder="0"
-      title="BESCOM 220kV substation network live diagram from KPTCL SLDC"
-      loading="lazy"
-      style="display:block;background:#fff"
-      onload="document.getElementById('iframe-loading').style.display='none'"
-      onerror="document.getElementById('iframe-fallback').style.display='block';document.getElementById('iframe-loading').style.display='none'"
-    ></iframe>
-    <div id="iframe-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--s2);border-radius:8px;pointer-events:none">
-      <div style="text-align:center">
-        <div class="spinner" style="margin:0 auto 10px"></div>
-        <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">Loading KPTCL SLDC…</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+    <div style="background:var(--s2);border-radius:8px;padding:12px 14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">What you'll see on KPTCL</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8">
+        Each node = a 220kV substation with real-time MW load<br>
+        Updated every 15–30 min by KPTCL SLDC<br>
+        Covers 8 districts: Bengaluru Urban, Rural,<br>
+        Ramanagara, Tumkuru, Chitradurga, Davangere,<br>
+        Kolar, Chikkaballapur
       </div>
     </div>
-  </div>
-  <div id="iframe-fallback" style="display:none;padding:16px;background:var(--s2);border-radius:6px;border:1px dashed var(--border);font-size:12px;color:var(--muted);text-align:center;margin-top:8px">
-    If the map does not load, your browser may be blocking the embed.
-    <a href="https://kptclsldc.in/bescom.aspx" target="_blank" style="color:var(--blue)">Open directly on KPTCL SLDC →</a>
-  </div>
-  <div style="margin-top:8px;font-size:10px;color:var(--muted);line-height:1.6">
-    Live 220kV substation diagram — each node is a substation with its current MW load. Covers
-    Bengaluru Urban, Bengaluru Rural, Ramanagara, Tumkuru, Chitradurga, Davangere, Kolar, Chikkaballapur.
-    The diagram is generated and updated by KPTCL SLDC every ~15–30 minutes.
+    <div style="background:var(--s2);border-radius:8px;padding:12px 14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Live data we do have</div>
+      <div style="display:flex;flex-direction:column;gap:6px" id="bescom-summary-tiles"></div>
+    </div>
   </div>
 </div>
 
@@ -384,108 +367,49 @@ footer a{color:var(--blue);text-decoration:none}
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <div id="tab-india" class="tab-content">
 <main>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-  <div style="font-size:10px;font-family:var(--mono);color:var(--muted)" id="india-last-updated">Loading…</div>
-  <button class="btn" onclick="loadIndiaData()">↻ Refresh data</button>
-</div>
-<div class="map-controls">
-  <span style="font-size:11px;color:var(--muted);font-family:var(--mono);align-self:center">View by:</span>
-  <button class="toggle-btn active" id="btn-tariff" onclick="setMetric('tariff')">₹ Tariff / unit</button>
-  <button class="toggle-btn" id="btn-avail" onclick="setMetric('avail')">% Grid availability</button>
-  <button class="toggle-btn" id="btn-renew" onclick="setMetric('renew')">% Renewables</button>
-  <button class="toggle-btn" id="btn-ev" onclick="setMetric('ev')">EV stations</button>
-</div>
 
-<div class="india-layout">
+<!-- Controls row -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
   <div>
-    <div id="india-svg-wrap">
-      <svg id="india-svg" viewBox="0 0 600 650" xmlns="http://www.w3.org/2000/svg"></svg>
-    </div>
-    <div class="map-legend-row">
-      <span id="legend-lo">Low</span>
-      <div class="legend-grad" id="legend-grad"></div>
-      <span id="legend-hi">High</span>
-      <span style="margin-left:12px;font-size:9px">Click a state for details</span>
-    </div>
-    <div style="font-size:10px;color:var(--muted);margin-top:6px;font-family:var(--mono)">Source: SERC tariff orders 2025-26 · Tariffs updated annually (next revision April 2027)</div>
-    </div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">India power — state overview</div>
+    <div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px" id="india-last-updated">Loading…</div>
   </div>
-</main>
-
-<!-- India Energy Stats — ICED style -->
-<main style="padding-top:0">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-  <div>
-    <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">India energy overview</div>
-    <div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px" id="energy-source-note">Source: MNRE · CEA · PIB · Loading…</div>
-  </div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <button class="btn" onclick="loadEnergyStats()">↻ Refresh</button>
-    <a href="https://iced.niti.gov.in" target="_blank" class="btn" style="text-decoration:none">ICED dashboard ↗</a>
-    <a href="https://iess2047.gov.in" target="_blank" class="btn" style="text-decoration:none">IESS 2047 scenarios ↗</a>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <span style="font-size:11px;color:var(--muted)">Sort &amp; color by:</span>
+    <button class="toggle-btn active" id="btn-tariff" onclick="setMetric('tariff')">₹ Tariff</button>
+    <button class="toggle-btn" id="btn-avail"  onclick="setMetric('avail')">Grid availability</button>
+    <button class="toggle-btn" id="btn-renew"  onclick="setMetric('renew')">Renewables %</button>
+    <button class="toggle-btn" id="btn-ev"     onclick="setMetric('ev')">EV stations</button>
+    <button class="btn" onclick="loadIndiaData()">↻ Refresh</button>
   </div>
 </div>
 
-<!-- KPI strip -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px" id="energy-kpis"></div>
-
-<!-- Capacity donut + milestones + growth -->
-<div style="display:grid;grid-template-columns:320px 1fr;gap:14px;margin-bottom:14px">
-  <div class="card">
-    <div class="sec-head"><div class="sec-title">Installed capacity by source</div><span id="energy-as-of" class="badge bb">—</span></div>
-    <div style="position:relative;height:220px"><canvas id="energyDonut" role="img" aria-label="India installed capacity breakdown by energy source"></canvas></div>
-    <div class="legend" id="energy-legend"></div>
-  </div>
-  <div class="card">
-    <div class="sec-head"><div class="sec-title">Key milestones</div></div>
-    <div id="energy-milestones" style="display:flex;flex-direction:column;gap:8px"></div>
-    <div style="margin-top:14px">
-      <div class="sec-title" style="margin-bottom:8px">2030 target: 500 GW non-fossil</div>
-      <div id="target-bar-wrap">
-        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:5px">
-          <span>0 GW</span><span id="target-achieved-label">—</span><span>500 GW</span>
-        </div>
-        <div style="height:10px;background:var(--s2);border-radius:5px;overflow:hidden">
-          <div id="target-bar" style="height:100%;border-radius:5px;background:linear-gradient(to right,#34D399,#10B981);transition:width 1s ease"></div>
-        </div>
-        <div style="font-size:10px;font-family:var(--mono);color:var(--green);margin-top:4px" id="target-pct-label">—</div>
-      </div>
-    </div>
-  </div>
+<!-- Legend -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:10px;font-family:var(--mono);color:var(--muted)">
+  <span id="legend-lo-val">Low</span>
+  <div id="legend-grad" style="height:8px;flex:1;max-width:200px;border-radius:4px"></div>
+  <span id="legend-hi-val">High</span>
+  <span style="margin-left:8px">Click any state for full details</span>
+  <span style="margin-left:4px">· <strong style="color:var(--amber)">Amber</strong> = Karnataka</span>
 </div>
 
-<!-- Renewable growth chart -->
-<div class="card">
-  <div class="sec-head"><div class="sec-title">Renewable energy capacity growth 2014 → 2026</div><span style="font-size:10px;font-family:var(--mono);color:var(--muted)">GW installed</span></div>
-  <div style="height:200px;position:relative"><canvas id="growthChart" role="img" aria-label="India renewable energy capacity growth from 2014 to 2026"></canvas></div>
-</div>
+<!-- Two-column: state cards + detail panel -->
+<div style="display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start">
+
+  <!-- State cards grid -->
+  <div id="state-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px"></div>
+
+  <!-- Detail panel -->
+  <div class="card" id="state-detail" style="position:sticky;top:80px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">State details</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.7">Click any state card to see detailed power data.</div>
   </div>
 
-  <div>
-    <div class="state-panel" id="state-panel">
-      <div class="state-panel-title">State details</div>
-      <div style="font-size:12px;color:var(--muted)">Click any state on the map to see detailed tariff, availability, and EV data.</div>
-    </div>
-
-    <div style="margin-top:14px">
-      <div class="card">
-        <div class="sec-title" style="margin-bottom:10px">All states — sorted by tariff</div>
-        <div class="state-table-wrap">
-          <table class="state-table" id="state-table">
-            <thead><tr><th>State</th><th>₹/unit</th><th>Avail%</th><th>RE%</th><th>EV stations</th></tr></thead>
-            <tbody id="state-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
+
 </main>
 </div>
 
-<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-<!-- TAB 3: EV & POWER POLICY                     -->
-<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <div id="tab-policy" class="tab-content">
 <main>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -644,7 +568,7 @@ function showTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
-  if (tab === 'india' && !indiaMapBuilt) buildIndiaMap();
+  if (tab === 'india') initIndiaTab();
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -687,218 +611,258 @@ const _stateDataOrig = {
 stateData = _stateDataOrig; // use hardcoded data immediately, API overrides this daily
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// INDIA MAP
+// INDIA STATE CARDS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let indiaMapBuilt = false;
-let currentMetric = 'tariff';
-let projection, pathGen, geoData;
+
+// stateData: starts with hardcoded fallback, overridden by /api/india-data daily
+let stateData = {};
+const _stateDataOrig = {
+  "Andhra Pradesh":    {rate:6.20,avail:93,renew:42,ev:1240,discom:"APSPDCL / APEPDCL"},
+  "Arunachal Pradesh": {rate:4.50,avail:78,renew:88,ev:45,  discom:"APDCL"},
+  "Assam":             {rate:7.00,avail:80,renew:20,ev:180, discom:"APDCL"},
+  "Bihar":             {rate:6.50,avail:78,renew:12,ev:320, discom:"NBPDCL / SBPDCL"},
+  "Chhattisgarh":      {rate:5.80,avail:87,renew:32,ev:280, discom:"CSPDCL"},
+  "Goa":               {rate:4.50,avail:99,renew:22,ev:210, discom:"Goa Electricity Dept"},
+  "Gujarat":           {rate:6.20,avail:95,renew:48,ev:2100,discom:"DGVCL / MGVCL / PGVCL"},
+  "Haryana":           {rate:6.00,avail:91,renew:30,ev:890, discom:"DHBVN / UHBVN"},
+  "Himachal Pradesh":  {rate:4.20,avail:98,renew:85,ev:220, discom:"HPSEBL"},
+  "Jharkhand":         {rate:7.50,avail:82,renew:15,ev:190, discom:"JBVNL"},
+  "Karnataka":         {rate:6.82,avail:96,renew:62,ev:6096,discom:"BESCOM / HESCOM / MESCOM"},
+  "Kerala":            {rate:5.50,avail:97,renew:52,ev:780, discom:"KSEB"},
+  "Madhya Pradesh":    {rate:6.80,avail:90,renew:35,ev:650, discom:"MPPKVVCL / others"},
+  "Maharashtra":       {rate:9.10,avail:94,renew:28,ev:3200,discom:"MSEDCL / BEST"},
+  "Manipur":           {rate:4.80,avail:72,renew:25,ev:28,  discom:"MSPDCL"},
+  "Meghalaya":         {rate:5.20,avail:75,renew:68,ev:32,  discom:"MePDCL"},
+  "Mizoram":           {rate:4.90,avail:74,renew:72,ev:18,  discom:"Power & Electricity Dept"},
+  "Nagaland":          {rate:5.50,avail:70,renew:60,ev:22,  discom:"Dept of Power"},
+  "Odisha":            {rate:6.00,avail:89,renew:38,ev:420, discom:"TPSODL / TPCODL"},
+  "Punjab":            {rate:4.80,avail:93,renew:28,ev:650, discom:"PSPCL"},
+  "Rajasthan":         {rate:6.50,avail:88,renew:55,ev:980, discom:"JDVVNL / JVVNL"},
+  "Sikkim":            {rate:3.40,avail:99,renew:92,ev:45,  discom:"Energy & Power Dept"},
+  "Tamil Nadu":        {rate:5.20,avail:91,renew:45,ev:2800,discom:"TANGEDCO"},
+  "Telangana":         {rate:6.80,avail:94,renew:38,ev:1100,discom:"TSSPDCL / TSNPDCL"},
+  "Tripura":           {rate:6.20,avail:80,renew:18,ev:55,  discom:"TSECL"},
+  "Uttar Pradesh":     {rate:6.00,avail:85,renew:22,ev:1200,discom:"UPPCL"},
+  "Uttarakhand":       {rate:4.50,avail:96,renew:72,ev:280, discom:"UPCL"},
+  "West Bengal":       {rate:8.50,avail:92,renew:8, ev:890, discom:"WBSEDCL / CESC"},
+  "Delhi":             {rate:4.50,avail:99,renew:12,ev:1850,discom:"BSES / TPDDL"},
+  "Jammu and Kashmir": {rate:3.50,avail:85,renew:75,ev:120, discom:"JKPDCL"},
+};
+stateData = _stateDataOrig;
 
 const metricCfg = {
-  tariff: {key:'rate', lo:'₹3.40', hi:'₹9.10', loVal:3.4, hiVal:9.1, fmt: v => '₹'+v.toFixed(2)+'/unit', colorLo:'#1a472a', colorHi:'#e34948'},
-  avail:  {key:'avail',lo:'70%', hi:'99%', loVal:70, hiVal:99, fmt: v => v+'%', colorLo:'#e34948', colorHi:'#10B981'},
-  renew:  {key:'renew',lo:'8%', hi:'92%', loVal:8,  hiVal:92, fmt: v => v+'%', colorLo:'#5A7FA8', colorHi:'#34D399'},
-  ev:     {key:'ev',   lo:'18', hi:'6,096', loVal:18, hiVal:6096, fmt: v => v.toLocaleString()+' stations', colorLo:'#1A3050', colorHi:'#3B82F6'},
+  tariff: {key:'rate', loVal:3.4,  hiVal:9.1,  unit:'₹',     suffix:'/unit', fmt:v=>'₹'+v.toFixed(2), cLo:'#1a6641', cHi:'#dc2626', loLabel:'₹3.40 — cheapest', hiLabel:'₹9.10 — most expensive'},
+  avail:  {key:'avail',loVal:70,   hiVal:99,   unit:'',       suffix:'%',     fmt:v=>v+'%',             cLo:'#dc2626', cHi:'#10B981', loLabel:'70% — unreliable',  hiLabel:'99% — excellent'},
+  renew:  {key:'renew',loVal:8,    hiVal:92,   unit:'',       suffix:'%',     fmt:v=>v+'%',             cLo:'#5A7FA8', cHi:'#34D399', loLabel:'8% — coal-heavy',   hiLabel:'92% — green'},
+  ev:     {key:'ev',   loVal:18,   hiVal:6096, unit:'',       suffix:'',      fmt:v=>v.toLocaleString(),cLo:'#132338', cHi:'#3B82F6', loLabel:'18 stations',       hiLabel:'6,096 stations'},
 };
 
-function getColor(val, cfg) {
+let currentMetric = 'tariff';
+
+function metricColor(val, cfg) {
   const t = Math.max(0, Math.min(1, (val - cfg.loVal) / (cfg.hiVal - cfg.loVal)));
-  const lo = d3.color(cfg.colorLo), hi = d3.color(cfg.colorHi);
-  return d3.interpolateRgb(lo, hi)(t);
+  // Simple linear RGB interpolation
+  function hexToRgb(h) {
+    const r = parseInt(h.slice(1,3),16), g=parseInt(h.slice(3,5),16), b=parseInt(h.slice(5,7),16);
+    return [r,g,b];
+  }
+  const [r1,g1,b1] = hexToRgb(cfg.cLo), [r2,g2,b2] = hexToRgb(cfg.cHi);
+  const r = Math.round(r1 + (r2-r1)*t), g = Math.round(g1 + (g2-g1)*t), b = Math.round(b1 + (b2-b1)*t);
+  return `rgb(${r},${g},${b})`;
 }
 
 function setMetric(m) {
   currentMetric = m;
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('btn-' + m).classList.add('active');
-  if (indiaMapBuilt && geoData) updateMapColors();
+  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('btn-'+m); if(btn) btn.classList.add('active');
+  const cfg = metricCfg[m];
+  const lg = document.getElementById('legend-grad');
+  if(lg) lg.style.background = 'linear-gradient(to right,'+cfg.cLo+','+cfg.cHi+')';
+  const ll = document.getElementById('legend-lo-val'); if(ll) ll.textContent = cfg.loLabel||'Low';
+  const lh = document.getElementById('legend-hi-val'); if(lh) lh.textContent = cfg.hiLabel||'High';
+  renderStateGrid();
 }
 
-function updateMapColors() {
+function rank(states, key) {
+  const sorted = [...states].sort((a,b)=>b[1][key]-a[1][key]);
+  return Object.fromEntries(sorted.map(([name],i)=>[name,i+1]));
+}
+
+function renderStateGrid() {
   const cfg = metricCfg[currentMetric];
-  document.getElementById('legend-lo').textContent = cfg.lo;
-  document.getElementById('legend-hi').textContent = cfg.hi;
-  const grad = document.getElementById('legend-grad');
-  grad.style.background = 'linear-gradient(to right, ' + cfg.colorLo + ', ' + cfg.colorHi + ')';
-  d3.select('#india-svg').selectAll('path.state-path')
-    .attr('fill', d => {
-      const name = d.properties.NAME || d.properties.name || d.properties.ST_NM || '';
-      const sd = findState(name);
-      return sd ? getColor(sd[cfg.key], cfg) : '#1A3050';
-    });
-}
-
-// Common mismatches between GeoJSON names and our stateData keys
-const STATE_ALIASES = {
-  'orissa': 'Odisha',
-  'uttaranchal': 'Uttarakhand',
-  'nct of delhi': 'Delhi',
-  'national capital territory of delhi': 'Delhi',
-  'jammu & kashmir': 'Jammu and Kashmir',
-  'j & k': 'Jammu and Kashmir',
-  'telengana': 'Telangana',
-  // union territories — not in stateData, return null explicitly
-  'pondicherry': null, 'puducherry': null, 'chandigarh': null,
-  'andaman and nicobar islands': null, 'lakshadweep': null,
-  'dadra and nagar haveli': null, 'daman and diu': null,
-  'dadra and nagar haveli and daman and diu': null,
-};
-
-function findState(geoName) {
-  if (!geoName) return null;
-  const n = geoName.trim();
-  // 1. Direct match
-  if (stateData[n]) return stateData[n];
-  // 2. Alias lookup
-  const lower = n.toLowerCase();
-  if (lower in STATE_ALIASES) {
-    const alias = STATE_ALIASES[lower];
-    return alias ? (stateData[alias] || null) : null;
+  const entries = Object.entries(stateData);
+  // Sort by current metric
+  entries.sort((a,b) => a[1][cfg.key] - b[1][cfg.key]);
+  if (currentMetric === 'avail' || currentMetric === 'renew' || currentMetric === 'ev') {
+    entries.reverse(); // higher is better for these
   }
-  // 3. Case-insensitive direct match
-  for (const k of Object.keys(stateData)) {
-    if (lower === k.toLowerCase()) return stateData[k];
-  }
-  // 4. Substring fuzzy (last resort)
-  for (const k of Object.keys(stateData)) {
-    if (lower.includes(k.toLowerCase()) || k.toLowerCase().includes(lower)) return stateData[k];
-  }
-  return null;
-}
 
-function showStatePanel(name, sd) {
-  const cfg = metricCfg[currentMetric];
-  const panel = document.getElementById('state-panel');
-  const isKA = name.includes('Karnataka');
-  panel.innerHTML = '<div class="state-panel-title">State details</div>' +
-    '<div class="state-selected">' + name + (isKA ? ' ⚡' : '') + '</div>' +
-    '<div class="state-discom">' + (sd.discom || '—') + '</div>' +
-    '<div class="state-metric">' +
-    row('Domestic tariff', '₹' + sd.rate.toFixed(2) + '/unit', sd.rate, 3.4, 9.1, cfg.colorLo, cfg.colorHi) +
-    row('Grid availability', sd.avail + '%', sd.avail, 70, 99, '#e34948', '#10B981') +
-    row('Renewable %', sd.renew + '%', sd.renew, 8, 92, '#5A7FA8', '#34D399') +
-    row('Public EV stations', sd.ev.toLocaleString(), sd.ev, 18, 6096, '#1A3050', '#3B82F6') +
-    '</div>';
-}
+  const ranks = {
+    rate:  rank(entries,'rate'),
+    avail: rank(entries,'avail'),
+    renew: rank(entries,'renew'),
+    ev:    rank(entries,'ev'),
+  };
 
-function row(label, val, num, lo, hi, cLo, cHi) {
-  const t = Math.max(0, Math.min(1, (num - lo) / (hi - lo)));
-  const c = d3.interpolateRgb(d3.color(cLo), d3.color(cHi))(t);
-  return '<div class="sm-row"><div><div class="sm-label">' + label + '</div><div class="sm-bar-wrap"><div class="sm-bar-track"><div class="sm-bar-fill" style="width:' + (t*100).toFixed(0) + '%;background:' + c + '"></div></div></div></div><div class="sm-val" style="color:' + c + '">' + val + '</div></div>';
-}
+  const grid = document.getElementById('state-grid');
+  if (!grid) return;
 
-function buildStateTable() {
-  const sorted = Object.entries(stateData).sort((a,b) => a[1].rate - b[1].rate);
-  const tbody = document.getElementById('state-tbody');
-  tbody.innerHTML = sorted.map(([name, d]) => {
+  // Update legend
+  setMetric(currentMetric);
+
+  grid.innerHTML = entries.map(([name, d]) => {
+    const val = d[cfg.key];
+    const color = metricColor(val, cfg);
     const isKA = name === 'Karnataka';
-    const maxW = 80;
-    const rw = ((d.rate - 3.4)/(9.1 - 3.4)*maxW).toFixed(0);
-    const rc = d3.interpolateRgb(d3.color('#1a472a'), d3.color('#e34948'))((d.rate-3.4)/(9.1-3.4));
-    return '<tr class="' + (isKA ? 'hl' : '') + '" onclick="selectStateByName(\'' + name.replace("'","") + '\')" style="cursor:pointer"><td>' + name + '</td><td><span class="rate-bar" style="width:' + rw + 'px;background:' + rc + '"></span>₹' + d.rate.toFixed(2) + '</td><td>' + d.avail + '%</td><td>' + d.renew + '%</td><td>' + d.ev.toLocaleString() + '</td></tr>';
+    const pct = Math.max(5, Math.min(100, (val-cfg.loVal)/(cfg.hiVal-cfg.loVal)*100));
+    return `<div class="state-card" onclick="showStateDetail('${name.replace("'","\'")}')" style="
+      background:var(--s2);border:1px solid ${isKA ? '#F59E0B' : 'var(--border)'};
+      border-left:4px solid ${color};
+      border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s
+      " onmouseover="this.style.borderColor='${color}'" onmouseout="this.style.borderColor='${isKA?'#F59E0B':'var(--border)'}'" >
+      <div style="font-size:12px;font-weight:600;color:${isKA?'#F59E0B':'var(--text)'};margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:${color}">${cfg.fmt(val)}</div>
+      <div style="height:4px;background:var(--dim);border-radius:2px;margin:6px 0;overflow:hidden">
+        <div style="height:100%;width:${pct.toFixed(0)}%;background:${color};border-radius:2px"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:9px;color:var(--muted);font-family:var(--mono)">
+        <span>Avail ${d.avail}%</span><span>RE ${d.renew}%</span>
+        <span>₹${d.rate.toFixed(2)}</span><span>EV ${d.ev>=1000?(d.ev/1000).toFixed(1)+'k':d.ev}</span>
+      </div>
+    </div>`;
   }).join('');
 }
 
-function selectStateByName(name) {
-  const sd = stateData[name];
-  if (sd) showStatePanel(name, sd);
+function showStateDetail(name) {
+  const d = stateData[name]; if (!d) return;
+  const cfg = metricCfg[currentMetric];
+  const isKA = name === 'Karnataka';
+  const panel = document.getElementById('state-detail');
+  if (!panel) return;
+
+  // National averages
+  const allVals = Object.values(stateData);
+  const avgRate  = (allVals.reduce((s,x)=>s+x.rate, 0)/allVals.length).toFixed(2);
+  const avgAvail = Math.round(allVals.reduce((s,x)=>s+x.avail,0)/allVals.length);
+  const avgRenew = Math.round(allVals.reduce((s,x)=>s+x.renew,0)/allVals.length);
+  const avgEv    = Math.round(allVals.reduce((s,x)=>s+x.ev,  0)/allVals.length);
+
+  function vs(val, avg, higherBetter=true) {
+    const better = higherBetter ? val > avg : val < avg;
+    const c = better ? 'var(--green)' : 'var(--red)';
+    const arrow = val > avg ? '▲' : val < avg ? '▼' : '=';
+    return `<span style="color:${c};font-size:9px;font-family:var(--mono)">${arrow} vs avg</span>`;
+  }
+
+  function metricRow(label, val, avg, unit, higherBetter, icon) {
+    const color = metricColor(val, metricCfg[currentMetric]);
+    const pct = Math.max(0, Math.min(100, (val - metricCfg.tariff.loVal)/(metricCfg.tariff.hiVal-metricCfg.tariff.loVal)*100));
+    return `<div style="padding:8px 0;border-bottom:0.5px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:11px;color:var(--muted)">${icon} ${label}</span>
+        <div style="text-align:right">
+          <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text)">${val}${unit}</span>
+          &nbsp;${vs(val,avg,higherBetter)}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--mono);color:var(--muted)">
+        <div style="flex:1;height:4px;background:var(--dim);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${Math.max(0,Math.min(100,(val-metricCfg.avail.loVal)/(metricCfg.avail.hiVal-metricCfg.avail.loVal)*100)).toFixed(0)}%;background:var(--blue);border-radius:2px"></div>
+        </div>
+        <span>Nat avg: ${avg}${unit}</span>
+      </div>
+    </div>`;
+  }
+
+  const evRank = Object.entries(stateData).sort((a,b)=>b[1].ev-a[1].ev).findIndex(([n])=>n===name)+1;
+  const reRank = Object.entries(stateData).sort((a,b)=>b[1].renew-a[1].renew).findIndex(([n])=>n===name)+1;
+
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:${isKA?'#F59E0B':'var(--text)'}">${name} ${isKA?'⚡':''}</div>
+        <div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px">${d.discom}</div>
+      </div>
+      <div style="text-align:right;font-size:10px;font-family:var(--mono);color:var(--muted)">
+        EV rank: <strong style="color:var(--text)">#${evRank}</strong><br>
+        RE rank: <strong style="color:var(--text)">#${reRank}</strong>
+      </div>
+    </div>
+
+    <div>
+      <div style="padding:8px 0;border-bottom:0.5px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted)">💰 Domestic tariff</span>
+          <div><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text)">₹${d.rate.toFixed(2)}/unit</span>&nbsp;${vs(d.rate,parseFloat(avgRate),false)}</div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);color:var(--muted)">National avg ₹${avgRate}/unit · Source: SERC tariff order 2025-26</div>
+      </div>
+      <div style="padding:8px 0;border-bottom:0.5px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted)">⚡ Grid availability</span>
+          <div><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text)">${d.avail}%</span>&nbsp;${vs(d.avail,avgAvail,true)}</div>
+        </div>
+        <div style="height:4px;background:var(--dim);border-radius:2px;overflow:hidden;margin-bottom:3px">
+          <div style="height:100%;width:${d.avail}%;background:${d.avail>90?'var(--green)':'var(--amber)'};border-radius:2px"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);color:var(--muted)">National avg ${avgAvail}% · Hours of reliable supply per day</div>
+      </div>
+      <div style="padding:8px 0;border-bottom:0.5px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted)">🌿 Renewable mix</span>
+          <div><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text)">${d.renew}%</span>&nbsp;${vs(d.renew,avgRenew,true)}</div>
+        </div>
+        <div style="height:4px;background:var(--dim);border-radius:2px;overflow:hidden;margin-bottom:3px">
+          <div style="height:100%;width:${d.renew}%;background:#34D399;border-radius:2px"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);color:var(--muted)">National avg ${avgRenew}% · Rank #${reRank} nationally</div>
+      </div>
+      <div style="padding:8px 0;border-bottom:0.5px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted)">🔌 Public EV stations</span>
+          <div><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text)">${d.ev.toLocaleString()}</span>&nbsp;${vs(d.ev,avgEv,true)}</div>
+        </div>
+        <div style="height:4px;background:var(--dim);border-radius:2px;overflow:hidden;margin-bottom:3px">
+          <div style="height:100%;width:${Math.min(100,d.ev/6096*100).toFixed(0)}%;background:#3B82F6;border-radius:2px"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);color:var(--muted)">National avg ${avgEv.toLocaleString()} · Rank #${evRank} nationally</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;padding:10px;background:var(--s2);border-radius:6px">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase">EV charging cost</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">
+        At domestic tariff <strong style="color:var(--text)">₹${d.rate.toFixed(2)}/unit</strong>, charging a 30 kWh EV (e.g. Tata Nexon) costs
+        <strong style="color:var(--amber)">₹${(d.rate*30).toFixed(0)}</strong> for ~250 km range
+        (<strong style="color:var(--green)">₹${(d.rate*30/250).toFixed(1)}/km</strong> vs ~₹8–10/km for petrol).
+      </div>
+    </div>
+    <div style="margin-top:8px;font-size:9px;font-family:var(--mono);color:var(--muted)">Source: SERC tariff order 2025-26 · CEA · ICED NITI Aayog</div>
+  `;
 }
 
 async function loadIndiaData() {
   try {
     const r = await fetch('/api/india-data');
-    if (!r.ok) throw new Error('HTTP ' + r.status);
+    if (!r.ok) throw new Error('HTTP '+r.status);
     const payload = await r.json();
-    stateData = payload.states || {};
+    stateData = payload.states || stateData;
     const el = document.getElementById('india-last-updated');
-    if (el) el.textContent = 'Data: ' + (payload.data_as_of||'') + ' · Fetched ' + new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-    if (indiaMapBuilt && geoData) updateMapColors();
-    buildStateTable();
-  } catch(e) { console.warn('India data fetch failed:', e); }
-}
-
-async function loadPolicyData() {
-  try {
-    const r = await fetch('/api/ev-policy');
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const payload = await r.json();
-    renderPolicyDynamic(payload);
-    const el = document.getElementById('policy-last-updated');
-    if (el) el.textContent = 'Updated: ' + (payload.updated_on||'') + ' · Fetched ' + new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    if (el) el.textContent = 'Data: '+(payload.data_as_of||'')+' · Fetched '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    renderStateGrid();
   } catch(e) {
-    const el = document.getElementById('policy-last-updated');
-    if (el) el.textContent = 'Could not load policy data';
+    console.warn('India data fetch failed, using fallback:', e);
+    renderStateGrid();
   }
 }
 
-function renderPolicyDynamic(p) {
-  const ka = p.karnataka||{}, kpi = p.national_kpis||{};
-  const set = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  set('kpi-edrive',      'Rs ' + ((kpi.pm_edrive_outlay_cr||0)/100).toFixed(1) + 'k Cr');
-  set('kpi-chargers',    (kpi.chargers_targeted||0).toLocaleString() + '+');
-  set('kpi-gst',         (kpi.gst_on_ev_pct||5) + '%');
-  set('kpi-ka-stations', (ka.ev_stations||0).toLocaleString());
-  set('ka-stations',     (ka.ev_stations||0).toLocaleString());
-  set('ka-tariff',       'Rs ' + (ka.ev_tariff_per_unit||0).toFixed(2) + '/unit');
-  set('ka-renew',        (ka.renewable_pct||0) + '%');
-  set('ka-subsidy',      (ka.capital_subsidy_pct||'—') + '%');
-  const smap = {active:{cls:'ps-active',label:'● Active'},expiring:{cls:'ps-expiring',label:'⚠ Expiring'},upcoming:{cls:'ps-upcoming',label:'◎ Proposed'},enacted:{cls:'ps-enacted',label:'Enacted'},closed:{cls:'ps-closed',label:'Closed'}};
-  function cardHTML(pol) {
-    const s = smap[pol.status]||smap.enacted;
-    const tags = (pol.tags||[]).map(t=>'<span class="policy-tag">'+t+'</span>').join('');
-    const outl = pol.outlay ? '<div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:6px">'+pol.outlay+'</div>' : '';
-    return '<div class="policy-card"><div class="policy-head"><div class="policy-name">'+pol.name+'</div><span class="policy-status '+s.cls+'">'+s.label+'</span></div>'+outl+'<div class="policy-body">'+pol.summary+'</div><div class="policy-tag-row">'+tags+'</div><div class="policy-deadline">'+(pol.deadline||'')+'</div></div>';
-  }
-  const policies = p.policies||[];
-  const lEl = document.getElementById('policy-col-left'),  rEl = document.getElementById('policy-col-right');
-  if (lEl) lEl.innerHTML = policies.filter((_,i)=>i%2===0).map(cardHTML).join('');
-  if (rEl) rEl.innerHTML = policies.filter((_,i)=>i%2!==0).map(cardHTML).join('');
-}
-
-function buildIndiaMap() {
-  indiaMapBuilt = true;
-  buildStateTable();
-  const cfg = metricCfg[currentMetric];
-  document.getElementById('legend-lo').textContent = cfg.lo;
-  document.getElementById('legend-hi').textContent = cfg.hi;
-  document.getElementById('legend-grad').style.background = 'linear-gradient(to right,' + cfg.colorLo + ',' + cfg.colorHi + ')';
-
-  const url = 'https://cdn.jsdelivr.net/gh/geohacker/india@master/state/india_telengana.geojson';
-  fetch(url).then(r => r.json()).then(data => {
-    geoData = data;
-    const svg = d3.select('#india-svg');
-    projection = d3.geoMercator().fitSize([580, 630], data);
-    pathGen = d3.geoPath().projection(projection);
-    svg.selectAll('path.state-path')
-      .data(data.features)
-      .enter().append('path')
-      .attr('class', 'state-path')
-      .attr('d', pathGen)
-      .attr('stroke', '#1E3352')
-      .attr('stroke-width', 0.8)
-      .attr('fill', d => {
-        const name = d.properties.NAME || d.properties.name || d.properties.ST_NM || '';
-        const sd = findState(name);
-        return sd ? getColor(sd[metricCfg[currentMetric].key], metricCfg[currentMetric]) : '#1A3050';
-      })
-      .style('cursor', 'pointer')
-      .on('mouseover', function(event, d) {
-        d3.select(this).attr('stroke-width', 2).attr('stroke', '#F59E0B');
-      })
-      .on('mouseout', function() {
-        d3.select(this).attr('stroke-width', 0.8).attr('stroke', '#1E3352');
-      })
-      .on('click', function(event, d) {
-        const name = d.properties.NAME || d.properties.name || d.properties.ST_NM || '';
-        const sd = findState(name);
-        if (sd) showStatePanel(name, sd);
-      });
-    // Re-apply colors now that both GeoJSON and stateData are ready
-    updateMapColors();
-    buildStateTable();
-  }).catch(() => {
-    document.getElementById('india-svg-wrap').innerHTML =
-      '<div style="padding:40px;text-align:center;color:var(--muted);font-size:12px">Could not load India GeoJSON. Check internet connection.<br><br>The state table below still works.</div>';
-  });
+// Init India tab on first click
+let indiaTabInited = false;
+function initIndiaTab() {
+  if (indiaTabInited) return;
+  indiaTabInited = true;
+  setMetric('tariff');
+  renderStateGrid();
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -993,11 +957,7 @@ function initOsc(){
   }
   if(oscAnimId)cancelAnimationFrame(oscAnimId);draw();
 }
-function reloadMap(){
-  // BESCOM map now uses iframe — reload the iframe src
-  const f = document.getElementById('bescom-iframe');
-  if (f) { f.src = f.src; document.getElementById('iframe-loading').style.display='flex'; }
-}
+function reloadMap(){ /* BESCOM map opens in new tab — no reload needed */ }
 async function fetchHistory(){try{const r=await fetch(HISTORY_API);if(!r.ok)return[];return await r.json();}catch{return[];}}
 async function render(data){
   const gen=data.generation,dem=data.demand,hz=gen.frequency_hz||dem.frequency_hz||50.0;
@@ -1032,6 +992,18 @@ async function render(data){
   const hist=await fetchHistory();
   if(hist.length>0){drawSparkline(hist);const up=hist.filter(h=>h.score>=80).length;document.getElementById('gauge-uptime').textContent=`Session uptime: ${(up/hist.length*100).toFixed(0)}% (${hist.length} readings)`;document.getElementById('spark-hint').textContent=`${hist.length} readings · last ${hist[hist.length-1].score}/100`;}
   renderSrcChart(data);renderESCOM(data);renderNCEP(data);renderExplainer(data);
+  // Populate the BESCOM summary tiles
+  const bTiles = document.getElementById('bescom-summary-tiles');
+  if (bTiles && dem.bescom) {
+    const b = dem.bescom, hz = gen.frequency_hz || dem.frequency_hz || 50;
+    const ncepb = (data.ncep.escom_ncep||[]).find(e=>e.escom==='BESCOM')||{};
+    bTiles.innerHTML = [
+      {label:'BESCOM actual load',  val:(b.actual_mw||0).toLocaleString()+' MW', color:'var(--blue)'},
+      {label:'Grid frequency',       val:hz.toFixed(2)+' Hz',                    color:hz>=49.9&&hz<=50.1?'var(--green)':'var(--amber)'},
+      {label:'Solar + wind (NCEP)', val:((ncepb.solar_mw||0)+(ncepb.wind_mw||0)).toLocaleString()+' MW', color:'#34D399'},
+      {label:'UI deviation',         val:(b.ui_mw>=0?'+':'')+b.ui_mw+' MW',     color:b.ui_mw>0?'var(--amber)':'var(--green)'},
+    ].map(t=>'<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--muted)">'+t.label+'</span><span style="font-family:var(--mono);font-size:12px;font-weight:700;color:'+t.color+'">'+t.val+'</span></div>').join('');
+  }
 }
 async function fetchData(){const r=await fetch(API);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
 async function refresh(){try{const data=await fetchData();await render(data);document.getElementById('err').style.display='none';}catch(e){document.getElementById('err').style.display='block';document.getElementById('err').textContent='⚠ '+e.message;}}
@@ -1092,7 +1064,7 @@ const DAILY_MS = 24 * 60 * 60 * 1000;
   // Kick off ALL three data sources in parallel so India tab
   // has stateData ready before the GeoJSON even loads
   const t1 = fetchData().catch(e => { throw e; });
-  loadIndiaData();    // sets stateData immediately, doesn't block Tab 1
+  loadIndiaData();    // loads stateData + triggers card grid if India tab is open
   loadPolicyData();   // same
   loadEnergyStats();  // ICED-style India energy stats
   loadEnergyStats();  // ICED-style India energy stats
