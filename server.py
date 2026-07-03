@@ -1,5 +1,5 @@
 """
-Karnataka Grid Monitor — FastAPI backend
+Bengaluru Grid Monitor — FastAPI backend
 Local:   uvicorn server:app --reload --port 8000
 Railway: PORT env var is set automatically
 """
@@ -7,25 +7,28 @@ Railway: PORT env var is set automatically
 import os
 import time
 import logging
+import requests as _req
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from kptcl_scraper import get_all
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("grid-monitor")
 
-app = FastAPI(title="Karnataka Grid Monitor", version="1.0.0")
+_SLDC_HEADERS = {"User-Agent": "BengaluruGridMonitor/1.0 (public data)"}
+
+app = FastAPI(title="Bengaluru Grid Monitor", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],          # tighten this in production
+    allow_origins=["*"],
     allow_methods=["GET"],
     allow_headers=["*"],
 )
 
-# ── Simple in-memory cache (5-minute TTL) ──────────────────────
+# ── In-memory cache (5-min TTL) ────────────────────────────────
 CACHE_TTL_SECONDS = 300
 _cache: dict | None = None
 _cache_ts: float = 0.0
@@ -43,14 +46,10 @@ def _get_data(force: bool = False) -> dict:
     return _cache
 
 
-# ── Routes ─────────────────────────────────────────────────────
+# ── Data routes ────────────────────────────────────────────────
 
 @app.get("/api/grid-data")
 def grid_data(force: bool = False):
-    """
-    Returns combined generation + demand + NCEP snapshot.
-    Add ?force=true to bypass the 5-minute cache.
-    """
     try:
         return _get_data(force=force)
     except Exception as exc:
@@ -60,19 +59,16 @@ def grid_data(force: bool = False):
 
 @app.get("/api/generation")
 def generation():
-    """Plant-level generation + frequency + source breakdown."""
     return _get_data()["generation"]
 
 
 @app.get("/api/demand")
 def demand():
-    """ESCOM schedule vs actual demand (BESCOM + all ESCOMs)."""
     return _get_data()["demand"]
 
 
 @app.get("/api/ncep")
 def ncep():
-    """Renewable breakdown (solar/wind/bio) per ESCOM."""
     return _get_data()["ncep"]
 
 
@@ -81,12 +77,35 @@ def health():
     return {"status": "ok", "cache_age_seconds": round(time.time() - _cache_ts)}
 
 
-# ── Serve the frontend ─────────────────────────────────────────
-# Put index.html in the same directory and it will be served at /
+# ── BESCOM 220kV network map (proxy from SLDC) ─────────────────
+# The SLDC publishes a live JPG of BESCOM's 220kV substation
+# network. We proxy it here so the browser doesn't hit kptclsldc.in
+# directly (avoids CORS/hotlinking issues).
+
+@app.get("/api/bescom-map")
+def bescom_map():
+    try:
+        r = _req.get(
+            "https://kptclsldc.in/data1/BESCOM.jpg",
+            headers=_SLDC_HEADERS,
+            timeout=10,
+        )
+        r.raise_for_status()
+        return Response(
+            content=r.content,
+            media_type="image/jpeg",
+            headers={"Cache-Control": "max-age=900"},  # 15 min browser cache
+        )
+    except Exception as exc:
+        log.warning("BESCOM map fetch failed: %s", exc)
+        raise HTTPException(status_code=502, detail="Could not fetch BESCOM map from SLDC")
+
+
+# ── Serve frontend ─────────────────────────────────────────────
 try:
     app.mount("/static", StaticFiles(directory="."), name="static")
 except Exception:
-    pass  # static dir optional in dev
+    pass
 
 
 @app.get("/")
@@ -94,8 +113,8 @@ def root():
     return FileResponse("index.html")
 
 
-# ── Run directly ──────────────────────────────────────────────
+# ── Run directly ───────────────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 8000))   # Railway sets $PORT automatically
+    port = int(os.environ.get("PORT", 8000))
     uvicorn.run("server:app", host="0.0.0.0", port=port)
