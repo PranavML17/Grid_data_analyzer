@@ -572,8 +572,8 @@ function showTab(tab) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // STATE DATA
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// stateData loaded from /api/india-data daily
-let stateData = {};
+// stateData: starts with hardcoded fallback, overridden by /api/india-data daily
+let stateData = {}; // filled below after _stateDataOrig is defined
 const _stateDataOrig = {
   "Andhra Pradesh":    {rate:6.20, avail:93, renew:42, ev:1240, discom:"APSPDCL / APEPDCL"},
   "Arunachal Pradesh": {rate:4.50, avail:78, renew:88, ev:45,   discom:"APDCL"},
@@ -606,6 +606,7 @@ const _stateDataOrig = {
   "Delhi":             {rate:4.50, avail:99, renew:12, ev:1850, discom:"BSES / TPDDL"},
   "Jammu and Kashmir": {rate:3.50, avail:85, renew:75, ev:120,  discom:"JKPDCL"},
 }; // end stateDataOrig
+stateData = _stateDataOrig; // use hardcoded data immediately, API overrides this daily
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // INDIA MAP
@@ -648,11 +649,40 @@ function updateMapColors() {
     });
 }
 
+// Common mismatches between GeoJSON names and our stateData keys
+const STATE_ALIASES = {
+  'orissa': 'Odisha',
+  'uttaranchal': 'Uttarakhand',
+  'nct of delhi': 'Delhi',
+  'national capital territory of delhi': 'Delhi',
+  'jammu & kashmir': 'Jammu and Kashmir',
+  'j & k': 'Jammu and Kashmir',
+  'telengana': 'Telangana',
+  // union territories — not in stateData, return null explicitly
+  'pondicherry': null, 'puducherry': null, 'chandigarh': null,
+  'andaman and nicobar islands': null, 'lakshadweep': null,
+  'dadra and nagar haveli': null, 'daman and diu': null,
+  'dadra and nagar haveli and daman and diu': null,
+};
+
 function findState(geoName) {
+  if (!geoName) return null;
   const n = geoName.trim();
+  // 1. Direct match
   if (stateData[n]) return stateData[n];
+  // 2. Alias lookup
+  const lower = n.toLowerCase();
+  if (lower in STATE_ALIASES) {
+    const alias = STATE_ALIASES[lower];
+    return alias ? (stateData[alias] || null) : null;
+  }
+  // 3. Case-insensitive direct match
   for (const k of Object.keys(stateData)) {
-    if (n.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(n.toLowerCase())) return stateData[k];
+    if (lower === k.toLowerCase()) return stateData[k];
+  }
+  // 4. Substring fuzzy (last resort)
+  for (const k of Object.keys(stateData)) {
+    if (lower.includes(k.toLowerCase()) || k.toLowerCase().includes(lower)) return stateData[k];
   }
   return null;
 }
@@ -754,7 +784,7 @@ function buildIndiaMap() {
   document.getElementById('legend-hi').textContent = cfg.hi;
   document.getElementById('legend-grad').style.background = 'linear-gradient(to right,' + cfg.colorLo + ',' + cfg.colorHi + ')';
 
-  const url = 'https://raw.githubusercontent.com/geohacker/india/master/state/india_telengana.geojson';
+  const url = 'https://cdn.jsdelivr.net/gh/geohacker/india@master/state/india_telengana.geojson';
   fetch(url).then(r => r.json()).then(data => {
     geoData = data;
     const svg = d3.select('#india-svg');
@@ -784,6 +814,9 @@ function buildIndiaMap() {
         const sd = findState(name);
         if (sd) showStatePanel(name, sd);
       });
+    // Re-apply colors now that both GeoJSON and stateData are ready
+    updateMapColors();
+    buildStateTable();
   }).catch(() => {
     document.getElementById('india-svg-wrap').innerHTML =
       '<div style="padding:40px;text-align:center;color:var(--muted);font-size:12px">Could not load India GeoJSON. Check internet connection.<br><br>The state table below still works.</div>';
@@ -929,13 +962,25 @@ async function fetchData(){const r=await fetch(API);if(!r.ok)throw new Error('HT
 async function refresh(){try{const data=await fetchData();await render(data);document.getElementById('err').style.display='none';}catch(e){document.getElementById('err').style.display='block';document.getElementById('err').textContent='⚠ '+e.message;}}
 (async()=>{
   initOsc();
-  try{const data=await fetchData();document.getElementById('loading').style.display='none';await render(data);}
-  catch(e){document.getElementById('loading').style.display='none';document.getElementById('err').style.display='block';document.getElementById('err').textContent='⚠ Backend not reachable — is the Python server running? '+e.message;}
-  setInterval(refresh, REFRESH_MS);
-
-  // Tabs 2 & 3: load on boot, then every 24 h
   const DAILY_MS = 24 * 60 * 60 * 1000;
-  await Promise.all([loadIndiaData(), loadPolicyData()]);
+
+  // Kick off ALL three data sources in parallel so India tab
+  // has stateData ready before the GeoJSON even loads
+  const t1 = fetchData().catch(e => { throw e; });
+  loadIndiaData();    // sets stateData immediately, doesn't block Tab 1
+  loadPolicyData();   // same
+
+  // Resolve Tab 1
+  try {
+    const data = await t1;
+    document.getElementById('loading').style.display='none';
+    await render(data);
+  } catch(e) {
+    document.getElementById('loading').style.display='none';
+    document.getElementById('err').style.display='block';
+    document.getElementById('err').textContent='⚠ Backend not reachable — is the Python server running? '+e.message;
+  }
+  setInterval(refresh,       REFRESH_MS);
   setInterval(loadIndiaData,  DAILY_MS);
   setInterval(loadPolicyData, DAILY_MS);
 })();
