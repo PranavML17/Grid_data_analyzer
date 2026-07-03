@@ -343,6 +343,62 @@ def bescom_map():
         log.warning("BESCOM map fetch failed: %s", exc)
         raise HTTPException(status_code=502, detail="BESCOM map unavailable from SLDC")
 
+# ── India Energy Stats (ICED-style) ───────────────────────────
+# Source: MNRE physical progress page, PIB press releases, CEA reports
+# Update this block when CEA/MNRE publish new monthly figures.
+# Current data: March 2026 (latest official release)
+
+INDIA_ENERGY_STATS = {
+    "as_of": "March 2026",
+    "sources": ["MNRE Physical Progress", "CEA Installed Capacity Report", "PIB Press Release PRID:2250039"],
+    "total_installed_gw": 530.5,
+    "non_fossil_gw": 283.46,
+    "non_fossil_pct": 53.4,
+    "capacity_by_source": [
+        {"source": "Coal",        "gw": 219.61, "color": "#F87171", "category": "thermal"},
+        {"source": "Gas/Lignite", "gw": 26.74,  "color": "#FB923C", "category": "thermal"},
+        {"source": "Solar",       "gw": 150.26, "color": "#FBBF24", "category": "renewable"},
+        {"source": "Wind",        "gw": 56.09,  "color": "#34D399", "category": "renewable"},
+        {"source": "Large Hydro", "gw": 51.41,  "color": "#60A5FA", "category": "renewable"},
+        {"source": "Bio Energy",  "gw": 11.75,  "color": "#A78BFA", "category": "renewable"},
+        {"source": "Small Hydro", "gw": 5.17,   "color": "#93C5FD", "category": "renewable"},
+        {"source": "Nuclear",     "gw": 8.78,   "color": "#F472B6", "category": "non_fossil"},
+    ],
+    "milestones": [
+        {"label": "50% non-fossil capacity achieved", "date": "June 2025", "note": "5 years ahead of 2030 NDC target"},
+        {"label": "Highest-ever RE share in generation", "value": "51.5%", "date": "July 29 2025"},
+        {"label": "Highest-ever annual capacity addition", "value": "55.29 GW", "date": "FY 2025-26"},
+        {"label": "Solar crossed 100 GW", "date": "January 2025"},
+        {"label": "Wind crossed 50 GW", "date": "March 2025"},
+        {"label": "India rank: 3rd in global RE capacity", "note": "Surpassed Brazil (IRENA 2026)"},
+    ],
+    "targets_2030": {
+        "non_fossil_gw": 500,
+        "achieved_gw": 283.46,
+        "pct_complete": 56.7,
+    },
+    "growth_series": [
+        {"year": "2014", "solar": 2.82,   "wind": 21.04, "total_re": 35.0},
+        {"year": "2016", "solar": 6.76,   "wind": 28.70, "total_re": 46.9},
+        {"year": "2018", "solar": 22.81,  "wind": 35.29, "total_re": 70.0},
+        {"year": "2020", "solar": 37.63,  "wind": 38.43, "total_re": 88.4},
+        {"year": "2022", "solar": 61.97,  "wind": 42.63, "total_re": 121.8},
+        {"year": "2023", "solar": 73.32,  "wind": 44.74, "total_re": 143.6},
+        {"year": "2024", "solar": 94.17,  "wind": 47.96, "total_re": 203.2},
+        {"year": "2025", "solar": 132.85, "wind": 53.99, "total_re": 246.0},
+        {"year": "2026", "solar": 150.26, "wind": 56.09, "total_re": 274.7},
+    ],
+    "fetched_at": None,
+}
+
+
+@app.get("/api/india-energy-stats")
+def india_energy_stats():
+    from datetime import datetime
+    return {**INDIA_ENERGY_STATS, "fetched_at": datetime.utcnow().isoformat() + "Z"}
+
+
+
 
 # ── Serve frontend ─────────────────────────────────────────────
 try:

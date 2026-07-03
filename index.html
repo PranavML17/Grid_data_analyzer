@@ -315,15 +315,42 @@ footer a{color:var(--blue);text-decoration:none}
 </div>
 
 <div class="card">
-  <div class="sec-head"><div class="sec-title">BESCOM 220kV substation network — live</div><span class="badge bb">Source: KPTCL SLDC</span></div>
-  <div style="position:relative">
-    <img id="bescom-map" class="map-img" alt="BESCOM 220kV live substation network"/>
-    <div id="map-spinner" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--s2);border-radius:6px"><div class="spinner"></div></div>
+  <div class="sec-head">
+    <div class="sec-title">BESCOM 220kV substation network — live</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="badge bb">KPTCL SLDC · updates every 15–30 min</span>
+      <a href="https://kptclsldc.in/bescom.aspx" target="_blank" class="btn" style="text-decoration:none">Open full page ↗</a>
+    </div>
   </div>
-  <div id="map-err" class="map-err">Could not load live map from KPTCL SLDC. View at <a href="https://kptclsldc.in/bescom.aspx" target="_blank" style="color:var(--blue)">kptclsldc.in/bescom.aspx</a></div>
-  <div class="map-footer">
-    <div class="map-note">Live 220kV substation diagram — each node is a substation with current MW load. Covers Bengaluru Urban, Rural, Ramanagara, Tumkuru, Chitradurga, Davangere, Kolar, Chikkaballapur. Updated by KPTCL every ~15–30 min.</div>
-    <div class="map-meta"><span id="map-ts" style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</span><button class="btn" onclick="reloadMap()">↻ Reload</button></div>
+  <div style="background:var(--s2);border-radius:8px;overflow:hidden;border:1px solid var(--border);position:relative">
+    <iframe
+      id="bescom-iframe"
+      src="https://kptclsldc.in/bescom.aspx"
+      width="100%"
+      height="500"
+      scrolling="no"
+      frameborder="0"
+      title="BESCOM 220kV substation network live diagram from KPTCL SLDC"
+      loading="lazy"
+      style="display:block;background:#fff"
+      onload="document.getElementById('iframe-loading').style.display='none'"
+      onerror="document.getElementById('iframe-fallback').style.display='block';document.getElementById('iframe-loading').style.display='none'"
+    ></iframe>
+    <div id="iframe-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--s2);border-radius:8px;pointer-events:none">
+      <div style="text-align:center">
+        <div class="spinner" style="margin:0 auto 10px"></div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">Loading KPTCL SLDC…</div>
+      </div>
+    </div>
+  </div>
+  <div id="iframe-fallback" style="display:none;padding:16px;background:var(--s2);border-radius:6px;border:1px dashed var(--border);font-size:12px;color:var(--muted);text-align:center;margin-top:8px">
+    If the map does not load, your browser may be blocking the embed.
+    <a href="https://kptclsldc.in/bescom.aspx" target="_blank" style="color:var(--blue)">Open directly on KPTCL SLDC →</a>
+  </div>
+  <div style="margin-top:8px;font-size:10px;color:var(--muted);line-height:1.6">
+    Live 220kV substation diagram — each node is a substation with its current MW load. Covers
+    Bengaluru Urban, Bengaluru Rural, Ramanagara, Tumkuru, Chitradurga, Davangere, Kolar, Chikkaballapur.
+    The diagram is generated and updated by KPTCL SLDC every ~15–30 minutes.
   </div>
 </div>
 
@@ -380,7 +407,58 @@ footer a{color:var(--blue);text-decoration:none}
       <span id="legend-hi">High</span>
       <span style="margin-left:12px;font-size:9px">Click a state for details</span>
     </div>
-    <div style="font-size:10px;color:var(--muted);margin-top:6px;font-family:var(--mono)">Source: SERC tariff orders 2025-26 · India installed capacity: 950+ GW · Last updated: June 2026</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px;font-family:var(--mono)">Source: SERC tariff orders 2025-26 · Tariffs updated annually (next revision April 2027)</div>
+    </div>
+  </div>
+</main>
+
+<!-- India Energy Stats — ICED style -->
+<main style="padding-top:0">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+  <div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">India energy overview</div>
+    <div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px" id="energy-source-note">Source: MNRE · CEA · PIB · Loading…</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="btn" onclick="loadEnergyStats()">↻ Refresh</button>
+    <a href="https://iced.niti.gov.in" target="_blank" class="btn" style="text-decoration:none">ICED dashboard ↗</a>
+    <a href="https://iess2047.gov.in" target="_blank" class="btn" style="text-decoration:none">IESS 2047 scenarios ↗</a>
+  </div>
+</div>
+
+<!-- KPI strip -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px" id="energy-kpis"></div>
+
+<!-- Capacity donut + milestones + growth -->
+<div style="display:grid;grid-template-columns:320px 1fr;gap:14px;margin-bottom:14px">
+  <div class="card">
+    <div class="sec-head"><div class="sec-title">Installed capacity by source</div><span id="energy-as-of" class="badge bb">—</span></div>
+    <div style="position:relative;height:220px"><canvas id="energyDonut" role="img" aria-label="India installed capacity breakdown by energy source"></canvas></div>
+    <div class="legend" id="energy-legend"></div>
+  </div>
+  <div class="card">
+    <div class="sec-head"><div class="sec-title">Key milestones</div></div>
+    <div id="energy-milestones" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div style="margin-top:14px">
+      <div class="sec-title" style="margin-bottom:8px">2030 target: 500 GW non-fossil</div>
+      <div id="target-bar-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:5px">
+          <span>0 GW</span><span id="target-achieved-label">—</span><span>500 GW</span>
+        </div>
+        <div style="height:10px;background:var(--s2);border-radius:5px;overflow:hidden">
+          <div id="target-bar" style="height:100%;border-radius:5px;background:linear-gradient(to right,#34D399,#10B981);transition:width 1s ease"></div>
+        </div>
+        <div style="font-size:10px;font-family:var(--mono);color:var(--green);margin-top:4px" id="target-pct-label">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Renewable growth chart -->
+<div class="card">
+  <div class="sec-head"><div class="sec-title">Renewable energy capacity growth 2014 → 2026</div><span style="font-size:10px;font-family:var(--mono);color:var(--muted)">GW installed</span></div>
+  <div style="height:200px;position:relative"><canvas id="growthChart" role="img" aria-label="India renewable energy capacity growth from 2014 to 2026"></canvas></div>
+</div>
   </div>
 
   <div>
@@ -916,12 +994,9 @@ function initOsc(){
   if(oscAnimId)cancelAnimationFrame(oscAnimId);draw();
 }
 function reloadMap(){
-  const img=document.getElementById('bescom-map'),spin=document.getElementById('map-spinner'),err=document.getElementById('map-err'),ts=document.getElementById('map-ts');
-  spin.style.display='flex';err.style.display='none';img.style.display='block';
-  const url='/api/bescom-map?t='+Date.now(),tmp=new Image();
-  tmp.onload=()=>{img.src=url;spin.style.display='none';ts.textContent='Fetched '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});};
-  tmp.onerror=()=>{spin.style.display='none';img.style.display='none';err.style.display='block';ts.textContent='Unavailable';};
-  tmp.src=url;
+  // BESCOM map now uses iframe — reload the iframe src
+  const f = document.getElementById('bescom-iframe');
+  if (f) { f.src = f.src; document.getElementById('iframe-loading').style.display='flex'; }
 }
 async function fetchHistory(){try{const r=await fetch(HISTORY_API);if(!r.ok)return[];return await r.json();}catch{return[];}}
 async function render(data){
@@ -956,19 +1031,71 @@ async function render(data){
   document.getElementById('demand-score-sub').textContent=`Actual ${act.toLocaleString()} / Sched ${sched.toLocaleString()} MW`;
   const hist=await fetchHistory();
   if(hist.length>0){drawSparkline(hist);const up=hist.filter(h=>h.score>=80).length;document.getElementById('gauge-uptime').textContent=`Session uptime: ${(up/hist.length*100).toFixed(0)}% (${hist.length} readings)`;document.getElementById('spark-hint').textContent=`${hist.length} readings · last ${hist[hist.length-1].score}/100`;}
-  renderSrcChart(data);renderESCOM(data);renderNCEP(data);renderExplainer(data);reloadMap();
+  renderSrcChart(data);renderESCOM(data);renderNCEP(data);renderExplainer(data);
 }
 async function fetchData(){const r=await fetch(API);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
 async function refresh(){try{const data=await fetchData();await render(data);document.getElementById('err').style.display='none';}catch(e){document.getElementById('err').style.display='block';document.getElementById('err').textContent='⚠ '+e.message;}}
 (async()=>{
   initOsc();
-  const DAILY_MS = 24 * 60 * 60 * 1000;
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INDIA ENERGY STATS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let energyDonutChart=null, growthChartObj=null;
+
+async function loadEnergyStats(){
+  try{
+    const r=await fetch('/api/india-energy-stats');
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    renderEnergyStats(await r.json());
+  }catch(e){console.warn('Energy stats:',e);}
+}
+
+function renderEnergyStats(d){
+  const sn=document.getElementById('energy-source-note');
+  if(sn)sn.textContent='Source: '+(d.sources||[]).join(' · ')+' · As of '+(d.as_of||'—');
+  const ao=document.getElementById('energy-as-of');if(ao)ao.textContent=d.as_of||'—';
+
+  const kpiEl=document.getElementById('energy-kpis');
+  if(kpiEl)kpiEl.innerHTML=[
+    {label:'Total capacity',val:d.total_installed_gw+'GW',col:'var(--blue)'},
+    {label:'Non-fossil capacity',val:d.non_fossil_gw+'GW',col:'var(--green)'},
+    {label:'Non-fossil share',val:d.non_fossil_pct+'%',col:'var(--green)'},
+    {label:'2030 target progress',val:d.targets_2030.pct_complete.toFixed(1)+'%',col:'var(--amber)'},
+  ].map(k=>'<div class="card" style="text-align:center;padding:12px 10px"><div style="font-family:var(--mono);font-size:22px;font-weight:700;color:'+k.col+'">'+k.val+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">'+k.label+'</div></div>').join('');
+
+  const src=d.capacity_by_source||[];
+  const ctx=document.getElementById('energyDonut');
+  if(ctx){
+    if(energyDonutChart)energyDonutChart.destroy();
+    energyDonutChart=new Chart(ctx.getContext('2d'),{type:'doughnut',data:{labels:src.map(s=>s.source),datasets:[{data:src.map(s=>s.gw),backgroundColor:src.map(s=>s.color),borderColor:'#08111F',borderWidth:3,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw} GW`}}}}});
+    const leg=document.getElementById('energy-legend');
+    if(leg)leg.innerHTML=src.map(s=>'<div class="legend-item"><div class="legend-sq" style="background:'+s.color+'"></div>'+s.source+' <b style="color:var(--text)">'+s.gw+'</b></div>').join('');
+  }
+
+  const mEl=document.getElementById('energy-milestones');
+  if(mEl)mEl.innerHTML=(d.milestones||[]).map(m=>'<div style="display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:0.5px solid var(--border)"><div style="font-size:16px;flex-shrink:0">★</div><div><div style="font-size:12px;font-weight:600;color:var(--text)">'+(m.value?m.value+' — ':'')+m.label+'</div><div style="font-size:10px;color:var(--muted);font-family:var(--mono)">'+(m.date||'')+(m.note?' · '+m.note:'')+'</div></div></div>').join('');
+
+  const t=d.targets_2030||{};
+  const tb=document.getElementById('target-bar');if(tb)tb.style.width=Math.min(100,t.pct_complete||0)+'%';
+  const tl=document.getElementById('target-achieved-label');if(tl)tl.textContent=(t.achieved_gw||0)+' GW achieved';
+  const tp=document.getElementById('target-pct-label');if(tp)tp.textContent=(t.pct_complete||0).toFixed(1)+'% of 500 GW target — NDC milestone achieved June 2025 (5 yrs early)';
+
+  const gs=d.growth_series||[];const gc=document.getElementById('growthChart');
+  if(gc&&gs.length){
+    if(growthChartObj)growthChartObj.destroy();
+    growthChartObj=new Chart(gc.getContext('2d'),{type:'bar',data:{labels:gs.map(g=>g.year),datasets:[{label:'Solar GW',data:gs.map(g=>g.solar),backgroundColor:'#FBBF24',stack:'re'},{label:'Wind GW',data:gs.map(g=>g.wind),backgroundColor:'#34D399',stack:'re'},{label:'Other RE',data:gs.map(g=>parseFloat(((g.total_re-g.solar-g.wind)||0).toFixed(2))),backgroundColor:'#60A5FA',stack:'re'}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'rgba(30,51,82,0.5)'},ticks:{color:'#5A7FA8'}},y:{grid:{color:'rgba(30,51,82,0.5)'},ticks:{color:'#5A7FA8'},title:{display:true,text:'GW',color:'#5A7FA8'}}},plugins:{legend:{labels:{color:'#5A7FA8',boxWidth:12}}}}});
+  }
+}
+
+const DAILY_MS = 24 * 60 * 60 * 1000;
 
   // Kick off ALL three data sources in parallel so India tab
   // has stateData ready before the GeoJSON even loads
   const t1 = fetchData().catch(e => { throw e; });
   loadIndiaData();    // sets stateData immediately, doesn't block Tab 1
   loadPolicyData();   // same
+  loadEnergyStats();  // ICED-style India energy stats
+  loadEnergyStats();  // ICED-style India energy stats
 
   // Resolve Tab 1
   try {
@@ -981,8 +1108,10 @@ async function refresh(){try{const data=await fetchData();await render(data);doc
     document.getElementById('err').textContent='⚠ Backend not reachable — is the Python server running? '+e.message;
   }
   setInterval(refresh,       REFRESH_MS);
-  setInterval(loadIndiaData,  DAILY_MS);
-  setInterval(loadPolicyData, DAILY_MS);
+  setInterval(loadIndiaData,   DAILY_MS);
+  setInterval(loadPolicyData,  DAILY_MS);
+  setInterval(loadEnergyStats, DAILY_MS);
+  setInterval(loadEnergyStats, DAILY_MS);
 })();
 </script>
 </body>
