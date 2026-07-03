@@ -7,104 +7,115 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg:       #08111F;
-  --s1:       #0E1D30;
-  --s2:       #132338;
-  --border:   #1E3352;
-  --text:     #E2EDF8;
-  --muted:    #5A7FA8;
-  --dim:      #2A4A6B;
-  --green:    #10B981;
-  --amber:    #F59E0B;
-  --red:      #EF4444;
-  --blue:     #3B82F6;
-  --solar:    #FBBF24;
-  --wind:     #34D399;
-  --mono:     'IBM Plex Mono','Courier New',monospace;
-  --sans:     'Inter',system-ui,sans-serif;
+  --bg:#08111F; --s1:#0E1D30; --s2:#132338; --border:#1E3352;
+  --text:#E2EDF8; --muted:#5A7FA8; --dim:#1A3050;
+  --green:#10B981; --amber:#F59E0B; --red:#EF4444; --blue:#3B82F6;
+  --mono:'IBM Plex Mono','Courier New',monospace;
+  --sans:'Inter',system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh}
 
-/* Header */
 header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--border);background:var(--s1);position:sticky;top:0;z-index:50}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-hex{width:28px;height:28px;background:var(--amber);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);flex-shrink:0}
 .logo h1{font-size:14px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
 .logo .sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:1px}
-.live{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.live{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--muted)}
 .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.refresh-btn{background:none;border:1px solid var(--border);color:var(--blue);font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;font-family:var(--mono)}
-.refresh-btn:hover{background:rgba(59,130,246,.1)}
+.btn{background:none;border:1px solid var(--border);color:var(--blue);font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;font-family:var(--mono)}
+.btn:hover{background:rgba(59,130,246,.1)}
 
 main{max-width:1280px;margin:0 auto;padding:20px 20px 40px;display:grid;gap:14px}
 
-/* Cards */
 .card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
 .label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .bignum{font-family:var(--mono);font-size:36px;font-weight:700;line-height:1;letter-spacing:-1px}
 .unit{font-size:13px;color:var(--muted);font-family:var(--mono);margin-left:3px}
 .sub{margin-top:8px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:var(--mono)}
-.badge-green{background:rgba(16,185,129,.12);color:var(--green)}
-.badge-amber{background:rgba(245,158,11,.12);color:var(--amber)}
-.badge-red{background:rgba(239,68,68,.12);color:var(--red)}
-.badge-blue{background:rgba(59,130,246,.12);color:var(--blue)}
+.g{background:rgba(16,185,129,.12);color:var(--green)}
+.a{background:rgba(245,158,11,.12);color:var(--amber)}
+.r{background:rgba(239,68,68,.12);color:var(--red)}
+.b{background:rgba(59,130,246,.12);color:var(--blue)}
 
-/* Hero 4-col */
-.hero-row{display:grid;grid-template-columns:260px 1fr 1fr 1fr;gap:12px}
+/* ── HEALTH HERO ─────────────────────────────── */
+.health-hero{display:grid;grid-template-columns:280px 1fr;gap:14px}
 
-/* Freq card */
-.freq-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
-.freq-val{font-family:var(--mono);font-size:50px;font-weight:700;line-height:1;letter-spacing:-2px;transition:color .5s}
-.freq-status{margin-top:10px;font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.05em}
-.freq-scale{margin-top:8px}
-.freq-scale-labels{display:flex;justify-content:space-between;font-size:9px;font-family:var(--mono);color:var(--muted);margin-bottom:4px}
-.freq-track{height:5px;background:var(--s2);border-radius:3px;overflow:hidden}
-.freq-fill{height:100%;border-radius:3px;transition:width .8s ease,background .5s}
+.gauge-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.gauge-wrap{position:relative;width:160px;height:160px;margin:0 auto 14px}
+#gaugeCanvas{display:block}
+.gauge-score{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-num{font-family:var(--mono);font-size:44px;font-weight:700;line-height:1}
+.gauge-label{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.gauge-status{font-size:13px;font-weight:700;font-family:var(--mono);letter-spacing:.05em}
+.gauge-uptime{margin-top:6px;font-size:11px;color:var(--muted);font-family:var(--mono)}
 
-/* Oscilloscope */
-.osc-card{padding:0;overflow:hidden;height:66px;border-radius:10px}
+.health-right{display:flex;flex-direction:column;gap:10px}
+.health-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.metric-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.metric-val{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1}
+.metric-bar{height:4px;background:var(--dim);border-radius:2px;margin-top:8px;overflow:hidden}
+.metric-fill{height:100%;border-radius:2px;transition:width .8s}
+.metric-sub{font-size:10px;color:var(--muted);margin-top:5px;font-family:var(--mono)}
+
+.sparkline-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.spark-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.spark-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.spark-hint{font-size:10px;font-family:var(--mono);color:var(--muted)}
+#sparkCanvas{width:100%;height:52px;display:block}
+
+/* ── FREQ + STATS ROW ────────────────────────── */
+.stats-row{display:grid;grid-template-columns:240px 1fr 1fr 1fr;gap:12px}
+.freq-val{font-family:var(--mono);font-size:46px;font-weight:700;line-height:1;letter-spacing:-2px;transition:color .5s}
+.freq-track{height:5px;background:var(--s2);border-radius:3px;overflow:hidden;margin-top:8px}
+.freq-fill{height:100%;border-radius:3px;transition:width .8s,background .5s}
+.freq-labels{display:flex;justify-content:space-between;font-size:9px;font-family:var(--mono);color:var(--muted);margin-top:3px}
+.freq-status{margin-top:8px;font-size:11px;font-family:var(--mono);font-weight:700}
+
+/* ── OSC ─────────────────────────────────────── */
+.osc-card{padding:0;overflow:hidden;height:62px;border-radius:10px}
 #oscCanvas{width:100%;height:100%;display:block}
 
-/* Explainer + Tariff row */
+/* ── EXPLAINER + TARIFF ──────────────────────── */
 .info-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-/* Explainer */
-.explainer-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.explainer-body{font-size:12px;color:var(--muted);line-height:1.7}
-.sch-bar-demo{display:flex;flex-direction:column;gap:6px;margin-top:12px}
-.demo-row{display:grid;grid-template-columns:80px 1fr 60px;align-items:center;gap:8px}
-.demo-label{font-size:10px;font-family:var(--mono);color:var(--muted);letter-spacing:.04em}
-.demo-track{height:8px;background:var(--s2);border-radius:3px;position:relative;overflow:hidden}
-.demo-sched{position:absolute;top:0;left:0;height:100%;background:var(--dim);border-radius:3px}
+.expl-body{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px}
+.demo-rows{display:flex;flex-direction:column;gap:7px}
+.demo-row{display:grid;grid-template-columns:76px 1fr 68px;align-items:center;gap:8px}
+.demo-name{font-size:10px;font-family:var(--mono);color:var(--muted)}
+.demo-track{height:9px;background:var(--dim);border-radius:3px;position:relative;overflow:hidden}
+.demo-sched{position:absolute;top:0;left:0;height:100%;background:#1A3050;border-radius:3px}
 .demo-actual{position:absolute;top:0;left:0;height:100%;border-radius:3px}
-.demo-val{font-family:var(--mono);font-size:10px;text-align:right}
-.ui-note{margin-top:10px;font-size:11px;padding:8px 10px;background:rgba(245,158,11,.08);border-left:2px solid var(--amber);border-radius:0 4px 4px 0;color:var(--muted)}
-.ui-note strong{color:var(--amber)}
+.demo-val{font-family:var(--mono);font-size:10px;text-align:right;font-weight:600}
+.ui-box{margin-top:10px;padding:8px 10px;background:rgba(245,158,11,.08);border-left:2px solid var(--amber);border-radius:0 4px 4px 0;font-size:11px;color:var(--muted);line-height:1.6}
 
-/* Tariff */
-.tariff-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
-.tariff-item{background:var(--s2);border-radius:8px;padding:10px 12px}
+.tariff-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tariff-tile{background:var(--s2);border-radius:8px;padding:10px 12px}
 .tariff-cat{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-.tariff-rate{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text)}
-.tariff-unit{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.tariff-rate{font-family:var(--mono);font-size:20px;font-weight:700}
 .tariff-note{font-size:10px;color:var(--muted);margin-top:2px}
-.tariff-footer{margin-top:10px;font-size:10px;color:var(--muted);line-height:1.6;padding:8px 10px;background:var(--s2);border-radius:6px}
+.tariff-footer{margin-top:8px;font-size:10px;color:var(--muted);line-height:1.6;padding:8px 10px;background:var(--s2);border-radius:6px}
 .tariff-footer a{color:var(--blue);text-decoration:none}
 
-/* BESCOM map */
-.map-card img{width:100%;border-radius:6px;display:block;background:var(--s2)}
-.map-card .map-note{margin-top:8px;font-size:10px;color:var(--muted);line-height:1.6}
+/* ── MAP ─────────────────────────────────────── */
+.map-img{width:100%;border-radius:6px;display:block;min-height:100px;background:var(--s2)}
+.map-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.map-note{font-size:10px;color:var(--muted);line-height:1.6;flex:1}
+.map-meta{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:16px}
+#map-ts{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.map-err{display:none;padding:16px;background:var(--s2);border-radius:6px;font-size:12px;color:var(--muted);text-align:center;border:1px dashed var(--border)}
 
-/* Mid row */
+/* ── MID ROW ─────────────────────────────────── */
 .mid-row{display:grid;grid-template-columns:300px 1fr;gap:12px}
+.chart-wrap{position:relative;height:190px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:var(--mono)}
+.legend-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 
-/* Donut */
-.chart-wrap{position:relative;height:200px}
-
-/* ESCOM bars */
+/* ── ESCOM ───────────────────────────────────── */
 .escom-rows{display:flex;flex-direction:column;gap:11px}
 .escom-row{display:grid;grid-template-columns:68px 1fr 72px;align-items:center;gap:8px}
 .escom-name{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em}
@@ -112,14 +123,14 @@ main{max-width:1280px;margin:0 auto;padding:20px 20px 40px;display:grid;gap:14px
 .bar-track{height:10px;background:var(--s2);border-radius:3px;position:relative;overflow:hidden}
 .bar-sched{position:absolute;top:0;left:0;height:100%;background:var(--dim);border-radius:3px}
 .bar-actual{position:absolute;top:0;left:0;height:100%;border-radius:3px;opacity:.85}
-.escom-meta{text-align:right;font-family:var(--mono);font-size:10px}
+.escom-meta{text-align:right;font-family:var(--mono)}
 .escom-mw{font-size:13px;font-weight:700}
 .escom-ui{font-size:9px}
 
-/* NCEP */
+/* ── NCEP ────────────────────────────────────── */
 .ncep-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.ncep-tile{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 10px;text-align:center}
-.ncep-escom{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;text-transform:uppercase}
+.ncep-tile{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:11px 10px;text-align:center}
+.ncep-escom{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:9px;text-transform:uppercase}
 .ncep-escom.hi{color:var(--amber)}
 .ncep-sources{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
 .ncep-src{display:flex;justify-content:space-between;align-items:center;font-size:10px}
@@ -127,22 +138,15 @@ main{max-width:1280px;margin:0 auto;padding:20px 20px 40px;display:grid;gap:14px
 .ncep-total{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--green);border-top:1px solid var(--border);padding-top:7px}
 .ncep-tlabel{font-size:9px;color:var(--muted);margin-top:1px}
 
-/* Legend */
-.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:var(--mono)}
-.legend-sq{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+/* ── LOADING / ERROR ─────────────────────────── */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99;gap:14px}
+.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading p{font-family:var(--mono);font-size:11px;color:var(--muted)}
+#err{display:none;background:rgba(239,68,68,.08);border:1px solid var(--red);border-radius:8px;padding:12px 16px;color:var(--red);font-size:12px;margin-bottom:4px}
 
-/* Section headers */
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .sec-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.sec-ts{font-family:var(--mono);font-size:10px;color:var(--muted)}
-
-/* Loading */
-#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99;gap:14px}
-.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loading p{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.05em}
-#err{display:none;background:rgba(239,68,68,.1);border:1px solid var(--red);border-radius:8px;padding:12px 16px;color:var(--red);font-size:13px;margin-bottom:8px}
 
 footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);font-family:var(--mono);border-top:1px solid var(--border)}
 footer a{color:var(--blue);text-decoration:none}
@@ -150,7 +154,7 @@ footer a{color:var(--blue);text-decoration:none}
 </head>
 <body>
 
-<div id="loading"><div class="spinner"></div><p>Fetching live KPTCL SLDC data …</p></div>
+<div id="loading"><div class="spinner"></div><p>Fetching live KPTCL SLDC data…</p></div>
 <div id="err"></div>
 
 <header>
@@ -158,28 +162,69 @@ footer a{color:var(--blue);text-decoration:none}
     <div class="logo-hex"></div>
     <div>
       <h1>Bengaluru Grid Monitor</h1>
-      <div class="sub">BESCOM · KPTCL SLDC · kptclsldc.in</div>
+      <div class="sub">BESCOM · KPTCL SLDC · Live</div>
     </div>
   </div>
-  <div class="live">
-    <div class="live-dot"></div>
-    <span id="ts-label">Connecting…</span>
-    <button class="refresh-btn" onclick="refresh()">↻ Refresh</button>
+  <div class="hdr-right">
+    <div class="live"><div class="live-dot"></div><span id="ts-label">Connecting…</span></div>
+    <button class="btn" onclick="refresh()">↻ Refresh</button>
   </div>
 </header>
 
 <main>
 
-<!-- Hero row -->
-<div class="hero-row">
+<!-- ── HEALTH HERO ─────────────────────────── -->
+<div class="health-hero">
 
-  <div class="freq-card">
-    <div class="label">Karnataka grid frequency</div>
-    <div><span class="freq-val" id="freq-val">--.-</span><span class="unit">Hz</span></div>
-    <div class="freq-scale">
-      <div class="freq-scale-labels"><span>49.5</span><span>49.8</span><span>50.0</span><span>50.2</span></div>
-      <div class="freq-track"><div class="freq-fill" id="freq-fill"></div></div>
+  <div class="gauge-card">
+    <div class="label">Bengaluru grid health</div>
+    <div class="gauge-wrap">
+      <canvas id="gaugeCanvas" width="160" height="160"></canvas>
+      <div class="gauge-score">
+        <div class="gauge-num" id="gauge-num" style="color:var(--green)">—</div>
+        <div class="gauge-label">/100</div>
+      </div>
     </div>
+    <div class="gauge-status" id="gauge-status">—</div>
+    <div class="gauge-uptime" id="gauge-uptime">Session uptime: —</div>
+  </div>
+
+  <div class="health-right">
+
+    <div class="health-metrics">
+      <div class="metric-card">
+        <div class="metric-label">Frequency health</div>
+        <div class="metric-val" id="freq-score">—</div>
+        <div class="metric-bar"><div class="metric-fill" id="freq-score-bar"></div></div>
+        <div class="metric-sub" id="freq-score-sub">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Demand fulfillment</div>
+        <div class="metric-val" id="demand-score">—</div>
+        <div class="metric-bar"><div class="metric-fill" id="demand-score-bar"></div></div>
+        <div class="metric-sub" id="demand-score-sub">—</div>
+      </div>
+    </div>
+
+    <div class="sparkline-card">
+      <div class="spark-head">
+        <div class="spark-title">Health history — this session</div>
+        <div class="spark-hint" id="spark-hint">Waiting for readings…</div>
+      </div>
+      <canvas id="sparkCanvas"></canvas>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── FREQ + STATS ROW ───────────────────── -->
+<div class="stats-row">
+
+  <div class="card">
+    <div class="label">Grid frequency</div>
+    <div><span class="freq-val" id="freq-val">--.-</span><span class="unit">Hz</span></div>
+    <div class="freq-track"><div class="freq-fill" id="freq-fill"></div></div>
+    <div class="freq-labels"><span>49.5</span><span>49.8</span><span>50.0</span><span>50.2</span></div>
     <div class="freq-status" id="freq-status">—</div>
   </div>
 
@@ -196,63 +241,59 @@ footer a{color:var(--blue);text-decoration:none}
   </div>
 
   <div class="card">
-    <div class="label">Karnataka total generation</div>
+    <div class="label">Karnataka total</div>
     <div><span class="bignum" id="total-gen">----</span><span class="unit">MW</span></div>
     <div class="sub" id="gen-sub">—</div>
   </div>
 
 </div>
 
-<!-- Oscilloscope -->
-<div class="card osc-card"><canvas id="oscCanvas" role="img" aria-label="Live frequency oscilloscope"></canvas></div>
+<!-- ── OSCILLOSCOPE ──────────────────────── -->
+<div class="card osc-card"><canvas id="oscCanvas" aria-label="Live frequency oscilloscope"></canvas></div>
 
-<!-- Explainer + Tariff -->
+<!-- ── EXPLAINER + TARIFF ────────────────── -->
 <div class="info-row">
 
-  <!-- Schedule vs Actual explainer -->
   <div class="card">
-    <div class="explainer-title">
-      <span style="font-size:16px">📋</span> What is schedule vs actual load?
+    <div class="sec-head"><div class="sec-title">What is schedule vs actual load?</div></div>
+    <div class="expl-body">
+      Every day, BESCOM submits a <strong style="color:var(--text)">schedule</strong> — a 15-minute block-by-block plan of how much power it will draw from the state grid. The <strong style="color:var(--text)">actual</strong> is what Bengaluru's consumers really used in real time.
+      The gap between them is called <strong style="color:var(--amber)">Unscheduled Interchange (UI)</strong>. A positive UI means BESCOM drew more than planned — this attracts a financial penalty. A negative UI means demand was lower than expected.
     </div>
-    <div class="explainer-body">
-      Every day, BESCOM submits a <strong style="color:var(--text)">schedule</strong> — a 15-minute block-by-block plan of how much power it will draw from the grid. The <strong style="color:var(--text)">actual</strong> is what BESCOM's consumers really consumed in real time.
-    </div>
-    <div class="sch-bar-demo" id="demo-bars"></div>
-    <div class="ui-note" id="ui-note">—</div>
+    <div class="demo-rows" id="demo-rows"></div>
+    <div class="ui-box" id="ui-box">—</div>
   </div>
 
-  <!-- Tariff -->
   <div class="card">
     <div class="sec-head">
       <div class="sec-title">Current BESCOM tariff</div>
-      <span class="badge badge-blue">Effective May 2026</span>
+      <span class="badge b">Effective May 2026</span>
     </div>
     <div class="tariff-grid">
-      <div class="tariff-item">
+      <div class="tariff-tile">
         <div class="tariff-cat">Domestic (LT-1)</div>
-        <div><span class="tariff-rate">₹6.82</span><span class="tariff-unit">/unit</span></div>
-        <div class="tariff-note">Base ₹5.80 + ₹0.36 P&amp;G + ₹0.56 FY25 true-up</div>
+        <div><span class="tariff-rate">₹6.82</span><span class="unit" style="font-size:11px">/unit</span></div>
+        <div class="tariff-note">Base ₹5.80 + ₹0.36 P&amp;G + ₹0.56 true-up</div>
       </div>
-      <div class="tariff-item">
+      <div class="tariff-tile">
         <div class="tariff-cat">Commercial (LT-3)</div>
-        <div><span class="tariff-rate">₹8.92</span><span class="tariff-unit">/unit</span></div>
+        <div><span class="tariff-rate">₹8.92</span><span class="unit" style="font-size:11px">/unit</span></div>
         <div class="tariff-note">Shops, offices, restaurants</div>
       </div>
-      <div class="tariff-item">
+      <div class="tariff-tile">
         <div class="tariff-cat">Educational (LT-2)</div>
-        <div><span class="tariff-rate">₹8.17</span><span class="tariff-unit">/unit</span></div>
+        <div><span class="tariff-rate">₹8.17</span><span class="unit" style="font-size:11px">/unit</span></div>
         <div class="tariff-note">Schools, colleges, hospitals</div>
       </div>
-      <div class="tariff-item">
+      <div class="tariff-tile">
         <div class="tariff-cat">EV Charging (LT-6)</div>
-        <div><span class="tariff-rate">₹6.00</span><span class="tariff-unit">/unit</span></div>
+        <div><span class="tariff-rate">₹6.00</span><span class="unit" style="font-size:11px">/unit</span></div>
         <div class="tariff-note">Public EV charging stations</div>
       </div>
     </div>
     <div class="tariff-footer">
-      + 6% electricity duty on total bill &nbsp;·&nbsp;
-      Fixed charge ₹120/kW/month (domestic) &nbsp;·&nbsp;
-      Rural areas get ₹0.30/unit rebate &nbsp;·&nbsp;
+      + 6% electricity duty on total bill &nbsp;·&nbsp; Fixed charge ₹120/kW/month (domestic) &nbsp;·&nbsp;
+      Rural rebate ₹0.30/unit &nbsp;·&nbsp;
       <strong style="color:var(--green)">Gruha Jyothi:</strong> first 200 units free for eligible BPL households &nbsp;·&nbsp;
       Source: <a href="https://kerc.karnataka.gov.in" target="_blank">KERC tariff order 2025</a>
     </div>
@@ -260,28 +301,39 @@ footer a{color:var(--blue);text-decoration:none}
 
 </div>
 
-<!-- BESCOM 220kV network map -->
-<div class="card map-card">
+<!-- ── BESCOM 220kV MAP ───────────────────── -->
+<div class="card">
   <div class="sec-head">
     <div class="sec-title">BESCOM 220kV substation network — live</div>
-    <span class="badge badge-blue">Source: KPTCL SLDC</span>
+    <span class="badge b">Source: kptclsldc.in</span>
   </div>
-  <img id="bescom-map" src="/api/bescom-map" alt="BESCOM 220kV substation network — live diagram from KPTCL SLDC showing current substation loading across Bengaluru and surrounding districts" loading="lazy"/>
-  <div class="map-note">
-    This is a <strong style="color:var(--text)">live diagram</strong> published by KPTCL SLDC showing the current state of BESCOM's 220kV transmission network across Bengaluru Urban, Bengaluru Rural, Ramanagara, Tumkuru, Chitradurga, Davangere, Kolar and Chikkaballapur districts.
-    Each node is a 220kV substation — the numbers show real-time MW load at that point. This is the highest-resolution publicly available view of how the Bengaluru grid is behaving zone-by-zone. Updated every ~15–30 min by KPTCL.
+  <div style="position:relative">
+    <img id="bescom-map" class="map-img" alt="BESCOM 220kV live substation network"/>
+    <div id="map-spinner" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--s2);border-radius:6px"><div class="spinner"></div></div>
+  </div>
+  <div id="map-err" class="map-err">
+    Could not load live map from KPTCL SLDC. The site may be temporarily unavailable.
+    <br>View directly at <a href="https://kptclsldc.in/bescom.aspx" target="_blank" style="color:var(--blue)">kptclsldc.in/bescom.aspx</a>
+  </div>
+  <div class="map-footer">
+    <div class="map-note">
+      Live 220kV substation diagram from KPTCL SLDC showing real-time MW load at each node.
+      Covers Bengaluru Urban, Bengaluru Rural, Ramanagara, Tumkuru, Chitradurga, Davangere, Kolar, Chikkaballapur. Updated by KPTCL every ~15–30 min.
+    </div>
+    <div class="map-meta">
+      <span id="map-ts" style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</span>
+      <button class="btn" onclick="reloadMap()">↻ Reload</button>
+    </div>
   </div>
 </div>
 
-<!-- Source mix + ESCOM demand -->
+<!-- ── SOURCE MIX + ESCOM ────────────────── -->
 <div class="mid-row">
-
   <div class="card">
     <div class="sec-title" style="margin-bottom:12px">Karnataka power source mix</div>
-    <div class="chart-wrap"><canvas id="srcChart" role="img" aria-label="Power source breakdown donut chart"></canvas></div>
+    <div class="chart-wrap"><canvas id="srcChart"></canvas></div>
     <div class="legend" id="src-legend"></div>
   </div>
-
   <div class="card">
     <div class="sec-head">
       <div class="sec-title">ESCOM demand — schedule vs actual</div>
@@ -292,12 +344,11 @@ footer a{color:var(--blue);text-decoration:none}
     </div>
     <div class="escom-rows" id="escom-rows"></div>
   </div>
-
 </div>
 
-<!-- NCEP renewables -->
+<!-- ── NCEP ──────────────────────────────── -->
 <div class="card">
-  <div class="sec-title" style="margin-bottom:12px">Renewable energy per ESCOM</div>
+  <div class="sec-title" style="margin-bottom:12px">Renewable sources per ESCOM</div>
   <div class="ncep-row" id="ncep-grid"></div>
 </div>
 
@@ -305,299 +356,349 @@ footer a{color:var(--blue);text-decoration:none}
 
 <footer>
   Data: <a href="https://kptclsldc.in" target="_blank">kptclsldc.in</a> (KPTCL SLDC public dashboard) ·
-  Tariff: <a href="https://kerc.karnataka.gov.in" target="_blank">KERC tariff order 2025</a> ·
-  Auto-refreshes every 5 min · Built for Bengaluru
+  Tariff: <a href="https://kerc.karnataka.gov.in" target="_blank">KERC 2025</a> ·
+  Auto-refreshes every 5 min
 </footer>
 
 <script>
-const API = '/api/grid-data';
-const REFRESH_MS = 5 * 60 * 1000;
+const API          = '/api/grid-data';
+const HISTORY_API  = '/api/health-history';
+const REFRESH_MS   = 5 * 60 * 1000;
 
-const SRC_COLORS = {
-  thermal:'#F87171', ipp_thermal:'#FB923C',
-  hydro_major:'#60A5FA', hydro_other:'#93C5FD',
-  ncep:'#34D399', cgs:'#A78BFA'
-};
-const SRC_LABELS = {
-  thermal:'State Thermal', ipp_thermal:'IPP Thermal',
-  hydro_major:'Major Hydro', hydro_other:'Other Hydro',
-  ncep:'Renewables (NCEP)', cgs:'Central (CGS)'
-};
-const ESCOM_COLORS = {
-  BESCOM:'#F59E0B', MESCOM:'#3B82F6', CESC:'#10B981',
-  GESCOM:'#A78BFA', HESCOM:'#F472B6'
-};
-const NCEP_COLORS = {
-  solar:'#FBBF24', wind:'#34D399', bio:'#FB923C',
-  mh:'#60A5FA', cogen:'#C084FC'
-};
+const SRC_COLORS  = { thermal:'#F87171',ipp_thermal:'#FB923C',hydro_major:'#60A5FA',hydro_other:'#93C5FD',ncep:'#34D399',cgs:'#A78BFA' };
+const SRC_LABELS  = { thermal:'State Thermal',ipp_thermal:'IPP Thermal',hydro_major:'Major Hydro',hydro_other:'Other Hydro',ncep:'Renewables',cgs:'Central (CGS)' };
+const ESCOM_COL   = { BESCOM:'#F59E0B',MESCOM:'#3B82F6',CESC:'#10B981',GESCOM:'#A78BFA',HESCOM:'#F472B6' };
+const NCEP_COL    = { solar:'#FBBF24',wind:'#34D399',bio:'#FB923C',mh:'#60A5FA',cogen:'#C084FC' };
 
-let srcChart = null;
-let oscAnimId = null;
-let oscPhase = 0;
-let liveHz = 50.0;
+let srcChart=null, oscAnimId=null, oscPhase=0, liveHz=50.0;
 
-// ── Frequency helpers ─────────────────────────────────────────
-function fColor(hz) {
-  if (hz >= 49.9 && hz <= 50.1) return '#10B981';
-  if (hz >= 49.7 || hz <= 50.3) return '#F59E0B';
-  return '#EF4444';
-}
-function fPct(hz) { return Math.max(0, Math.min(100, (hz - 49.5) / 1.0 * 100)); }
-function fStatus(hz) {
-  if (hz >= 49.9 && hz <= 50.1) return '● Healthy — 50 Hz nominal';
-  if (hz >= 49.7 && hz < 49.9)  return '▲ Slightly under-frequency';
-  if (hz > 50.1 && hz <= 50.3)  return '▲ Slightly over-frequency';
-  if (hz < 49.7)                 return '⚠ Under-frequency — grid stressed';
-  return '⚠ Over-frequency';
+// ── Score helpers ──────────────────────────────────────────────
+function scoreColor(s){ return s>=80?'#10B981':s>=50?'#F59E0B':'#EF4444' }
+function fColor(hz){ return hz>=49.9&&hz<=50.1?'#10B981':(hz>=49.7||hz<=50.3?'#F59E0B':'#EF4444') }
+function fPct(hz){ return Math.max(0,Math.min(100,(hz-49.5)/1.0*100)) }
+function fStatus(hz){
+  if(hz>=49.9&&hz<=50.1) return '● Healthy — 50 Hz nominal';
+  if(hz>=49.7&&hz<49.9)  return '▲ Slightly under-frequency';
+  if(hz>50.1&&hz<=50.3)  return '▲ Slightly over-frequency';
+  return hz<49.7?'⚠ Under-frequency — grid stressed':'⚠ Over-frequency';
 }
 
-// ── Oscilloscope ──────────────────────────────────────────────
-function initOsc() {
-  const canvas = document.getElementById('oscCanvas');
-  function draw() {
-    const W = canvas.offsetWidth, H = canvas.offsetHeight;
-    canvas.width = W; canvas.height = H;
-    if (!W || !H) { oscAnimId = requestAnimationFrame(draw); return; }
-    const ctx = canvas.getContext('2d');
-    const isDark = true; // always dark
-    ctx.fillStyle = '#0E1D30';
-    ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = 'rgba(30,51,82,0.7)';
-    ctx.lineWidth = .5;
-    for (let x = 0; x < W; x += W/10) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-    }
-    ctx.strokeStyle = 'rgba(90,127,168,0.3)';
-    ctx.setLineDash([3,5]); ctx.lineWidth = .8;
-    ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
-    ctx.setLineDash([]);
-    const wc = fColor(liveHz);
-    ctx.strokeStyle = wc; ctx.lineWidth = 1.8;
-    const amp = H * .28;
-    ctx.beginPath();
-    for (let px = 0; px <= W; px++) {
-      const t = px / W;
-      const y = H/2 - Math.sin(t * Math.PI * 7 + oscPhase) * amp
-                     - Math.sin(t * Math.PI * 2.2 + oscPhase * .45) * amp * .09;
-      px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
-    }
-    ctx.stroke();
-    ctx.fillStyle = wc;
-    ctx.font = '600 10px monospace';
-    ctx.fillText(liveHz.toFixed(2) + ' Hz', 10, 14);
-    ctx.fillStyle = 'rgba(90,127,168,0.6)';
-    ctx.fillText('50.00 Hz (nominal)', W - 130, H/2 - 5);
-    oscPhase -= .055;
-    oscAnimId = requestAnimationFrame(draw);
-  }
-  if (oscAnimId) cancelAnimationFrame(oscAnimId);
-  draw();
+// ── Gauge ──────────────────────────────────────────────────────
+function drawGauge(score){
+  const c=document.getElementById('gaugeCanvas');
+  const ctx=c.getContext('2d');
+  const cx=80,cy=80,R=68,lw=12;
+  ctx.clearRect(0,0,160,160);
+
+  // Track
+  ctx.beginPath();ctx.arc(cx,cy,R,Math.PI*0.75,Math.PI*2.25);
+  ctx.strokeStyle='#132338';ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
+
+  // Fill
+  const pct=Math.max(0,Math.min(100,score))/100;
+  const startA=Math.PI*0.75, totalA=Math.PI*1.5;
+  ctx.beginPath();ctx.arc(cx,cy,R,startA,startA+totalA*pct);
+  ctx.strokeStyle=scoreColor(score);ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
+
+  // Score number
+  const num=document.getElementById('gauge-num');
+  num.textContent=score;
+  num.style.color=scoreColor(score);
 }
 
-// ── Source donut ──────────────────────────────────────────────
-function renderSrcChart(data) {
-  const gen = data.generation;
-  const sb = gen.source_breakdown;
-  const segs = [
-    { key:'thermal',     val: sb.thermal     || 0 },
-    { key:'ipp_thermal', val: sb.ipp_thermal || 0 },
-    { key:'hydro_major', val: sb.hydro_major || 0 },
-    { key:'hydro_other', val: sb.hydro_other || 0 },
-    { key:'ncep',        val: gen.ncep_mw    || 0 },
-    { key:'cgs',         val: gen.cgs_mw     || 0 },
-  ].filter(s => s.val > 0);
-  const ctx = document.getElementById('srcChart').getContext('2d');
-  if (srcChart) srcChart.destroy();
-  srcChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: segs.map(s => SRC_LABELS[s.key]),
-      datasets: [{
-        data: segs.map(s => s.val),
-        backgroundColor: segs.map(s => SRC_COLORS[s.key]),
-        borderColor: '#08111F', borderWidth: 3, hoverOffset: 6
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '68%',
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => ` ${c.label}: ${c.raw.toLocaleString()} MW` } }
-      }
-    }
+// ── Sparkline ──────────────────────────────────────────────────
+function drawSparkline(history){
+  const c=document.getElementById('sparkCanvas');
+  const W=c.offsetWidth,H=52;
+  c.width=W;c.height=H;
+  if(!W||history.length<2)return;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  // Grid line at 80 (healthy threshold)
+  const y80=H-(80/100)*H;
+  ctx.strokeStyle='rgba(16,185,129,0.2)';ctx.lineWidth=0.8;ctx.setLineDash([3,5]);
+  ctx.beginPath();ctx.moveTo(0,y80);ctx.lineTo(W,y80);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Filled area
+  const n=history.length;
+  const step=W/(n-1);
+  ctx.beginPath();
+  history.forEach((h,i)=>{
+    const x=i*step, y=H-(h.score/100)*H;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
   });
-  const leg = document.getElementById('src-legend');
-  leg.innerHTML = segs.map(s =>
+  const last=history[n-1];
+  ctx.lineTo((n-1)*step,H);ctx.lineTo(0,H);ctx.closePath();
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(16,185,129,0.3)');
+  grad.addColorStop(1,'rgba(16,185,129,0.02)');
+  ctx.fillStyle=grad;ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  history.forEach((h,i)=>{
+    const x=i*step, y=H-(h.score/100)*H;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle=scoreColor(last.score);ctx.lineWidth=1.5;ctx.stroke();
+
+  // Last dot
+  const lx=(n-1)*step, ly=H-(last.score/100)*H;
+  ctx.beginPath();ctx.arc(lx,ly,3,0,Math.PI*2);
+  ctx.fillStyle=scoreColor(last.score);ctx.fill();
+}
+
+// ── Source donut ───────────────────────────────────────────────
+function renderSrcChart(data){
+  const sb=data.generation.source_breakdown;
+  const segs=[
+    {key:'thermal',val:sb.thermal||0},
+    {key:'ipp_thermal',val:sb.ipp_thermal||0},
+    {key:'hydro_major',val:sb.hydro_major||0},
+    {key:'hydro_other',val:sb.hydro_other||0},
+    {key:'ncep',val:data.generation.ncep_mw||0},
+    {key:'cgs',val:data.generation.cgs_mw||0},
+  ].filter(s=>s.val>0);
+  const ctx=document.getElementById('srcChart').getContext('2d');
+  if(srcChart)srcChart.destroy();
+  srcChart=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:segs.map(s=>SRC_LABELS[s.key]),
+      datasets:[{data:segs.map(s=>s.val),backgroundColor:segs.map(s=>SRC_COLORS[s.key]),borderColor:'#08111F',borderWidth:3,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw.toLocaleString()} MW`}}}}
+  });
+  document.getElementById('src-legend').innerHTML=segs.map(s=>
     `<div class="legend-item"><div class="legend-sq" style="background:${SRC_COLORS[s.key]}"></div>${SRC_LABELS[s.key]} <b style="color:var(--text)">${s.val.toLocaleString()}</b></div>`
   ).join('');
 }
 
-// ── ESCOM demand bars ─────────────────────────────────────────
-function renderESCOM(data) {
-  const loads = data.demand.escom_loads || [];
-  if (!loads.length) return;
-  const maxVal = Math.max(...loads.flatMap(e => [e.schedule_mw||0, e.actual_mw||0]));
-  document.getElementById('escom-rows').innerHTML = loads.map(e => {
-    const sp = ((e.schedule_mw||0) / maxVal * 100).toFixed(1);
-    const ap = ((e.actual_mw||0) / maxVal * 100).toFixed(1);
-    const ui = e.ui_mw || 0;
-    const c = ESCOM_COLORS[e.escom] || '#3B82F6';
-    const hi = e.escom === 'BESCOM';
+// ── ESCOM bars ─────────────────────────────────────────────────
+function renderESCOM(data){
+  const loads=data.demand.escom_loads||[];if(!loads.length)return;
+  const maxVal=Math.max(...loads.flatMap(e=>[e.schedule_mw||0,e.actual_mw||0]));
+  document.getElementById('escom-rows').innerHTML=loads.map(e=>{
+    const sp=((e.schedule_mw||0)/maxVal*100).toFixed(1);
+    const ap=((e.actual_mw||0)/maxVal*100).toFixed(1);
+    const ui=e.ui_mw||0;const c=ESCOM_COL[e.escom]||'#3B82F6';
     return `<div class="escom-row">
-      <div class="escom-name ${hi?'hi':''}">${e.escom}</div>
-      <div class="bar-track">
-        <div class="bar-sched" style="width:${sp}%"></div>
-        <div class="bar-actual" style="width:${ap}%;background:${c}"></div>
-      </div>
-      <div class="escom-meta">
-        <div class="escom-mw" style="color:${c}">${(e.actual_mw||0).toLocaleString()}</div>
-        <div class="escom-ui" style="color:${ui>=0?'#F59E0B':'#10B981'}">${ui>=0?'+':''}${ui}</div>
-      </div>
+      <div class="escom-name ${e.escom==='BESCOM'?'hi':''}">${e.escom}</div>
+      <div class="bar-track"><div class="bar-sched" style="width:${sp}%"></div><div class="bar-actual" style="width:${ap}%;background:${c}"></div></div>
+      <div class="escom-meta"><div class="escom-mw" style="color:${c}">${(e.actual_mw||0).toLocaleString()}</div><div class="escom-ui" style="color:${ui>=0?'#F59E0B':'#10B981'}">${ui>=0?'+':''}${ui}</div></div>
     </div>`;
   }).join('');
 }
 
-// ── NCEP grid ─────────────────────────────────────────────────
-function renderNCEP(data) {
-  const items = data.ncep.escom_ncep || [];
-  const grid = document.getElementById('ncep-grid');
-  grid.innerHTML = items.map(e => {
-    const rows = [
-      {k:'solar', label:'Solar', v:e.solar_mw},
-      {k:'wind',  label:'Wind',  v:e.wind_mw},
-      {k:'bio',   label:'Bio',   v:e.biomass_mw},
-      {k:'mh',    label:'Mini-hydro', v:e.mini_hydro_mw},
-      {k:'cogen', label:'Cogen', v:e.cogen_mw},
-    ].filter(r => r.v > 0);
+// ── NCEP grid ──────────────────────────────────────────────────
+function renderNCEP(data){
+  const items=data.ncep.escom_ncep||[];
+  document.getElementById('ncep-grid').innerHTML=items.map(e=>{
+    const rows=[{k:'solar',l:'Solar',v:e.solar_mw},{k:'wind',l:'Wind',v:e.wind_mw},{k:'bio',l:'Biomass',v:e.biomass_mw},{k:'mh',l:'Mini-hydro',v:e.mini_hydro_mw},{k:'cogen',l:'Cogen',v:e.cogen_mw}].filter(r=>r.v>0);
     return `<div class="ncep-tile">
       <div class="ncep-escom ${e.escom==='BESCOM'?'hi':''}">${e.escom}</div>
-      <div class="ncep-sources">
-        ${rows.map(r=>`<div class="ncep-src">
-          <div style="display:flex;align-items:center;color:var(--muted)"><div class="ncep-dot" style="background:${NCEP_COLORS[r.k]}"></div>${r.label}</div>
-          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:${NCEP_COLORS[r.k]}">${r.v}</div>
-        </div>`).join('')}
-      </div>
-      <div class="ncep-total">${(e.total_mw||0).toLocaleString()}</div>
-      <div class="ncep-tlabel">MW</div>
+      <div class="ncep-sources">${rows.map(r=>`<div class="ncep-src"><div style="display:flex;align-items:center;color:var(--muted)"><div class="ncep-dot" style="background:${NCEP_COL[r.k]}"></div>${r.l}</div><div style="font-family:var(--mono);font-size:10px;font-weight:700;color:${NCEP_COL[r.k]}">${r.v}</div></div>`).join('')}</div>
+      <div class="ncep-total">${(e.total_mw||0).toLocaleString()}</div><div class="ncep-tlabel">MW</div>
     </div>`;
   }).join('');
 }
 
-// ── Explainer demo bars ───────────────────────────────────────
-function renderExplainer(data) {
-  const bescom = data.demand.bescom;
-  if (!bescom) return;
-  const s = bescom.schedule_mw || 0;
-  const a = bescom.actual_mw   || 0;
-  const ui = bescom.ui_mw || 0;
-  const max = Math.max(s, a);
-  const sp = (s/max*100).toFixed(0);
-  const ap = (a/max*100).toFixed(0);
-  document.getElementById('demo-bars').innerHTML = `
-    <div class="demo-row">
-      <div class="demo-label">Scheduled</div>
-      <div class="demo-track"><div class="demo-sched" style="width:${sp}%"></div></div>
-      <div class="demo-val" style="color:var(--muted)">${s.toLocaleString()} MW</div>
-    </div>
-    <div class="demo-row">
-      <div class="demo-label">Actual</div>
-      <div class="demo-track"><div class="demo-actual" style="width:${ap}%;background:${ui>=0?'#F59E0B':'#10B981'}"></div></div>
-      <div class="demo-val" style="color:${ui>=0?'#F59E0B':'#10B981'}">${a.toLocaleString()} MW</div>
-    </div>`;
-  const uiAbs = Math.abs(ui);
-  const msg = ui > 0
-    ? `<strong>BESCOM drew ${uiAbs.toLocaleString()} MW more than scheduled</strong> — demand exceeded the plan. This is called Unscheduled Interchange (UI). Positive UI attracts a financial penalty from the grid operator.`
-    : ui < 0
-    ? `<strong>BESCOM drew ${uiAbs.toLocaleString()} MW less than scheduled</strong> — demand was lower than planned. Negative UI means BESCOM was over-allocated.`
-    : `<strong>BESCOM is exactly on schedule</strong> — consumption matches the day's plan perfectly.`;
-  document.getElementById('ui-note').innerHTML = msg;
+// ── Explainer bars ─────────────────────────────────────────────
+function renderExplainer(data){
+  const b=data.demand.bescom;if(!b)return;
+  const s=b.schedule_mw||0,a=b.actual_mw||0,ui=b.ui_mw||0;
+  const max=Math.max(s,a);
+  const sp=(s/max*100).toFixed(0),ap=(a/max*100).toFixed(0);
+  document.getElementById('demo-rows').innerHTML=`
+    <div class="demo-row"><div class="demo-name">Scheduled</div><div class="demo-track"><div class="demo-sched" style="width:${sp}%"></div></div><div class="demo-val" style="color:var(--muted)">${s.toLocaleString()} MW</div></div>
+    <div class="demo-row"><div class="demo-name">Actual</div><div class="demo-track"><div class="demo-actual" style="width:${ap}%;background:${ui>=0?'#F59E0B':'#10B981'}"></div></div><div class="demo-val" style="color:${ui>=0?'#F59E0B':'#10B981'}">${a.toLocaleString()} MW</div></div>`;
+  const abs=Math.abs(ui);
+  document.getElementById('ui-box').innerHTML=ui>0
+    ?`<strong>BESCOM drew ${abs.toLocaleString()} MW more than scheduled</strong> — demand exceeded the plan. This is Unscheduled Interchange (UI). Positive UI attracts a financial penalty from POSOCO.`
+    :ui<0
+    ?`<strong>BESCOM drew ${abs.toLocaleString()} MW less than scheduled</strong> — demand was lower than planned. This is normal and means BESCOM was over-allocated today.`
+    :`<strong>BESCOM is exactly on schedule</strong> — real-time consumption matches the day plan perfectly.`;
 }
 
-// ── Main render ───────────────────────────────────────────────
-function render(data) {
-  const gen = data.generation, dem = data.demand;
-  const hz = gen.frequency_hz || dem.frequency_hz || 50.0;
-  liveHz = hz;
+// ── Oscilloscope ───────────────────────────────────────────────
+function initOsc(){
+  const c=document.getElementById('oscCanvas');
+  function draw(){
+    const W=c.offsetWidth,H=c.offsetHeight;
+    c.width=W;c.height=H;
+    if(!W||!H){oscAnimId=requestAnimationFrame(draw);return;}
+    const ctx=c.getContext('2d');
+    ctx.fillStyle='#0E1D30';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(30,51,82,0.7)';ctx.lineWidth=.5;
+    for(let x=0;x<W;x+=W/10){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    ctx.strokeStyle='rgba(90,127,168,0.25)';ctx.setLineDash([3,5]);ctx.lineWidth=.8;
+    ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();ctx.setLineDash([]);
+    const wc=fColor(liveHz);
+    ctx.strokeStyle=wc;ctx.lineWidth=1.8;
+    const amp=H*.28;
+    ctx.beginPath();
+    for(let px=0;px<=W;px++){
+      const t=px/W;
+      const y=H/2-Math.sin(t*Math.PI*7+oscPhase)*amp-Math.sin(t*Math.PI*2.2+oscPhase*.45)*amp*.08;
+      px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);
+    }
+    ctx.stroke();
+    ctx.fillStyle=wc;ctx.font='600 10px monospace';
+    ctx.fillText(liveHz.toFixed(2)+' Hz',10,14);
+    ctx.fillStyle='rgba(90,127,168,0.5)';
+    ctx.fillText('50.00 Hz nominal',W-130,H/2-5);
+    oscPhase-=.055;
+    oscAnimId=requestAnimationFrame(draw);
+  }
+  if(oscAnimId)cancelAnimationFrame(oscAnimId);draw();
+}
+
+// ── Map reload ─────────────────────────────────────────────────
+function reloadMap(){
+  const img=document.getElementById('bescom-map');
+  const spin=document.getElementById('map-spinner');
+  const err=document.getElementById('map-err');
+  const ts=document.getElementById('map-ts');
+  spin.style.display='flex';err.style.display='none';img.style.display='block';
+  const url='/api/bescom-map?t='+Date.now();
+  const tmp=new Image();
+  tmp.onload=()=>{
+    img.src=url;
+    spin.style.display='none';
+    ts.textContent='Fetched '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  };
+  tmp.onerror=()=>{
+    spin.style.display='none';
+    img.style.display='none';
+    err.style.display='block';
+    ts.textContent='Unavailable';
+  };
+  tmp.src=url;
+}
+
+// ── Health history fetch ───────────────────────────────────────
+async function fetchHistory(){
+  try{
+    const r=await fetch(HISTORY_API);
+    if(!r.ok)return[];
+    return await r.json();
+  }catch{return[];}
+}
+
+// ── Main render ────────────────────────────────────────────────
+async function render(data){
+  const gen=data.generation,dem=data.demand;
+  const hz=gen.frequency_hz||dem.frequency_hz||50.0;
+  liveHz=hz;
 
   // Frequency
-  const fc = fColor(hz);
-  const fv = document.getElementById('freq-val');
-  fv.textContent = hz.toFixed(2); fv.style.color = fc;
-  const ff = document.getElementById('freq-fill');
-  ff.style.width = fPct(hz) + '%'; ff.style.background = fc;
-  const fs = document.getElementById('freq-status');
-  fs.textContent = fStatus(hz); fs.style.color = fc;
+  const fc=fColor(hz);
+  const fv=document.getElementById('freq-val');fv.textContent=hz.toFixed(2);fv.style.color=fc;
+  const ff=document.getElementById('freq-fill');ff.style.width=fPct(hz)+'%';ff.style.background=fc;
+  const fs=document.getElementById('freq-status');fs.textContent=fStatus(hz);fs.style.color=fc;
 
-  // BESCOM
-  const bescom = dem.bescom || {};
-  document.getElementById('bescom-actual').textContent = (bescom.actual_mw||0).toLocaleString();
-  const ui = bescom.ui_mw || 0;
-  document.getElementById('bescom-sub').innerHTML =
-    `vs scheduled <b style="color:var(--text)">${(bescom.schedule_mw||0).toLocaleString()} MW</b>
-     <span class="badge ${ui>=0?'badge-amber':'badge-green'}">${ui>=0?'+':''}${ui} MW UI</span>`;
+  // BESCOM stats
+  const b=dem.bescom||{};
+  document.getElementById('bescom-actual').textContent=(b.actual_mw||0).toLocaleString();
+  const ui=b.ui_mw||0;
+  document.getElementById('bescom-sub').innerHTML=
+    `vs scheduled <b style="color:var(--text)">${(b.schedule_mw||0).toLocaleString()} MW</b>
+     <span class="badge ${ui>=0?'a':'g'}">${ui>=0?'+':''}${ui} MW UI</span>`;
 
   // BESCOM NCEP
-  const bncep = (data.ncep.escom_ncep||[]).find(e=>e.escom==='BESCOM');
-  if (bncep) {
-    document.getElementById('bescom-ncep').textContent = (bncep.total_mw||0).toLocaleString();
-    document.getElementById('ncep-sub').innerHTML =
-      `<span style="color:#FBBF24">☀ Solar ${bncep.solar_mw}</span>
-       &nbsp;<span style="color:#34D399">~ Wind ${bncep.wind_mw}</span>
-       &nbsp;<span style="color:#FB923C">Bio ${bncep.biomass_mw}</span> MW`;
+  const bn=(data.ncep.escom_ncep||[]).find(e=>e.escom==='BESCOM');
+  if(bn){
+    document.getElementById('bescom-ncep').textContent=(bn.total_mw||0).toLocaleString();
+    document.getElementById('ncep-sub').innerHTML=
+      `<span style="color:#FBBF24">☀ Solar ${bn.solar_mw}</span>&nbsp;<span style="color:#34D399">~ Wind ${bn.wind_mw}</span>&nbsp;Bio ${bn.biomass_mw} MW`;
   }
 
   // Total gen
-  document.getElementById('total-gen').textContent = (gen.total_generation_mw||0).toLocaleString();
-  document.getElementById('gen-sub').innerHTML =
+  document.getElementById('total-gen').textContent=(gen.total_generation_mw||0).toLocaleString();
+  document.getElementById('gen-sub').innerHTML=
     `Own <b style="color:var(--text)">${(gen.own_gen_mw||0).toLocaleString()}</b>
-     + CGS <b style="color:var(--text)">${(gen.cgs_mw||0).toLocaleString()}</b>
+     + CGS <b>${(gen.cgs_mw||0).toLocaleString()}</b>
      + NCEP <b style="color:var(--green)">${(gen.ncep_mw||0).toLocaleString()}</b> MW`;
 
   // Timestamp
-  document.getElementById('ts-label').textContent =
-    'SLDC data · ' + (gen.timestamp || dem.timestamp || '—');
+  document.getElementById('ts-label').textContent='SLDC data · '+(gen.timestamp||dem.timestamp||'—');
 
-  // Charts
+  // Health score (compute client-side for immediate display)
+  const dev=Math.abs(hz-50.0);
+  const freqS=dev<=.10?100:dev<=.20?80:dev<=.30?60:dev<=.50?30:0;
+  const sched=b.schedule_mw||0,act=b.actual_mw||0;
+  let demS=50;
+  if(sched>0){const r=act/sched;demS=r>=.95&&r<=1.05?100:r>=.90&&r<=1.10?80:r>=.85&&r<=1.15?60:40;}
+  const score=Math.round(freqS*.6+demS*.4);
+  const sc=scoreColor(score);
+  const statusText=score>=80?'HEALTHY':score>=50?'DEGRADED':'STRESSED';
+
+  drawGauge(score);
+  document.getElementById('gauge-status').textContent=statusText;
+  document.getElementById('gauge-status').style.color=sc;
+
+  // Freq component
+  document.getElementById('freq-score').textContent=freqS+'/100';
+  document.getElementById('freq-score').style.color=scoreColor(freqS);
+  document.getElementById('freq-score-bar').style.width=freqS+'%';
+  document.getElementById('freq-score-bar').style.background=scoreColor(freqS);
+  document.getElementById('freq-score-sub').textContent=hz.toFixed(2)+' Hz ('+(dev<=0.10?'nominal':dev<=0.20?'minor deviation':'deviation')+')';
+
+  // Demand component
+  document.getElementById('demand-score').textContent=demS+'/100';
+  document.getElementById('demand-score').style.color=scoreColor(demS);
+  document.getElementById('demand-score-bar').style.width=demS+'%';
+  document.getElementById('demand-score-bar').style.background=scoreColor(demS);
+  document.getElementById('demand-score-sub').textContent=`Actual ${act.toLocaleString()} / Sched ${sched.toLocaleString()} MW`;
+
+  // History + sparkline
+  const hist=await fetchHistory();
+  if(hist.length>0){
+    drawSparkline(hist);
+    const healthy=hist.filter(h=>h.score>=80).length;
+    const upPct=(healthy/hist.length*100).toFixed(0);
+    document.getElementById('gauge-uptime').textContent=`Session uptime: ${upPct}% (${hist.length} readings)`;
+    document.getElementById('spark-hint').textContent=`${hist.length} readings · last ${hist[hist.length-1].score}/100`;
+  }
+
   renderSrcChart(data);
   renderESCOM(data);
   renderNCEP(data);
   renderExplainer(data);
-
-  // Refresh BESCOM map (add timestamp to bust cache)
-  document.getElementById('bescom-map').src = '/api/bescom-map?t=' + Date.now();
+  reloadMap();
 }
 
-// ── Fetch & boot ──────────────────────────────────────────────
-async function fetchData() {
-  const r = await fetch(API);
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+// ── Fetch & boot ───────────────────────────────────────────────
+async function fetchData(){
+  const r=await fetch(API);
+  if(!r.ok)throw new Error(`HTTP ${r.status}`);
   return r.json();
 }
 
-async function refresh() {
-  try {
-    const data = await fetchData();
-    render(data);
-    document.getElementById('err').style.display = 'none';
-  } catch(e) {
-    document.getElementById('err').style.display = 'block';
-    document.getElementById('err').textContent = '⚠ ' + e.message;
+async function refresh(){
+  try{
+    const data=await fetchData();
+    await render(data);
+    document.getElementById('err').style.display='none';
+  }catch(e){
+    document.getElementById('err').style.display='block';
+    document.getElementById('err').textContent='⚠ '+e.message;
   }
 }
 
-(async () => {
+(async()=>{
   initOsc();
-  try {
-    const data = await fetchData();
-    document.getElementById('loading').style.display = 'none';
-    render(data);
-  } catch(e) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('err').style.display = 'block';
-    document.getElementById('err').textContent = '⚠ Could not load data — is the Python server running? ' + e.message;
+  try{
+    const data=await fetchData();
+    document.getElementById('loading').style.display='none';
+    await render(data);
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('err').style.display='block';
+    document.getElementById('err').textContent='⚠ Backend not reachable — is the Python server running? '+e.message;
   }
-  setInterval(refresh, REFRESH_MS);
+  setInterval(refresh,REFRESH_MS);
 })();
 </script>
 </body>
