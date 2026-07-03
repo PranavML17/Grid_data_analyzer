@@ -252,7 +252,10 @@ footer a{color:var(--blue);text-decoration:none}
 <div class="card" style="border-color:var(--amber)">
   <div class="sec-row">
     <div><div class="sec">BESCOM 220kV substation network</div><div style="font-size:10px;color:var(--muted);font-family:var(--mono)">Chrome blocks cross-site embedding — open directly on KPTCL SLDC</div></div>
-    <a href="https://kptclsldc.in/bescom.aspx" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:var(--amber);color:#08111F;font-size:12px;font-weight:700;padding:7px 14px;border-radius:6px;text-decoration:none;white-space:nowrap;flex-shrink:0">Open live map ↗</a>
+    <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0">
+      <a href="https://kptclsldc.in/bescom.aspx" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:var(--amber);color:#08111F;font-size:12px;font-weight:700;padding:7px 14px;border-radius:6px;text-decoration:none;white-space:nowrap">Open page ↗</a>
+      <a href="https://kptclsldc.in/data1/BESCOM.jpg" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:var(--s2);color:var(--blue);border:1px solid var(--border);font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;text-decoration:none;white-space:nowrap;font-family:var(--mono)">Direct image ↗</a>
+    </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
     <div style="background:var(--s2);border-radius:7px;padding:11px 13px">
@@ -303,11 +306,62 @@ footer a{color:var(--blue);text-decoration:none}
     <div class="tf">+ 6% electricity duty &nbsp;·&nbsp; Fixed ₹120/kW/month &nbsp;·&nbsp; Rural rebate ₹0.30/unit &nbsp;·&nbsp; <strong style="color:var(--green)">Gruha Jyothi:</strong> first 200 units free (BPL) &nbsp;·&nbsp; <a href="https://kerc.karnataka.gov.in" target="_blank">KERC tariff order 2025</a></div>
   </div>
 </div>
+
+<!-- Glossary -->
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="sec" style="margin:0">Glossary — key terms explained</div>
+    <button onclick="this.closest('.card').querySelector('.gloss-body').style.display=this.closest('.card').querySelector('.gloss-body').style.display==='none'?'grid':'none';this.textContent=this.textContent==='▲ Collapse'?'▼ Expand':'▲ Collapse'" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;font-family:var(--mono)">▼ Expand</button>
+  </div>
+  <div class="gloss-body" style="display:none;grid-template-columns:1fr 1fr;gap:0">
+    <div style="padding:9px 12px;border-bottom:.5px solid var(--border);border-right:.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">⚡ Grid Frequency (Hz)</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">India's AC grid runs at <strong style="color:var(--text)">50 Hz</strong> (50 cycles/second). If too many people draw power simultaneously, frequency drops below 50 Hz — the grid is "stressed". Target: 49.90–50.05 Hz at all times.</div>
+    </div>
+    <div style="padding:9px 12px;border-bottom:.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">📋 Scheduled Load</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">Every day, BESCOM submits a <strong style="color:var(--text)">day-ahead schedule</strong> in 15-minute blocks telling the grid how many MW it will draw. Think of it as a booking — BESCOM reserves that much power in advance.</div>
+    </div>
+    <div style="padding:9px 12px;border-bottom:.5px solid var(--border);border-right:.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">📊 Actual Load</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">The <strong style="color:var(--text)">real-time MW</strong> that Bengaluru's consumers are actually drawing. If actual > scheduled, BESCOM drew more than its booking — it must pay a penalty called UI charges.</div>
+    </div>
+    <div style="padding:9px 12px;border-bottom:.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">🔄 UI — Unscheduled Interchange</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6"><strong style="color:var(--text)">Actual minus scheduled</strong>. Positive = BESCOM over-drew (pays penalty). Negative = BESCOM under-drew (gets credit). POSOCO (national grid operator) manages this in real time.</div>
+    </div>
+    <div style="padding:9px 12px;border-bottom:.5px solid var(--border);border-right:.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">🌿 NCEP — Non-Conventional Energy</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">Renewable power sources: <strong style="color:var(--text)">solar, wind, biomass, mini-hydro, cogen</strong>. BESCOM buys NCEP separately from regular generation. The MW shown is what's currently feeding into the grid from these sources.</div>
+    </div>
+    <div style="padding:9px 12px;border-bottom:.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">🏭 CGS — Central Generating Stations</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">Power plants owned by the <strong style="color:var(--text)">central government</strong> (NTPC coal, nuclear, large hydro). Karnataka gets a fixed allocation from CGS daily — this is its share of "national" electricity.</div>
+    </div>
+    <div style="padding:9px 12px;border-right:.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">⚡ 1 Unit of Electricity</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">1 unit = <strong style="color:var(--text)">1 kWh (kilowatt-hour)</strong>. Running a 1,000W appliance for 1 hour = 1 unit. At BESCOM's ₹6.82/unit domestic rate, charging a 30 kWh EV costs ~₹205 and gives ~250 km of range.</div>
+    </div>
+    <div style="padding:9px 12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">🏢 ESCOM / DISCOM</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6"><strong style="color:var(--text)">Electricity Supply / Distribution Company</strong>. Karnataka has 5: BESCOM (Bengaluru), HESCOM (Hubli), MESCOM (Mangaluru), CESC (Mysuru), GESCOM (Gulbarga). Each buys power from the state grid and distributes it to consumers.</div>
+    </div>
+    <div style="padding:9px 12px;border-top:.5px solid var(--border);border-right:.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">🔋 MW vs GW</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6"><strong style="color:var(--text)">1 GW = 1,000 MW</strong>. Karnataka generates ~9,000–10,000 MW (9–10 GW) at any moment. India's total installed capacity is ~530 GW. A typical home uses ~1–2 kW (0.001–0.002 MW).</div>
+    </div>
+    <div style="padding:9px 12px;border-top:.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">📡 Grid Health Score</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">A <strong style="color:var(--text)">0–100 score</strong> computed from two signals: frequency deviation from 50 Hz (60% weight) and BESCOM's demand fulfillment — how close actual is to scheduled (40% weight). ≥80 = healthy, 50–79 = degraded, &lt;50 = stressed.</div>
+    </div>
+  </div>
+</div>
+
 </main>
 </div>
 
 <!-- ══════════════════════════ TAB 2: INDIA POWER MAP ══════════════════════════ -->
-<div id="tab-india" class="tab-pane">
+<div id="tab-india" class="tab-pane" style="display:none">
 <main>
 
 <!-- Controls -->
@@ -371,7 +425,7 @@ footer a{color:var(--blue);text-decoration:none}
 </div>
 
 <!-- ══════════════════════════ TAB 3: EV & POWER POLICY ══════════════════════════ -->
-<div id="tab-policy" class="tab-pane">
+<div id="tab-policy" class="tab-pane" style="display:none">
 <main>
 
 <!-- KPI row -->
@@ -445,12 +499,7 @@ function setHTML(id,v){ const e=document.getElementById(id); if(e)e.innerHTML=v;
 // ─────────────────────────────────────────────────────────────
 // TAB SWITCHING
 // ─────────────────────────────────────────────────────────────
-function showTab(tab){
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  document.querySelector('[data-tab="'+tab+'"]').classList.add('active');
-}
+// showTab defined below
 
 // ─────────────────────────────────────────────────────────────
 // GAUGE & SPARKLINE
@@ -817,11 +866,17 @@ async function refresh(){
   catch(e){ document.getElementById('err').style.display='block';document.getElementById('err').textContent='⚠ '+e.message; }
 }
 
-// On India tab first open — init the card grid
+// Tab switching — single clean function, no wrapper tricks
 let indiaInited=false;
-const origShowTab=showTab;
 function showTab(tab){
-  origShowTab(tab);
+  // Use explicit display style — more reliable than CSS class toggling
+  ['blr','india','policy'].forEach(t=>{
+    const pane=document.getElementById('tab-'+t);
+    if(pane) pane.style.display = (t===tab) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab===tab);
+  });
   if(tab==='india'&&!indiaInited){indiaInited=true;setMetric('tariff');}
 }
 
