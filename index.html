@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Karnataka Grid Monitor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  /* ── Design tokens ──────────────────────────────────────── */
+  :root {
+    --bg:        #08111F;
+    --surface:   #0E1D30;
+    --surface2:  #152540;
+    --border:    #1E3352;
+    --amber:     #F59E0B;
+    --amber-dim: rgba(245,158,11,0.12);
+    --green:     #10B981;
+    --green-dim: rgba(16,185,129,0.12);
+    --blue:      #3B82F6;
+    --blue-dim:  rgba(59,130,246,0.12);
+    --red:       #EF4444;
+    --red-dim:   rgba(239,68,68,0.12);
+    --solar:     #FBBF24;
+    --wind:      #34D399;
+    --hydro:     #60A5FA;
+    --thermal:   #F87171;
+    --cgs:       #A78BFA;
+    --text:      #E2EDF8;
+    --muted:     #5A7FA8;
+    --mono:      'IBM Plex Mono', 'Courier New', monospace;
+    --sans:      'Inter', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* ── Header ─────────────────────────────────────────────── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 50;
+  }
+
+  .header-left {
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--amber);
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  header .subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+    font-family: var(--mono);
+  }
+
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── Main layout ─────────────────────────────────────────── */
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px 20px 40px;
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+  }
+
+  /* ── Hero row ────────────────────────────────────────────── */
+  .hero-row {
+    display: grid;
+    grid-template-columns: 280px 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* ── Frequency hero card ─────────────────────────────────── */
+  .freq-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .freq-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, var(--amber-dim) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .freq-value {
+    font-family: var(--mono);
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -2px;
+    transition: color 0.5s;
+  }
+
+  .freq-unit {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+
+  .freq-bar-wrap {
+    margin-top: 14px;
+  }
+
+  .freq-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    font-family: var(--mono);
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  .freq-bar-track {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .freq-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease, background 0.5s;
+  }
+
+  .freq-status {
+    margin-top: 8px;
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Stat cards ─────────────────────────────────────────── */
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .stat-unit {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-left: 3px;
+  }
+
+  .stat-sub {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--mono);
+    letter-spacing: 0.04em;
+  }
+
+  .badge-green  { background: var(--green-dim);  color: var(--green); }
+  .badge-amber  { background: var(--amber-dim);  color: var(--amber); }
+  .badge-red    { background: var(--red-dim);    color: var(--red);   }
+  .badge-blue   { background: var(--blue-dim);   color: var(--blue);  }
+
+  /* ── Oscilloscope pulse ──────────────────────────────────── */
+  .pulse-card {
+    padding: 0;
+    overflow: hidden;
+    height: 72px;
+  }
+
+  #pulseCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* ── Mid row ─────────────────────────────────────────────── */
+  .mid-row {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 16px;
+  }
+
+  /* ── Chart cards ─────────────────────────────────────────── */
+  .chart-wrap {
+    position: relative;
+    height: 240px;
+  }
+
+  /* ── ESCOM demand bars ───────────────────────────────────── */
+  .escom-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .escom-item {
+    display: grid;
+    grid-template-columns: 72px 1fr 80px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .escom-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  .escom-name.highlight { color: var(--amber); }
+
+  .bar-track {
+    height: 12px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: visible;
+    position: relative;
+  }
+
+  .bar-schedule {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    background: var(--border);
+    border-radius: 3px;
+  }
+
+  .bar-actual {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+
+  .escom-meta {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 10px;
+  }
+
+  .escom-actual { font-size: 13px; font-weight: 700; }
+  .escom-ui { color: var(--muted); }
+
+  /* ── NCEP renewables ─────────────────────────────────────── */
+  .ncep-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+  .ncep-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .ncep-escom {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .ncep-escom.highlight { color: var(--amber); }
+
+  .ncep-source {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .ncep-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+  }
+
+  .ncep-label {
+    display: flex; align-items: center; gap: 4px;
+    color: var(--muted);
+  }
+
+  .ncep-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .ncep-val {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 10px;
+  }
+
+  .ncep-total {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--green);
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 2px;
+  }
+
+  .ncep-total-label {
+    font-size: 9px; color: var(--muted); margin-top: 1px;
+  }
+
+  /* ── Plant table ─────────────────────────────────────────── */
+  .plant-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .plant-table th {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .plant-table td {
+    padding: 7px 10px;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(30,51,82,0.4);
+    font-family: var(--mono);
+  }
+
+  .plant-table tr:last-child td { border-bottom: none; }
+  .plant-table tr:hover td { background: var(--surface2); }
+
+  .util-bar {
+    width: 80px;
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  .util-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  /* ── Type chip ───────────────────────────────────────────── */
+  .chip {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ── Loading / Error ─────────────────────────────────────── */
+  #loading {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 99;
+    gap: 16px;
+  }
+
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--amber);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #loading p {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  #error-banner {
+    display: none;
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    padding: 14px 18px;
+    color: var(--red);
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  /* ── Section headers ─────────────────────────────────────── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .section-ts {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* ── Legend ──────────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .legend-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── Source: link ────────────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  footer a { color: var(--blue); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading">
+  <div class="spinner"></div>
+  <p>Fetching KPTCL SLDC data …</p>
+</div>
+
+<!-- Error banner -->
+<div id="error-banner"></div>
+
+<!-- Header -->
+<header>
+  <div class="header-left">
+    <div class="logo-mark"></div>
+    <div>
+      <h1>Karnataka Grid Monitor</h1>
+      <div class="subtitle">KPTCL SLDC · kptclsldc.in</div>
+    </div>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    <span id="ts-label">Connecting …</span>
+    &nbsp;·&nbsp;
+    <a href="#" onclick="refresh()" style="color:var(--blue);font-size:11px;">↻ Refresh</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── HERO ROW ─────────────────────────────────────────── -->
+  <div class="hero-row">
+
+    <!-- Frequency hero -->
+    <div class="freq-card">
+      <div class="card-label">Grid Frequency</div>
+      <div>
+        <span class="freq-value" id="freq-val">--.-</span><span class="freq-unit">Hz</span>
+      </div>
+      <div class="freq-bar-wrap">
+        <div class="freq-bar-label">
+          <span>49.5</span><span>49.8</span><span>50.0</span><span>50.2</span>
+        </div>
+        <div class="freq-bar-track">
+          <div class="freq-bar-fill" id="freq-bar" style="width:50%"></div>
+        </div>
+      </div>
+      <div class="freq-status" id="freq-status">—</div>
+    </div>
+
+    <!-- Total generation -->
+    <div class="card">
+      <div class="card-label">Total Generation</div>
+      <div>
+        <span class="stat-value" id="total-gen">----</span>
+        <span class="stat-unit">MW</span>
+      </div>
+      <div class="stat-sub">
+        <span>Own gen</span>
+        <span class="badge badge-blue" id="own-gen-val">----</span>
+        <span>+ CGS</span>
+        <span class="badge badge-blue" id="cgs-val">----</span>
+      </div>
+    </div>
+
+    <!-- BESCOM actual load -->
+    <div class="card">
+      <div class="card-label">BESCOM Load</div>
+      <div>
+        <span class="stat-value" id="bescom-actual">----</span>
+        <span class="stat-unit">MW</span>
+      </div>
+      <div class="stat-sub">
+        <span>vs scheduled</span>
+        <span class="badge" id="bescom-badge">----</span>
+      </div>
+    </div>
+
+    <!-- Renewables -->
+    <div class="card">
+      <div class="card-label">Renewables (NCEP)</div>
+      <div>
+        <span class="stat-value" id="ncep-val" style="color:var(--green)">----</span>
+        <span class="stat-unit">MW</span>
+      </div>
+      <div class="stat-sub" id="ncep-pct">— % of total</div>
+    </div>
+
+  </div>
+
+  <!-- ── PULSE LINE ─────────────────────────────────────────── -->
+  <div class="card pulse-card">
+    <canvas id="pulseCanvas"></canvas>
+  </div>
+
+  <!-- ── MID ROW ───────────────────────────────────────────── -->
+  <div class="mid-row">
+
+    <!-- Source mix donut -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">Power Source Mix</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="sourceChart"></canvas>
+      </div>
+      <div class="legend" id="source-legend"></div>
+    </div>
+
+    <!-- ESCOM demand -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">ESCOM Demand — Schedule vs Actual</div>
+        <div style="display:flex;gap:14px;font-size:10px;color:var(--muted)">
+          <span style="display:flex;align-items:center;gap:4px">
+            <span style="width:10px;height:4px;background:var(--border);display:inline-block;border-radius:2px"></span> Schedule
+          </span>
+          <span style="display:flex;align-items:center;gap:4px">
+            <span style="width:10px;height:4px;background:var(--blue);display:inline-block;border-radius:2px"></span> Actual
+          </span>
+        </div>
+      </div>
+      <div class="escom-row" id="escom-bars"></div>
+    </div>
+
+  </div>
+
+  <!-- ── NCEP RENEWABLES ────────────────────────────────────── -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">Renewable Sources per ESCOM</div>
+    </div>
+    <div class="ncep-grid" id="ncep-grid"></div>
+  </div>
+
+  <!-- ── PLANT TABLE ───────────────────────────────────────── -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">Generating Station Status</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="plant-table">
+        <thead>
+          <tr>
+            <th>Plant</th>
+            <th>Type</th>
+            <th>Capacity</th>
+            <th>Generating</th>
+            <th>Utilisation</th>
+          </tr>
+        </thead>
+        <tbody id="plant-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Data source: <a href="https://kptclsldc.in" target="_blank">kptclsldc.in</a>
+  · Karnataka State Load Dispatch Centre (public dashboard)
+  · Auto-refreshes every 5 min
+</footer>
+
+<script>
+// ──────────────────────────────────────────────────────────────
+// Config
+// ──────────────────────────────────────────────────────────────
+const API = '/api/grid-data';   // works both locally and on Railway
+const REFRESH_MS = 5 * 60 * 1000;
+
+const COLORS = {
+  thermal:      '#F87171',
+  hydro_major:  '#60A5FA',
+  hydro_other:  '#93C5FD',
+  ipp_thermal:  '#FCA5A5',
+  ncep:         '#34D399',
+  cgs:          '#A78BFA',
+};
+
+const TYPE_LABELS = {
+  thermal:     'State Thermal',
+  hydro_major: 'Major Hydro',
+  hydro_other: 'Other Hydro',
+  ipp_thermal: 'IPP Thermal',
+  ncep:        'Renewables',
+  cgs:         'Central (CGS)',
+};
+
+const ESCOM_COLORS = {
+  BESCOM: '#F59E0B',
+  MESCOM: '#3B82F6',
+  CESC:   '#10B981',
+  GESCOM: '#A78BFA',
+  HESCOM: '#F472B6',
+};
+
+// ──────────────────────────────────────────────────────────────
+// State
+// ──────────────────────────────────────────────────────────────
+let sourceChart = null;
+let pulseAnimId = null;
+let pulseFreq = 50.0;
+let pulsePhase = 0;
+
+// ──────────────────────────────────────────────────────────────
+// Frequency helpers
+// ──────────────────────────────────────────────────────────────
+function freqColor(hz) {
+  if (hz >= 49.9 && hz <= 50.1) return 'var(--green)';
+  if (hz >= 49.7 && hz <  49.9) return 'var(--amber)';
+  if (hz >  50.1 && hz <= 50.3) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function freqBarPct(hz) {
+  // Map 49.5 – 50.5 Hz to 0–100%
+  return Math.max(0, Math.min(100, ((hz - 49.5) / 1.0) * 100));
+}
+
+function freqStatusText(hz) {
+  if (hz >= 49.9 && hz <= 50.1) return '● HEALTHY';
+  if (hz >= 49.7 && hz <  49.9) return '▲ SLIGHTLY LOW';
+  if (hz >  50.1 && hz <= 50.3) return '▲ SLIGHTLY HIGH';
+  if (hz < 49.7)                 return '⚠ UNDER-FREQUENCY';
+  return '⚠ OVER-FREQUENCY';
+}
+
+// ──────────────────────────────────────────────────────────────
+// Oscilloscope pulse
+// ──────────────────────────────────────────────────────────────
+function initPulse(hz) {
+  pulseFreq = hz;
+  const canvas = document.getElementById('pulseCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function frame() {
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    const W = canvas.width, H = canvas.height;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(30,51,82,0.6)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 60) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
+
+    // 50 Hz reference line
+    ctx.strokeStyle = 'rgba(90,127,168,0.4)';
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Waveform
+    const color = freqColor(pulseFreq);
+    const glowColor = color.replace('var(--', '').replace(')', '');
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = color;
+
+    ctx.beginPath();
+    const amplitude = 18;
+    const freqMult = (pulseFreq - 50.0) * 20;
+    for (let px = 0; px < W; px++) {
+      const t = px / W;
+      const y = H/2 - Math.sin((t * Math.PI * 6) + pulsePhase + freqMult * t) * amplitude
+                     - Math.sin((t * Math.PI * 2.2) + pulsePhase * 0.7) * 5;
+      px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    pulsePhase -= 0.04;
+    pulseAnimId = requestAnimationFrame(frame);
+  }
+
+  if (pulseAnimId) cancelAnimationFrame(pulseAnimId);
+  frame();
+}
+
+// ──────────────────────────────────────────────────────────────
+// Source donut chart
+// ──────────────────────────────────────────────────────────────
+function renderSourceChart(data) {
+  const gen = data.generation;
+  const sb = gen.source_breakdown;
+  const ncep = gen.ncep_mw || 0;
+  const cgs  = gen.cgs_mw  || 0;
+
+  const segments = [
+    { key: 'thermal',     val: sb.thermal     || 0 },
+    { key: 'hydro_major', val: sb.hydro_major || 0 },
+    { key: 'hydro_other', val: sb.hydro_other || 0 },
+    { key: 'ipp_thermal', val: sb.ipp_thermal || 0 },
+    { key: 'ncep',        val: ncep               },
+    { key: 'cgs',         val: cgs                },
+  ].filter(s => s.val > 0);
+
+  const labels = segments.map(s => TYPE_LABELS[s.key]);
+  const vals   = segments.map(s => s.val);
+  const colors = segments.map(s => COLORS[s.key]);
+
+  const ctx = document.getElementById('sourceChart').getContext('2d');
+
+  if (sourceChart) sourceChart.destroy();
+  sourceChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: vals,
+        backgroundColor: colors,
+        borderColor: '#08111F',
+        borderWidth: 3,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.raw.toLocaleString()} MW`
+          }
+        }
+      }
+    }
+  });
+
+  // Legend
+  const legend = document.getElementById('source-legend');
+  legend.innerHTML = segments.map(s =>
+    `<div class="legend-item">
+      <div class="legend-dot" style="background:${COLORS[s.key]}"></div>
+      <span>${TYPE_LABELS[s.key]} <b style="color:var(--text)">${s.val.toLocaleString()}</b></span>
+    </div>`
+  ).join('');
+}
+
+// ──────────────────────────────────────────────────────────────
+// ESCOM demand bars
+// ──────────────────────────────────────────────────────────────
+function renderESCOM(data) {
+  const loads = data.demand.escom_loads || [];
+  if (!loads.length) return;
+
+  const maxActual = Math.max(...loads.map(e => e.actual_mw || 0));
+  const container = document.getElementById('escom-bars');
+
+  container.innerHTML = loads.map(e => {
+    const schedPct  = ((e.schedule_mw || 0) / maxActual * 100).toFixed(1);
+    const actualPct = ((e.actual_mw   || 0) / maxActual * 100).toFixed(1);
+    const ui = e.ui_mw || 0;
+    const uiSign = ui >= 0 ? '+' : '';
+    const color = ESCOM_COLORS[e.escom] || 'var(--blue)';
+    const isHighlight = e.escom === 'BESCOM';
+
+    return `<div class="escom-item">
+      <div class="escom-name ${isHighlight ? 'highlight' : ''}">${e.escom}</div>
+      <div class="bar-track">
+        <div class="bar-schedule" style="width:${schedPct}%"></div>
+        <div class="bar-actual" style="width:${actualPct}%;background:${color};opacity:0.85"></div>
+      </div>
+      <div class="escom-meta">
+        <div class="escom-actual" style="color:${color}">${(e.actual_mw||0).toLocaleString()}</div>
+        <div class="escom-ui" style="color:${ui>=0?'var(--amber)':'var(--green)'}">${uiSign}${ui}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ──────────────────────────────────────────────────────────────
+// NCEP renewable grid
+// ──────────────────────────────────────────────────────────────
+function renderNCEP(data) {
+  const escomNcep = data.ncep.escom_ncep || [];
+  const grid = document.getElementById('ncep-grid');
+
+  grid.innerHTML = escomNcep.map(e => {
+    const rows = [
+      { label: 'Solar',     color: 'var(--solar)',  val: e.solar_mw     || 0 },
+      { label: 'Wind',      color: 'var(--wind)',   val: e.wind_mw      || 0 },
+      { label: 'Biomass',   color: '#FB923C',       val: e.biomass_mw   || 0 },
+      { label: 'Mini Hydro',color: 'var(--hydro)',  val: e.mini_hydro_mw|| 0 },
+      { label: 'Cogen',     color: '#C084FC',       val: e.cogen_mw     || 0 },
+    ].filter(r => r.val > 0);
+
+    return `<div class="ncep-card">
+      <div class="ncep-escom ${e.escom==='BESCOM'?'highlight':''}">${e.escom}</div>
+      <div class="ncep-source">
+        ${rows.map(r => `
+          <div class="ncep-row">
+            <div class="ncep-label">
+              <div class="ncep-dot" style="background:${r.color}"></div>
+              ${r.label}
+            </div>
+            <div class="ncep-val" style="color:${r.color}">${r.val}</div>
+          </div>`).join('')}
+      </div>
+      <div class="ncep-total">${(e.total_mw||0).toLocaleString()}</div>
+      <div class="ncep-total-label">MW total</div>
+    </div>`;
+  }).join('');
+}
+
+// ──────────────────────────────────────────────────────────────
+// Plant table
+// ──────────────────────────────────────────────────────────────
+function renderPlants(data) {
+  const plants = data.generation.plants || [];
+  const tbody  = document.getElementById('plant-tbody');
+
+  const TYPE_CHIP = {
+    thermal:     { label: 'Thermal',    bg: 'rgba(248,113,113,0.15)', color: '#F87171' },
+    hydro_major: { label: 'Major Hydro', bg: 'rgba(96,165,250,0.15)', color: '#60A5FA' },
+    hydro_other: { label: 'Hydro',       bg: 'rgba(96,165,250,0.1)',  color: '#93C5FD' },
+    ipp_thermal: { label: 'IPP',         bg: 'rgba(252,165,165,0.15)', color: '#FCA5A5' },
+  };
+
+  tbody.innerHTML = plants.map(p => {
+    const chip   = TYPE_CHIP[p.type] || { label: p.type, bg: '#1E3352', color: '#5A7FA8' };
+    const cap    = p.capacity_mw || 0;
+    const gen    = p.generation_mw || 0;
+    const util   = cap > 0 ? Math.min(100, (gen / cap * 100)) : 0;
+    const color  = util > 75 ? 'var(--red)' : util > 40 ? 'var(--amber)' : 'var(--green)';
+
+    return `<tr>
+      <td style="color:var(--text);font-weight:600">${p.name}</td>
+      <td><span class="chip" style="background:${chip.bg};color:${chip.color}">${chip.label}</span></td>
+      <td>${cap.toLocaleString()} MW</td>
+      <td style="color:var(--text)">${gen.toLocaleString()} MW</td>
+      <td>
+        <div style="display:flex;align-items:center">
+          <div class="util-bar">
+            <div class="util-fill" style="width:${util}%;background:${color}"></div>
+          </div>
+          <span style="color:${color}">${util.toFixed(0)}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ──────────────────────────────────────────────────────────────
+// Main render
+// ──────────────────────────────────────────────────────────────
+function render(data) {
+  const gen    = data.generation;
+  const demand = data.demand;
+  const hz = gen.frequency_hz || demand.frequency_hz || 50.0;
+
+  // ── Frequency
+  const freqEl = document.getElementById('freq-val');
+  freqEl.textContent = hz.toFixed(2);
+  freqEl.style.color = freqColor(hz);
+  document.getElementById('freq-bar').style.width    = freqBarPct(hz) + '%';
+  document.getElementById('freq-bar').style.background = freqColor(hz);
+  const statusEl = document.getElementById('freq-status');
+  statusEl.textContent = freqStatusText(hz);
+  statusEl.style.color  = freqColor(hz);
+
+  // ── Totals
+  const totalGen = gen.total_generation_mw;
+  const ownGen   = gen.own_gen_mw;
+  const cgs      = gen.cgs_mw;
+  const ncep     = gen.ncep_mw;
+  document.getElementById('total-gen').textContent = (totalGen||0).toLocaleString();
+  document.getElementById('own-gen-val').textContent = (ownGen||0).toLocaleString() + ' MW';
+  document.getElementById('cgs-val').textContent     = (cgs||0).toLocaleString() + ' MW';
+
+  // ── BESCOM
+  const bescom = demand.bescom;
+  if (bescom) {
+    document.getElementById('bescom-actual').textContent = (bescom.actual_mw||0).toLocaleString();
+    const ui = bescom.ui_mw || 0;
+    const badge = document.getElementById('bescom-badge');
+    badge.textContent = (ui >= 0 ? '+' : '') + ui + ' MW';
+    badge.className = 'badge ' + (ui > 0 ? 'badge-amber' : 'badge-green');
+  }
+
+  // ── NCEPs
+  if (ncep && totalGen) {
+    document.getElementById('ncep-val').textContent = ncep.toLocaleString();
+    const pct = (ncep / totalGen * 100).toFixed(1);
+    document.getElementById('ncep-pct').innerHTML =
+      `<span class="badge badge-green">${pct}%</span> of total generation`;
+  }
+
+  // ── Timestamp
+  const ts = gen.timestamp || demand.timestamp || '';
+  document.getElementById('ts-label').textContent = `SLDC data: ${ts}`;
+
+  // ── Charts & tables
+  renderSourceChart(data);
+  renderESCOM(data);
+  renderNCEP(data);
+  renderPlants(data);
+
+  // ── Pulse
+  initPulse(hz);
+}
+
+// ──────────────────────────────────────────────────────────────
+// Fetch & refresh
+// ──────────────────────────────────────────────────────────────
+async function fetchData() {
+  try {
+    const res = await fetch(API);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    throw new Error(`Could not reach backend (${e.message}). Is the Python server running?`);
+  }
+}
+
+async function refresh() {
+  try {
+    const data = await fetchData();
+    render(data);
+    document.getElementById('error-banner').style.display = 'none';
+  } catch (err) {
+    document.getElementById('error-banner').style.display = 'block';
+    document.getElementById('error-banner').textContent = '⚠ ' + err.message;
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Boot
+// ──────────────────────────────────────────────────────────────
+(async () => {
+  try {
+    const data = await fetchData();
+    document.getElementById('loading').style.display = 'none';
+    render(data);
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-banner').style.display = 'block';
+    document.getElementById('error-banner').textContent = '⚠ ' + err.message;
+    // Still try to start the pulse with default 50Hz
+    initPulse(50.0);
+  }
+  setInterval(refresh, REFRESH_MS);
+})();
+</script>
+</body>
+</html>
