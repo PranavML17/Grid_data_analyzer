@@ -387,6 +387,641 @@ EV_DENSITY = {
 }
 
 
+
+
+# ── City-level feasibility data — Tier 1 & 2 cities, all major states ─────────
+# Grid loading: estimated from state DISCOM published reports + CEA data
+# EV stations: PM E-DRIVE portal + OEM locators (July 2026)
+# headroom: high (loading <65%) | medium (65-82%) | low (>82%)
+CITY_DATA = {
+    "Karnataka": {
+        "Bengaluru": {"tier":1,"discom":"BESCOM","grid_avail_pct":96,"loading_pct":72,"headroom":"medium","ev_stations":6096,"ev_density":"moderate","power_context":"BESCOM territory with 220kV infrastructure in IT corridors. Headroom varies by zone — 57% loaded at Whitefield/Yelahanka, 93% at Koramangala/Rajajinagar. Use the Bengaluru substation lookup on the homepage for zone-specific headroom.","zones":[{"zone":"Whitefield / ITPL","city":"Bengaluru","discom":"BESCOM","opportunity_score":9,"ev_demand":"Very High","power_reliability":"High","supply_voltage":"220kV","reason":"High headroom, moderate competition, large IT commuter base"},{"zone":"Yelahanka / NH-44 North","city":"Bengaluru","discom":"BESCOM","opportunity_score":9,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"220kV","reason":"51% loaded substation, airport corridor, only 4 stations in 2km"},{"zone":"Electronic City","city":"Bengaluru","discom":"BESCOM","opportunity_score":8,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"220kV","reason":"150k+ IT employees, good 220kV supply"},{"zone":"Koramangala","city":"Bengaluru","discom":"BESCOM","opportunity_score":3,"ev_demand":"Very High","power_reliability":"Low","supply_voltage":"66kV","reason":"93% loaded substation + saturated market — both red flags"}],"corridors":[{"name":"NH-48 Bengaluru-Mumbai","distance_km":995,"stations_existing":9,"stations_per_100km":0.9,"opportunity":"Very High","gap_towns":["Chitradurga","Davangere"]},{"name":"NH-44 Bengaluru-Hyderabad","distance_km":570,"stations_existing":14,"stations_per_100km":2.5,"opportunity":"High","gap_towns":["Kolar"]}]},
+        "Mysuru": {"tier":2,"discom":"CESC","grid_avail_pct":95,"loading_pct":61,"headroom":"high","ev_stations":320,"ev_density":"underserved","power_context":"CESC territory with reliable 110kV grid (61% loaded). Bengaluru-Mysuru Expressway is a strong EV corridor. Tourism and IT park growth driving EV adoption faster than infrastructure.","zones":[{"zone":"Infosys / IT City Periphery","city":"Mysuru","discom":"CESC","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Growing IT workforce, low station count, high headroom"},{"zone":"Nazarbad / Commercial Core","city":"Mysuru","discom":"CESC","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"66kV","reason":"Tourism hub, reliable grid, gap in fast DC charging"}],"corridors":[{"name":"Bengaluru-Mysuru Expressway (NH-275)","distance_km":118,"stations_existing":4,"stations_per_100km":3.4,"opportunity":"High","gap_towns":["Mandya","Srirangapatna"]}]},
+        "Hubli-Dharwad": {"tier":2,"discom":"HESCOM","grid_avail_pct":89,"loading_pct":68,"headroom":"medium","ev_stations":210,"ev_density":"underserved","power_context":"HESCOM territory, 110kV supply. Twin city with significant commercial and educational activity. NH-48 (Mumbai-Bengaluru) passes through — highway charging opportunity.","zones":[{"zone":"Dharwad Commercial / NH-48","city":"Hubli-Dharwad","discom":"HESCOM","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"Medium","supply_voltage":"110kV","reason":"NH-48 node, university town, underserved market"}],"corridors":[{"name":"NH-48 Bengaluru-Mumbai","distance_km":200,"stations_existing":3,"stations_per_100km":1.5,"opportunity":"High","gap_towns":["Haveri","Gadag"]}]},
+        "Mangaluru": {"tier":2,"discom":"MESCOM","grid_avail_pct":94,"loading_pct":63,"headroom":"high","ev_stations":280,"ev_density":"underserved","power_context":"MESCOM territory, reliable grid (94% availability). Port city with growing commercial activity. NH-66 coastal highway is the primary EV corridor.","zones":[{"zone":"Lalbagh / Commercial Core","city":"Mangaluru","discom":"MESCOM","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"Port city commercial hub, high headroom, underserved charging market"}],"corridors":[{"name":"NH-66 Goa-Mangaluru-Kochi","distance_km":350,"stations_existing":5,"stations_per_100km":1.4,"opportunity":"High","gap_towns":["Udupi","Karwar"]}]},
+    },
+    "Maharashtra": {
+        "Mumbai": {"tier":1,"discom":"BEST (island) / TPC (western) / MSEDCL (suburbs)","grid_avail_pct":99,"loading_pct":84,"headroom":"medium","ev_stations":820,"ev_density":"moderate","power_context":"Multiple DISCOMs. Mumbai island and western suburbs have 220kV rings — very reliable. MSEDCL outer suburbs are more constrained. High tariff (Rs 9.10/unit) makes charging economics tighter than other cities. Demand is very high.","zones":[{"zone":"Bandra-Kurla Complex","city":"Mumbai","discom":"BEST/TPC","opportunity_score":8,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"Financial district, premium users, high willingness-to-pay, good grid"},{"zone":"Andheri East / MIDC","city":"Mumbai","discom":"TPC/MSEDCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Industrial + IT area, high commuter traffic, moderate competition"},{"zone":"Navi Mumbai / Vashi","city":"Mumbai","discom":"MSEDCL/TPC","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Planned city, good grid, lower competition than core Mumbai"},{"zone":"Thane / Kapurbawdi","city":"Mumbai","discom":"MSEDCL","opportunity_score":7,"ev_demand":"High","power_reliability":"Medium","supply_voltage":"110kV","reason":"Residential + commercial hub, growing EV fleet, moderate supply"}],"corridors":[{"name":"Mumbai-Pune Expressway","distance_km":94,"stations_existing":12,"stations_per_100km":12.8,"opportunity":"Low (saturating)","gap_towns":[]},{"name":"NH-48 Mumbai-Bengaluru","distance_km":995,"stations_existing":18,"stations_per_100km":1.8,"opportunity":"High","gap_towns":["Kolhapur","Belgaum"]}]},
+        "Pune": {"tier":1,"discom":"MSEDCL / Tata Power (some zones)","grid_avail_pct":94,"loading_pct":74,"headroom":"medium","ev_stations":650,"ev_density":"moderate","power_context":"MSEDCL serves Pune with 110kV infrastructure. IT corridors (Hinjewadi, Kharadi) have better supply. Pune has one of the highest EV adoption rates in India — demand growing faster than infrastructure.","zones":[{"zone":"Hinjewadi IT Park","city":"Pune","discom":"MSEDCL","opportunity_score":9,"ev_demand":"Very High","power_reliability":"High","supply_voltage":"110kV","reason":"400k+ IT employees, EV demand far outstripping supply"},{"zone":"Kharadi / EON IT Park","city":"Pune","discom":"MSEDCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"IT corridor, Pune-Nagar Road, moderate competition"},{"zone":"Pimpri-Chinchwad Industrial","city":"Pune","discom":"MSEDCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Auto + manufacturing hub, fleet EV adoption growing"}],"corridors":[{"name":"NH-48 Pune-Bengaluru","distance_km":840,"stations_existing":11,"stations_per_100km":1.3,"opportunity":"High","gap_towns":["Satara","Kolhapur"]}]},
+        "Nagpur": {"tier":2,"discom":"MSEDCL / MSEDCL (city)","grid_avail_pct":91,"loading_pct":67,"headroom":"medium","ev_stations":290,"ev_density":"underserved","power_context":"Central India hub. 110kV supply. MIHAN (international airport zone) is a major development. NH-7/NH-44 junction makes it a critical charging corridor node.","zones":[{"zone":"MIHAN / Airport Zone","city":"Nagpur","discom":"MSEDCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"SEZ + airport hub, central India logistics node, low competition"},{"zone":"Sitabuldi / Commercial Core","city":"Nagpur","discom":"MSEDCL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"City centre, growing EV adoption, constrained old grid"}],"corridors":[{"name":"NH-44 Hyderabad-Nagpur-Delhi","distance_km":450,"stations_existing":8,"stations_per_100km":1.8,"opportunity":"High","gap_towns":["Yavatmal","Amravati"]}]},
+        "Nashik": {"tier":2,"discom":"MSEDCL","grid_avail_pct":92,"loading_pct":65,"headroom":"medium","ev_stations":220,"ev_density":"underserved","power_context":"Auto + pharma + wine manufacturing hub. 110kV supply, 65% loaded — reasonable headroom. NH-3 Agra-Mumbaj highway. Strong fleet EV opportunity in manufacturing sector.","zones":[{"zone":"Satpur / Ambad MIDC","city":"Nashik","discom":"MSEDCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Auto manufacturing cluster, fleet EV adoption, NH-3 corridor"}],"corridors":[{"name":"NH-3 Mumbai-Nashik-Indore","distance_km":390,"stations_existing":6,"stations_per_100km":1.5,"opportunity":"High","gap_towns":["Igatpuri","Dhule"]}]},
+        "Aurangabad": {"tier":2,"discom":"MSEDCL","grid_avail_pct":89,"loading_pct":66,"headroom":"medium","ev_stations":160,"ev_density":"underserved","power_context":"Marathwada industrial hub and heritage tourism centre. MSEDCL 110kV supply. Strong industrial base (auto ancillaries) makes fleet EV a natural opportunity.","zones":[{"zone":"Chikalthana MIDC","city":"Aurangabad","discom":"MSEDCL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"Medium","supply_voltage":"110kV","reason":"Industrial area, fleet vehicle concentration, low EV charging competition"}],"corridors":[{"name":"NH-52 Aurangabad-Hyderabad","distance_km":490,"stations_existing":5,"stations_per_100km":1.0,"opportunity":"High","gap_towns":["Latur","Nanded"]}]},
+        "Kolhapur": {"tier":2,"discom":"MSEDCL","grid_avail_pct":90,"loading_pct":64,"headroom":"high","ev_stations":130,"ev_density":"underserved","power_context":"South Maharashtra commercial hub, near Goa/Karnataka border. Good grid headroom (64% loaded). NH-48 Pune-Bengaluru passes through — highway charging opportunity.","zones":[{"zone":"Kolhapur Commercial","city":"Kolhapur","discom":"MSEDCL","opportunity_score":7,"ev_demand":"Medium","power_reliability":"High","supply_voltage":"110kV","reason":"Border city, high footfall on NH-48, underserved charging market"}],"corridors":[{"name":"NH-48 Pune-Belgaum border","distance_km":170,"stations_existing":3,"stations_per_100km":1.8,"opportunity":"High","gap_towns":["Sangli","Kagal"]}]},
+    },
+    "Tamil Nadu": {
+        "Chennai": {"tier":1,"discom":"TANGEDCO","grid_avail_pct":91,"loading_pct":79,"headroom":"medium","ev_stations":720,"ev_density":"moderate","power_context":"TANGEDCO 110kV in most corridors. ToD pricing available — off-peak (10pm-6am) significantly cheaper. Chennai has India's 3rd highest EV adoption. OMR and GST Road are primary IT/industrial corridors.","zones":[{"zone":"OMR / Sholinganallur","city":"Chennai","discom":"TANGEDCO","opportunity_score":9,"ev_demand":"Very High","power_reliability":"High","supply_voltage":"110kV","reason":"50km IT corridor, 400k employees, DC fast charging severely underserved"},{"zone":"Ambattur Industrial Estate","city":"Chennai","discom":"TANGEDCO","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Manufacturing hub, fleet EV adoption, NH-4 proximity"},{"zone":"GST Road / NH-44","city":"Chennai","discom":"TANGEDCO","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Airport-Bengaluru corridor, high-volume highway traffic"}],"corridors":[{"name":"NH-44 Chennai-Bengaluru","distance_km":345,"stations_existing":18,"stations_per_100km":5.2,"opportunity":"Medium","gap_towns":["Vellore"]},{"name":"NH-16 Chennai-Vijayawada","distance_km":420,"stations_existing":9,"stations_per_100km":2.1,"opportunity":"High","gap_towns":["Nellore"]}]},
+        "Coimbatore": {"tier":2,"discom":"TANGEDCO","grid_avail_pct":92,"loading_pct":68,"headroom":"medium","ev_stations":310,"ev_density":"underserved","power_context":"Textile + engineering manufacturing hub. 110kV supply, 68% loaded. Gateway to Kerala — NH-544 Coimbatore-Kochi is a high-traffic corridor. Strong fleet EV opportunity in textile and logistics.","zones":[{"zone":"Peelamedu / IT Corridor","city":"Coimbatore","discom":"TANGEDCO","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"IT + education hub, growing EV fleet, low competition"},{"zone":"SIDCO Industrial","city":"Coimbatore","discom":"TANGEDCO","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"Textile manufacturing, fleet EV, NH-544 Kerala gateway"}],"corridors":[{"name":"NH-544 Coimbatore-Kochi","distance_km":185,"stations_existing":5,"stations_per_100km":2.7,"opportunity":"High","gap_towns":["Palakkad"]}]},
+        "Madurai": {"tier":2,"discom":"TANGEDCO","grid_avail_pct":88,"loading_pct":72,"headroom":"medium","ev_stations":220,"ev_density":"underserved","power_context":"South Tamil Nadu hub and temple tourism centre. 110kV supply. Growing commercial activity. NH-44 south extension and NH-85 are key corridors.","zones":[{"zone":"Anna Nagar / Commercial","city":"Madurai","discom":"TANGEDCO","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"City centre, growing EV adoption, first-mover in underpenetrated market"}],"corridors":[{"name":"NH-44 Madurai-Kanyakumari","distance_km":180,"stations_existing":4,"stations_per_100km":2.2,"opportunity":"High","gap_towns":["Virudhunagar","Tirunelveli"]}]},
+        "Tiruchirappalli": {"tier":2,"discom":"TANGEDCO","grid_avail_pct":90,"loading_pct":65,"headroom":"high","ev_stations":180,"ev_density":"underserved","power_context":"Central Tamil Nadu hub with aerospace, heavy engineering, and education sectors. Good headroom (65% loaded). Bharat Heavy Electricals (BHEL) township — institutional fleet EV opportunity.","zones":[{"zone":"Thillai Nagar / Commercial","city":"Tiruchirappalli","discom":"TANGEDCO","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"BHEL + university town, government fleet EV, high headroom"}],"corridors":[{"name":"NH-38 Trichy-Chennai","distance_km":330,"stations_existing":5,"stations_per_100km":1.5,"opportunity":"High","gap_towns":["Villupuram"]}]},
+    },
+    "Telangana": {
+        "Hyderabad": {"tier":1,"discom":"TSSPDCL / TSNPDCL","grid_avail_pct":94,"loading_pct":76,"headroom":"medium","ev_stations":480,"ev_density":"moderate","power_context":"TSSPDCL serves Hyderabad metro with 220kV infrastructure in HITEC City and ORR. Strong EV adoption — 80% YoY growth. TSREDCO actively promoting EV charging. ToD pricing available.","zones":[{"zone":"HITEC City / Gachibowli","city":"Hyderabad","discom":"TSSPDCL","opportunity_score":9,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"500k+ tech workers, EV adoption growing 80% YoY, grid well-upgraded"},{"zone":"Outer Ring Road Corridor","city":"Hyderabad","discom":"TSSPDCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"158km ring, multiple nodes, sparse DC fast charging"},{"zone":"Begumpet / Commercial","city":"Hyderabad","discom":"TSSPDCL","opportunity_score":6,"ev_demand":"High","power_reliability":"Medium","supply_voltage":"66kV","reason":"Old commercial area, grid more constrained, high footfall"}],"corridors":[{"name":"NH-44 Hyderabad-Bengaluru","distance_km":570,"stations_existing":14,"stations_per_100km":2.5,"opportunity":"High","gap_towns":["Kurnool"]},{"name":"NH-65 Hyderabad-Pune","distance_km":560,"stations_existing":7,"stations_per_100km":1.3,"opportunity":"High","gap_towns":["Solapur"]}]},
+        "Warangal": {"tier":2,"discom":"TSNPDCL","grid_avail_pct":91,"loading_pct":62,"headroom":"high","ev_stations":85,"ev_density":"underserved","power_context":"North Telangana hub, 110kV supply, 62% loaded. NH-163 Hyderabad-Warangal highway is a key corridor. Steel, textile and education-driven economy.","zones":[{"zone":"Hanamkonda Commercial","city":"Warangal","discom":"TSNPDCL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"High","supply_voltage":"110kV","reason":"Twin city commercial hub, high headroom, first-mover opportunity"}],"corridors":[{"name":"NH-163 Hyderabad-Warangal","distance_km":145,"stations_existing":3,"stations_per_100km":2.1,"opportunity":"High","gap_towns":["Bhongir"]}]},
+    },
+    "Gujarat": {
+        "Ahmedabad": {"tier":1,"discom":"APDCL (AMCS) / DGVCL","grid_avail_pct":96,"loading_pct":72,"headroom":"medium","ev_stations":520,"ev_density":"moderate","power_context":"AMCS serves Ahmedabad city with reliable 110kV/220kV grid. DGVCL for periphery. Strong solar generation — off-peak ToD attractive for fleet charging. GIFT City nearby.","zones":[{"zone":"GIFT City / Gandhinagar","city":"Ahmedabad","discom":"DGVCL","opportunity_score":9,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"220kV dedicated","reason":"Smart city, premium market, very reliable dedicated grid"},{"zone":"SG Highway Corridor","city":"Ahmedabad","discom":"AMCS","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"IT + commercial corridor, high traffic, growing EV fleet"}],"corridors":[{"name":"NH-48 Ahmedabad-Mumbai","distance_km":530,"stations_existing":16,"stations_per_100km":3.0,"opportunity":"High","gap_towns":["Bharuch","Vapi"]}]},
+        "Surat": {"tier":1,"discom":"MGVCL / Surat Municipal","grid_avail_pct":95,"loading_pct":68,"headroom":"medium","ev_stations":380,"ev_density":"underserved","power_context":"Diamond + textile hub. 110kV supply, 68% loaded. Highest per-capita income city in India — strong willingness-to-pay for premium charging. Surat-Mumbai Expressway is new EV corridor.","zones":[{"zone":"Vesu / City Light","city":"Surat","discom":"MGVCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Affluent residential, high EV adoption, underserved on fast charging"},{"zone":"Sachin GIDC Industrial","city":"Surat","discom":"MGVCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Industrial zone, fleet EV opportunity, highway proximity"}],"corridors":[{"name":"NH-48 Surat-Mumbai","distance_km":265,"stations_existing":8,"stations_per_100km":3.0,"opportunity":"Medium-High","gap_towns":["Silvassa"]}]},
+        "Vadodara": {"tier":2,"discom":"MGVCL","grid_avail_pct":95,"loading_pct":63,"headroom":"high","ev_stations":280,"ev_density":"underserved","power_context":"Petrochemical + engineering hub. Good grid headroom (63% loaded). NH-48 and National Highway corridor. PCPIR zone (petroleum/chemical) creates fleet EV opportunity.","zones":[{"zone":"Alkapuri / Commercial","city":"Vadodara","discom":"MGVCL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"Premium commercial area, high headroom, growing EV fleet"}],"corridors":[{"name":"NH-48 Vadodara-Ahmedabad","distance_km":113,"stations_existing":6,"stations_per_100km":5.3,"opportunity":"Medium","gap_towns":[]}]},
+        "Rajkot": {"tier":2,"discom":"PGVCL / Rajkot Municipal","grid_avail_pct":94,"loading_pct":61,"headroom":"high","ev_stations":230,"ev_density":"underserved","power_context":"Engineering + auto parts manufacturing hub. Good grid (61% loaded). Growing EV adoption. NH-27 Rajkot-Ahmedabad corridor. Auto parts industry drives fleet EV opportunity.","zones":[{"zone":"Kalawad Road / Commercial","city":"Rajkot","discom":"PGVCL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"Commercial hub, auto industry fleet, high headroom, low competition"}],"corridors":[{"name":"NH-27 Rajkot-Ahmedabad","distance_km":216,"stations_existing":5,"stations_per_100km":2.3,"opportunity":"High","gap_towns":["Morbi"]}]},
+    },
+    "Rajasthan": {
+        "Jaipur": {"tier":1,"discom":"JVVNL","grid_avail_pct":90,"loading_pct":72,"headroom":"medium","ev_stations":380,"ev_density":"underserved","power_context":"JVVNL 110kV supply, 72% loaded. Strong state EV policy with capital subsidies. High tourism + IT growth. NH-48 Delhi-Jaipur is one of India's busiest highways.","zones":[{"zone":"Malviya Nagar / IT City","city":"Jaipur","discom":"JVVNL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"IT corridor, tourism gateway, aggressive state EV policy"},{"zone":"Sitapura Industrial","city":"Jaipur","discom":"JVVNL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Industrial zone, fleet EV adoption, NH-48 proximity"}],"corridors":[{"name":"NH-48 Delhi-Jaipur","distance_km":280,"stations_existing":9,"stations_per_100km":3.2,"opportunity":"High","gap_towns":["Kotputli"]}]},
+        "Jodhpur": {"tier":2,"discom":"JDVVNL","grid_avail_pct":86,"loading_pct":66,"headroom":"medium","ev_stations":190,"ev_density":"underserved","power_context":"Blue City — tourism + textile hub. JDVVNL 110kV, 66% loaded. Growing commercial activity. NH-65 Jodhpur-Hyderabad is a long-distance EV corridor.","zones":[{"zone":"Residency Road / Commercial","city":"Jodhpur","discom":"JDVVNL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"Tourism hub, first-mover opportunity, grid adequate"}],"corridors":[{"name":"NH-65 Jodhpur-Ahmedabad","distance_km":310,"stations_existing":4,"stations_per_100km":1.3,"opportunity":"High","gap_towns":["Barmer","Pali"]}]},
+        "Udaipur": {"tier":2,"discom":"JDVVNL","grid_avail_pct":87,"loading_pct":60,"headroom":"high","ev_stations":140,"ev_density":"underserved","power_context":"Heritage tourism city with high-income tourists. Good headroom (60% loaded). High EV adoption among luxury hotels. NH-76 and NH-58 corridors.","zones":[{"zone":"Udaipur Lake Pichola Area","city":"Udaipur","discom":"JDVVNL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"66kV","reason":"Premium tourism, luxury hotel fleet EVs, high willingness-to-pay"}],"corridors":[{"name":"NH-76 Udaipur-Chittorgarh","distance_km":115,"stations_existing":2,"stations_per_100km":1.7,"opportunity":"High","gap_towns":["Chittorgarh"]}]},
+    },
+    "Uttar Pradesh": {
+        "Lucknow": {"tier":1,"discom":"LECO (Lucknow Electric Supply Co.)","grid_avail_pct":88,"loading_pct":74,"headroom":"medium","ev_stations":320,"ev_density":"underserved","power_context":"UP state capital with improving grid. LECO serves core city. Expressway-connected (Agra, Kanpur, Gorakhpur). Growing IT corridor — Vibrant Lucknow. Government fleet EV push strong here.","zones":[{"zone":"Gomti Nagar / IT Park","city":"Lucknow","discom":"LECO","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Growing IT sector, government fleet EV, NH connectivity"},{"zone":"Hazratganj / Commercial","city":"Lucknow","discom":"LECO","opportunity_score":6,"ev_demand":"Medium-High","power_reliability":"Medium","supply_voltage":"66kV","reason":"Prime commercial area, dense footfall, old grid constraint"}],"corridors":[{"name":"Agra-Lucknow Expressway","distance_km":302,"stations_existing":6,"stations_per_100km":2.0,"opportunity":"High","gap_towns":["Unnao","Kannauj"]}]},
+        "Kanpur": {"tier":1,"discom":"KESCO","grid_avail_pct":84,"loading_pct":76,"headroom":"medium","ev_stations":210,"ev_density":"underserved","power_context":"Industrial hub — leather, textiles, defence manufacturing. KESCO grid improving but old industrial areas have quality issues. Strong fleet EV opportunity in logistics and manufacturing.","zones":[{"zone":"Naveen Market / Commercial","city":"Kanpur","discom":"KESCO","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"Major commercial centre, fleet opportunity but grid challenges"},{"zone":"Panki Industrial Area","city":"Kanpur","discom":"KESCO","opportunity_score":6,"ev_demand":"Medium-High","power_reliability":"Medium","supply_voltage":"110kV","reason":"Manufacturing hub, fleet EV, better grid in industrial zone"}],"corridors":[{"name":"NH-19 Delhi-Kanpur-Varanasi","distance_km":420,"stations_existing":8,"stations_per_100km":1.9,"opportunity":"High","gap_towns":["Etawah"]}]},
+        "Agra": {"tier":2,"discom":"PVVNL","grid_avail_pct":83,"loading_pct":72,"headroom":"medium","ev_stations":160,"ev_density":"underserved","power_context":"Tourism capital — Taj Mahal draws 7M+ annual visitors. PVVNL grid, 72% loaded. Yamuna Expressway is a well-developed EV corridor. Tourism-driven demand for EV taxis and cabs.","zones":[{"zone":"Fatehabad Road / Tourism Zone","city":"Agra","discom":"PVVNL","opportunity_score":7,"ev_demand":"High","power_reliability":"Medium","supply_voltage":"66kV","reason":"Tourism hub, EV taxi opportunity, Yamuna Expressway terminus"}],"corridors":[{"name":"Yamuna Expressway Delhi-Agra","distance_km":165,"stations_existing":8,"stations_per_100km":4.8,"opportunity":"Medium-High","gap_towns":[]}]},
+        "Varanasi": {"tier":2,"discom":"PUVVNL","grid_avail_pct":80,"loading_pct":73,"headroom":"medium","ev_stations":130,"ev_density":"underserved","power_context":"Temple city + major tourism destination. PUVVNL grid with improvement underway. Purvanchal Expressway now connected. High tourist footfall drives EV cab/auto demand.","zones":[{"zone":"Lanka / BHU Campus Area","city":"Varanasi","discom":"PUVVNL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"University + tourism area, growing EV cab fleet, underserved"}],"corridors":[{"name":"NH-19 Lucknow-Varanasi","distance_km":285,"stations_existing":4,"stations_per_100km":1.4,"opportunity":"High","gap_towns":["Allahabad","Mirzapur"]}]},
+    },
+    "Delhi": {
+        "New Delhi": {"tier":1,"discom":"BSES Rajdhani / BSES Yamuna / TPDDL","grid_avail_pct":99,"loading_pct":80,"headroom":"medium","ev_stations":950,"ev_density":"moderate","power_context":"Delhi has India's most reliable urban grid (99%, 220kV rings). Multiple DISCOMs. Delhi EV policy is India's most aggressive — free registration, road tax waiver, PM E-DRIVE priority city. High competition in central areas.","zones":[{"zone":"Connaught Place / Central","city":"New Delhi","discom":"BSES Rajdhani","opportunity_score":6,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"Very high demand but saturating market — competition is the constraint"},{"zone":"Saket / South Delhi","city":"New Delhi","discom":"BSES Rajdhani","opportunity_score":7,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"Premium residential + commercial, high-income EV owners"},{"zone":"Rohini / West Delhi","city":"New Delhi","discom":"BSES Yamuna","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Largest residential area in Delhi, moderate station count, growing fleet"}],"corridors":[{"name":"NH-44 Delhi-Chandigarh-Amritsar","distance_km":450,"stations_existing":14,"stations_per_100km":3.1,"opportunity":"Medium-High","gap_towns":[]},{"name":"NH-48 Delhi-Jaipur","distance_km":280,"stations_existing":9,"stations_per_100km":3.2,"opportunity":"High","gap_towns":["Dharuhera"]}]},
+        "Gurugram": {"tier":1,"discom":"DHBVN / TPC (Gurugram)","grid_avail_pct":98,"loading_pct":77,"headroom":"medium","ev_stations":420,"ev_density":"moderate","power_context":"NCR financial hub. Very reliable 220kV grid. Highest per-capita EV ownership in India. NH-48 expressway. Strong competition but demand consistently outstrips supply.","zones":[{"zone":"Cyber Hub / DLF Phase 2-3","city":"Gurugram","discom":"TPC","opportunity_score":8,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"Premium commercial, very high EV density, DC fast charging gap"},{"zone":"Sohna Road / Golf Course Ext","city":"Gurugram","discom":"DHBVN","opportunity_score":8,"ev_demand":"Very High","power_reliability":"High","supply_voltage":"110kV","reason":"Rapid residential growth, EV adoption highest in India"}],"corridors":[{"name":"NH-48 Delhi-Jaipur (through Gurugram)","distance_km":40,"stations_existing":12,"stations_per_100km":30,"opportunity":"Low (saturating)","gap_towns":[]}]},
+        "Noida": {"tier":1,"discom":"PVVNL / Noida Power Company","grid_avail_pct":96,"loading_pct":71,"headroom":"medium","ev_stations":340,"ev_density":"moderate","power_context":"NCR IT hub on UP side of Yamuna. Noida Power Company (NPC) serves core sectors with reliable 110kV. Good grid headroom relative to Delhi. Yamuna Expressway access.","zones":[{"zone":"Sector 62 / 63 IT Hub","city":"Noida","discom":"PVVNL","opportunity_score":8,"ev_demand":"Very High","power_reliability":"High","supply_voltage":"110kV","reason":"Large IT workforce, NCR EV adoption, better headroom than Delhi"},{"zone":"Greater Noida / Knowledge Park","city":"Noida","discom":"PVVNL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Planned township, low competition, good grid"}],"corridors":[{"name":"Yamuna Expressway (Noida-Agra)","distance_km":165,"stations_existing":8,"stations_per_100km":4.8,"opportunity":"Medium-High","gap_towns":[]}]},
+    },
+    "West Bengal": {
+        "Kolkata": {"tier":1,"discom":"CESC (Kolkata city) / WBSEDCL (suburbs)","grid_avail_pct":92,"loading_pct":80,"headroom":"medium","ev_stations":380,"ev_density":"moderate","power_context":"CESC serves Kolkata with reliable 220kV grid. WBSEDCL for suburbs is more variable. Among the highest tariff states (Rs 8.50/unit) — tightens charging economics. Salt Lake and Rajarhat are the IT/commercial EV corridors.","zones":[{"zone":"Salt Lake / Sector V","city":"Kolkata","discom":"CESC","opportunity_score":7,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"220kV","reason":"IT hub, reliable CESC grid, growing EV adoption, tariff is the constraint"},{"zone":"Rajarhat / New Town","city":"Kolkata","discom":"CESC/WBSEDCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Planned city, good grid, lower competition than Salt Lake"}],"corridors":[{"name":"NH-12 Kolkata-Siliguri","distance_km":600,"stations_existing":8,"stations_per_100km":1.3,"opportunity":"High","gap_towns":["Burdwan","Durgapur"]}]},
+        "Siliguri": {"tier":2,"discom":"WBSEDCL","grid_avail_pct":88,"loading_pct":67,"headroom":"medium","ev_stations":110,"ev_density":"underserved","power_context":"Northeast India gateway city. NH-10 junction for Sikkim/Bhutan. Growing commercial hub. Tourism to Darjeeling drives EV cab demand. Good connectivity opportunity.","zones":[{"zone":"Sevoke Road / Commercial","city":"Siliguri","discom":"WBSEDCL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"Medium","supply_voltage":"110kV","reason":"Northeast gateway, tourism EV, underserved charging market"}],"corridors":[{"name":"NH-10 Siliguri-Gangtok","distance_km":114,"stations_existing":3,"stations_per_100km":2.6,"opportunity":"High","gap_towns":["Rangpo"]}]},
+        "Durgapur": {"tier":2,"discom":"WBSEDCL / DPL","grid_avail_pct":89,"loading_pct":65,"headroom":"high","ev_stations":95,"ev_density":"underserved","power_context":"Steel + industrial city, Damodar Valley power region. Good headroom (65% loaded, industrial supply). NH-2 / Durgapur Expressway. Fleet EV opportunity in steel industry logistics.","zones":[{"zone":"Durgapur Steel Plant Area","city":"Durgapur","discom":"DPL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"High","supply_voltage":"110kV","reason":"Industrial fleet, high headroom, underserved EV market"}],"corridors":[{"name":"NH-2 / Durgapur Expressway","distance_km":170,"stations_existing":4,"stations_per_100km":2.4,"opportunity":"High","gap_towns":["Asansol"]}]},
+    },
+    "Haryana": {
+        "Gurugram": {"tier":1,"discom":"DHBVN / TPC (some zones)","grid_avail_pct":97,"loading_pct":77,"headroom":"medium","ev_stations":420,"ev_density":"moderate","power_context":"NCR financial hub with reliable 220kV grid. Highest per-capita EV ownership in India. NH-48 Delhi-Jaipur expressway. Strong demand but market moderately competitive.","zones":[{"zone":"Cyber Hub / DLF","city":"Gurugram","discom":"TPC","opportunity_score":8,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"Premium commercial, premium users, DC fast charging gap"},{"zone":"IMT Manesar","city":"Gurugram","discom":"DHBVN","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Auto manufacturing, fleet EV, NH-48 industrial corridor"}],"corridors":[{"name":"NH-48 Delhi-Jaipur","distance_km":280,"stations_existing":9,"stations_per_100km":3.2,"opportunity":"High","gap_towns":["Dharuhera"]}]},
+        "Faridabad": {"tier":2,"discom":"DHBVN","grid_avail_pct":91,"loading_pct":73,"headroom":"medium","ev_stations":220,"ev_density":"underserved","power_context":"Industrial suburb south of Delhi. DHBVN 110kV supply. Manufacturing hub (auto, textiles). NH-19 Delhi-Agra passes through. Fleet EV opportunity in industrial sector.","zones":[{"zone":"NHPC / Sector 17-21","city":"Faridabad","discom":"DHBVN","opportunity_score":6,"ev_demand":"Medium-High","power_reliability":"Medium","supply_voltage":"110kV","reason":"Industrial area, fleet EV, Delhi overspill demand"}],"corridors":[{"name":"NH-19 Delhi-Agra","distance_km":165,"stations_existing":8,"stations_per_100km":4.8,"opportunity":"Medium","gap_towns":[]}]},
+    },
+    "Madhya Pradesh": {
+        "Indore": {"tier":1,"discom":"MPMKVVCL","grid_avail_pct":92,"loading_pct":69,"headroom":"medium","ev_stations":340,"ev_density":"underserved","power_context":"India's cleanest city, strong civic culture favouring EVs. MPMKVVCL 110kV supply, 69% loaded. Commercial + pharma hub. NH-3 and NH-52 corridor node.","zones":[{"zone":"Vijay Nagar / Super Corridor","city":"Indore","discom":"MPMKVVCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"IT/commercial growth corridor, strong environmental awareness, low competition"},{"zone":"Pipliyahana / AB Road","city":"Indore","discom":"MPMKVVCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Commercial artery, high traffic, underserved charging market"}],"corridors":[{"name":"NH-3 Mumbai-Indore-Agra","distance_km":580,"stations_existing":8,"stations_per_100km":1.4,"opportunity":"High","gap_towns":["Dhule","Mhow","Shajapur"]}]},
+        "Bhopal": {"tier":1,"discom":"MPPKVVCL","grid_avail_pct":91,"loading_pct":67,"headroom":"medium","ev_stations":280,"ev_density":"underserved","power_context":"State capital, IT park + education hub. MPPKVVCL 110kV supply. Government fleet EV procurement strong. NH-12 Bhopal-Jabalpur and NH-146 Bhopal-Indore are key corridors.","zones":[{"zone":"MP Nagar / IT Park","city":"Bhopal","discom":"MPPKVVCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Government + IT hub, strong fleet EV, underserved public charging"}],"corridors":[{"name":"NH-146 Bhopal-Indore","distance_km":190,"stations_existing":4,"stations_per_100km":2.1,"opportunity":"High","gap_towns":["Sehore"]}]},
+        "Gwalior": {"tier":2,"discom":"MPPKVVCL","grid_avail_pct":88,"loading_pct":68,"headroom":"medium","ev_stations":150,"ev_density":"underserved","power_context":"Historic city + industrial hub. 110kV supply. NH-44 Delhi-Hyderabad corridor. Tourism (forts) and defence establishments drive demand.","zones":[{"zone":"Gwalior Commercial","city":"Gwalior","discom":"MPPKVVCL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"Tourism + defence, underserved market, NH-44 connectivity"}],"corridors":[{"name":"NH-44 Delhi-Hyderabad (Gwalior)","distance_km":100,"stations_existing":3,"stations_per_100km":3.0,"opportunity":"Medium","gap_towns":[]}]},
+    },
+    "Punjab": {
+        "Ludhiana": {"tier":1,"discom":"PSPCL","grid_avail_pct":93,"loading_pct":74,"headroom":"medium","ev_stations":280,"ev_density":"underserved","power_context":"Hosiery + bicycle + auto ancillary capital. PSPCL reliable 110kV supply. NH-44 Delhi-Amritsar passes through. Fleet EV strong opportunity in manufacturing.","zones":[{"zone":"Focal Point Industrial","city":"Ludhiana","discom":"PSPCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Largest industrial zone, fleet EV, NH-44 highway node"}],"corridors":[{"name":"NH-44 Delhi-Amritsar GT Road","distance_km":450,"stations_existing":14,"stations_per_100km":3.1,"opportunity":"Medium-High","gap_towns":["Panipat","Karnal"]}]},
+        "Amritsar": {"tier":2,"discom":"PSPCL","grid_avail_pct":92,"loading_pct":66,"headroom":"medium","ev_stations":190,"ev_density":"underserved","power_context":"Tourism capital + border city. Wagah border and Golden Temple draw 25M+ annual visitors. 110kV supply, 66% loaded. Airport expressway. Tourism EV opportunity is significant.","zones":[{"zone":"Lawrence Road / Ranjit Avenue","city":"Amritsar","discom":"PSPCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Tourism hub, EV cab/auto demand, airport proximity"}],"corridors":[{"name":"NH-54 Amritsar-Jammu","distance_km":220,"stations_existing":4,"stations_per_100km":1.8,"opportunity":"High","gap_towns":["Pathankot"]}]},
+    },
+    "Uttarakhand": {
+        "Dehradun": {"tier":1,"discom":"UPCL","grid_avail_pct":96,"loading_pct":62,"headroom":"high","ev_stations":180,"ev_density":"underserved","power_context":"State capital with reliable hydro-backed grid (96% availability, low tariff Rs 4.50/unit). IT + education hub. NH-7 to Rishikesh/Haridwar pilgrimage corridor. High headroom — very good for new connections.","zones":[{"zone":"Rajpur Road / Commercial","city":"Dehradun","discom":"UPCL","opportunity_score":8,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"110kV","reason":"IT + education hub, high headroom, tourism gateway, low competition"}],"corridors":[{"name":"NH-7 Dehradun-Haridwar-Rishikesh","distance_km":55,"stations_existing":3,"stations_per_100km":5.5,"opportunity":"Medium-High","gap_towns":[]}]},
+        "Haridwar": {"tier":2,"discom":"UPCL","grid_avail_pct":95,"loading_pct":58,"headroom":"high","ev_stations":95,"ev_density":"underserved","power_context":"Pilgrimage city — 30M+ annual visitors. UPCL reliable hydro grid, 58% loaded. NH-58 Delhi-Haridwar highway. Strong EV cab/auto demand from pilgrims.","zones":[{"zone":"Har Ki Pauri / Tourism Zone","city":"Haridwar","discom":"UPCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"66kV","reason":"10M+ pilgrims, growing EV cab fleet, high headroom, low charging competition"}],"corridors":[{"name":"NH-58 Delhi-Haridwar","distance_km":250,"stations_existing":9,"stations_per_100km":3.6,"opportunity":"Medium","gap_towns":[]}]},
+    },
+    "Odisha": {
+        "Bhubaneswar": {"tier":1,"discom":"TPCODL","grid_avail_pct":90,"loading_pct":67,"headroom":"medium","ev_stations":185,"ev_density":"underserved","power_context":"Smart city initiative — well-planned infrastructure. TPCODL (Tata Power) with improving grid. NH-16 Kolkata-Chennai passes through. IT + government hub with growing EV adoption.","zones":[{"zone":"Infocity / IT Park","city":"Bhubaneswar","discom":"TPCODL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"IT + government hub, smart city, underserved EV market"}],"corridors":[{"name":"NH-16 Bhubaneswar-Kolkata","distance_km":480,"stations_existing":6,"stations_per_100km":1.3,"opportunity":"High","gap_towns":["Balasore","Bhadrak"]}]},
+        "Rourkela": {"tier":2,"discom":"TPSODL","grid_avail_pct":88,"loading_pct":61,"headroom":"high","ev_stations":85,"ev_density":"underserved","power_context":"Steel city with industrial power supply. TPSODL (Tata Power), 61% loaded. Jharkhand border — Ranchi-Rourkela corridor. Fleet EV in steel/mining sector.","zones":[{"zone":"Steel Township","city":"Rourkela","discom":"TPSODL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"High","supply_voltage":"110kV","reason":"Industrial fleet opportunity, high headroom, very underserved market"}],"corridors":[{"name":"NH-143 Rourkela-Ranchi","distance_km":130,"stations_existing":2,"stations_per_100km":1.5,"opportunity":"High","gap_towns":["Simdega"]}]},
+    },
+    "Kerala": {
+        "Kochi": {"tier":1,"discom":"KSEB","grid_avail_pct":97,"loading_pct":70,"headroom":"medium","ev_stations":320,"ev_density":"underserved","power_context":"KSEB hydro-backed grid, 97% availability. Growing IT and port-based economy. Kerala has high EV adoption (environmental awareness + high literacy). NH-66 coastal highway is the primary corridor.","zones":[{"zone":"Infopark / SmartCity","city":"Kochi","discom":"KSEB","opportunity_score":8,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"110kV","reason":"IT hub, high-income workforce, EV-friendly state policy, low competition"},{"zone":"Kakkanad / NH-85","city":"Kochi","discom":"KSEB","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Commercial corridor, growing EV fleet"}],"corridors":[{"name":"NH-66 Kochi-Kozhikode","distance_km":230,"stations_existing":9,"stations_per_100km":3.9,"opportunity":"Medium","gap_towns":[]}]},
+        "Thiruvananthapuram": {"tier":1,"discom":"KSEB","grid_avail_pct":97,"loading_pct":65,"headroom":"high","ev_stations":240,"ev_density":"underserved","power_context":"State capital + IT hub. KSEB reliable grid, 65% loaded. High headroom. Technopark is India's first IT park — large EV-adopting workforce. Tourism to beaches and backwaters.","zones":[{"zone":"Technopark / Kazhakoottam","city":"Thiruvananthapuram","discom":"KSEB","opportunity_score":8,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"110kV","reason":"IT hub, high headroom, Kerala high EV policy support, underserved"}],"corridors":[{"name":"NH-44 Thiruvananthapuram-Chennai (NH-66)","distance_km":640,"stations_existing":22,"stations_per_100km":3.4,"opportunity":"Medium","gap_towns":[]}]},
+        "Kozhikode": {"tier":2,"discom":"KSEB","grid_avail_pct":96,"loading_pct":62,"headroom":"high","ev_stations":160,"ev_density":"underserved","power_context":"Calicut — commercial hub of North Kerala. KSEB reliable grid, 62% loaded — high headroom. NH-66 coastal highway. Textile and spice trade creates fleet opportunity.","zones":[{"zone":"Mavoor Road / Commercial","city":"Kozhikode","discom":"KSEB","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"Commercial hub, high headroom, low competition, growing EV fleet"}],"corridors":[{"name":"NH-66 Kozhikode-Goa","distance_km":350,"stations_existing":6,"stations_per_100km":1.7,"opportunity":"High","gap_towns":["Kannur","Kasaragod"]}]},
+    },
+    "Andhra Pradesh": {
+        "Visakhapatnam": {"tier":1,"discom":"APEPDCL","grid_avail_pct":93,"loading_pct":72,"headroom":"medium","ev_stations":280,"ev_density":"underserved","power_context":"Steel + IT hub and port city. APEPDCL 110kV, 72% loaded. NH-16 Chennai-Kolkata corridor. New state capital region driving investment. Fleet EV in steel and port logistics.","zones":[{"zone":"Rushikonda / IT Hill","city":"Visakhapatnam","discom":"APEPDCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"IT cluster, high-income area, growing EV market"},{"zone":"BHPV / Steel Plant Area","city":"Visakhapatnam","discom":"APEPDCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Industrial fleet, high EV potential in heavy industry"}],"corridors":[{"name":"NH-16 Vizag-Vijayawada","distance_km":350,"stations_existing":8,"stations_per_100km":2.3,"opportunity":"High","gap_towns":["Rajahmundry"]}]},
+        "Vijayawada": {"tier":1,"discom":"APSPDCL","grid_avail_pct":91,"loading_pct":74,"headroom":"medium","ev_stations":220,"ev_density":"underserved","power_context":"Andhra Pradesh commercial hub. Amaravati capital region nearby. APSPDCL 110kV supply. NH-16 junction — high-traffic corridor node. Seed capital area driving premium EV adoption.","zones":[{"zone":"MG Road / Benz Circle","city":"Vijayawada","discom":"APSPDCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Commercial hub, capital region proximity, growing EV fleet"}],"corridors":[{"name":"NH-65 Vijayawada-Hyderabad","distance_km":275,"stations_existing":6,"stations_per_100km":2.2,"opportunity":"High","gap_towns":["Nalgonda"]}]},
+    },
+}
+
+# ── EV zones data — all 30 states ─────────────────────────────────────────────
+# Detailed for 9 key states; summary-level for remaining 21.
+# Source: State EV policy portals, NH corridor data, DISCOM territory maps.
+# Last verified: July 2026
+EV_ZONES_DATA = {
+    "Karnataka": {
+        "discom": "BESCOM / HESCOM / MESCOM / CESC / GESCOM",
+        "ev_stations_total": 6096, "grid_avail_pct": 96,
+        "power_context": "BESCOM territory has dedicated 220kV infrastructure in Bengaluru. NH highway corridors fed by 11kV/33kV — transformer upgrades needed for chargers above 60kW. 220kV available at Electronic City, Whitefield, KIADB areas.",
+        "corridors": [
+            {"name":"NH-44 Bengaluru → Hyderabad","distance_km":570,"stations_existing":14,"stations_per_100km":2.5,"opportunity":"High","gap_towns":["Kolar","Chittoor border"]},
+            {"name":"NH-48 Bengaluru → Mumbai","distance_km":995,"stations_existing":9,"stations_per_100km":0.9,"opportunity":"Very High","gap_towns":["Chitradurga","Davangere","Dharwad"]},
+            {"name":"NH-75 Bengaluru → Mangaluru","distance_km":352,"stations_existing":6,"stations_per_100km":1.7,"opportunity":"High","gap_towns":["Hassan","Sakleshpur ghat"]},
+        ],
+        "zones": [
+            {"zone":"Whitefield","city":"Bengaluru","discom":"BESCOM","opportunity_score":9,"ev_demand":"Very High","power_reliability":"High","supply_voltage":"220kV nearby","reason":"1.2M daily footfall, low charger density vs EV registrations"},
+            {"zone":"Electronic City","city":"Bengaluru","discom":"BESCOM","opportunity_score":8,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"220kV","reason":"150k+ IT employees, dedicated KIADB infrastructure"},
+            {"zone":"Tumkuru (NH-48)","city":"Tumkuru","discom":"BESCOM","opportunity_score":9,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"NH-48 gateway, zero public DC fast chargers in 80km stretch"},
+            {"zone":"Mysuru City","city":"Mysuru","discom":"CESC","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"66kV","reason":"Tourism capital, growing EV fleet, limited fast charging"},
+        ]
+    },
+    "Maharashtra": {
+        "discom": "MSEDCL / BEST (Mumbai) / TPC (Mumbai)",
+        "ev_stations_total": 3200, "grid_avail_pct": 94,
+        "power_context": "Mumbai grid highly reliable (multiple 220kV rings). Pune and Nashik have 110kV. Rural MSEDCL areas have load-shedding — verify substation capacity before highway stations.",
+        "corridors": [
+            {"name":"Mumbai → Pune Expressway","distance_km":165,"stations_existing":22,"stations_per_100km":13.3,"opportunity":"Low (densifying)","gap_towns":[]},
+            {"name":"NH-48 Pune → Bengaluru","distance_km":840,"stations_existing":11,"stations_per_100km":1.3,"opportunity":"High","gap_towns":["Satara","Kolhapur","Belgaum"]},
+            {"name":"NH-44 Nagpur → Hyderabad","distance_km":500,"stations_existing":6,"stations_per_100km":1.2,"opportunity":"High","gap_towns":["Yavatmal","Nanded"]},
+        ],
+        "zones": [
+            {"zone":"Hinjewadi","city":"Pune","discom":"MSEDCL","opportunity_score":9,"ev_demand":"Very High","power_reliability":"High","supply_voltage":"110kV","reason":"IT corridor, 400k+ daily commuters, EV fleet growing faster than infrastructure"},
+            {"zone":"Bandra-Kurla Complex","city":"Mumbai","discom":"BEST/TPC","opportunity_score":7,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"Financial hub, premium users, high willingness-to-pay"},
+            {"zone":"Nashik Industrial Area","city":"Nashik","discom":"MSEDCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Auto manufacturing cluster, fleet EV adoption, Pune highway node"},
+        ]
+    },
+    "Tamil Nadu": {
+        "discom": "TANGEDCO",
+        "ev_stations_total": 2800, "grid_avail_pct": 91,
+        "power_context": "TANGEDCO has 110kV infrastructure for EV charging in Chennai metro. ToD tariff: off-peak (10pm-6am) significantly lower — strong overnight fleet charging signal.",
+        "corridors": [
+            {"name":"NH-44 Chennai → Bengaluru","distance_km":345,"stations_existing":18,"stations_per_100km":5.2,"opportunity":"Medium","gap_towns":["Vellore","Krishnagiri"]},
+            {"name":"NH-66 Chennai Coastal","distance_km":700,"stations_existing":8,"stations_per_100km":1.1,"opportunity":"High","gap_towns":["Cuddalore","Nagapattinam"]},
+        ],
+        "zones": [
+            {"zone":"OMR Tech Corridor","city":"Chennai","discom":"TANGEDCO","opportunity_score":9,"ev_demand":"Very High","power_reliability":"High","supply_voltage":"110kV","reason":"50km corridor, 400k IT employees, 2x EV growth YoY"},
+            {"zone":"Coimbatore Industrial","city":"Coimbatore","discom":"TANGEDCO","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"66kV","reason":"Textile + engineering hub, fleet EV early adopters, Kerala gateway"},
+        ]
+    },
+    "Delhi": {
+        "discom": "BSES Rajdhani / BSES Yamuna / TPDDL",
+        "ev_stations_total": 1850, "grid_avail_pct": 99,
+        "power_context": "Delhi has India's most reliable urban grid (99% availability). 220kV ring throughout NCR. Delhi EV policy aggressive — free registration, road tax waiver, 5% GST refund.",
+        "corridors": [
+            {"name":"NH-44 Delhi → Chandigarh","distance_km":275,"stations_existing":14,"stations_per_100km":5.1,"opportunity":"Medium","gap_towns":[]},
+            {"name":"NH-48 Delhi → Jaipur","distance_km":280,"stations_existing":9,"stations_per_100km":3.2,"opportunity":"Medium-High","gap_towns":["Dharuhera"]},
+        ],
+        "zones": [
+            {"zone":"Cyber City / DLF","city":"Gurugram (NCR)","discom":"DHBVN/TPDDL","opportunity_score":9,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"Highest per-capita EV density in India, premium willingness-to-pay"},
+            {"zone":"Noida Expressway","city":"Noida (NCR)","discom":"PVVNL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"IT/ITES hub, 300k+ daily commuters"},
+        ]
+    },
+    "Gujarat": {
+        "discom": "DGVCL / MGVCL / PGVCL / UGVCL",
+        "ev_stations_total": 2100, "grid_avail_pct": 95,
+        "power_context": "Gujarat has India's best industrial power quality. Strong solar + wind generation means off-peak ToD prices are low — attractive for fleet depot charging.",
+        "corridors": [
+            {"name":"NH-48 Ahmedabad → Mumbai","distance_km":530,"stations_existing":16,"stations_per_100km":3.0,"opportunity":"High","gap_towns":["Bharuch","Vapi"]},
+            {"name":"Ahmedabad → Surat Expressway","distance_km":265,"stations_existing":12,"stations_per_100km":4.5,"opportunity":"Medium-High","gap_towns":[]},
+        ],
+        "zones": [
+            {"zone":"GIFT City","city":"Gandhinagar","discom":"DGVCL","opportunity_score":8,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"220kV dedicated","reason":"Smart city infrastructure, premium commercial, rapid EV adoption"},
+            {"zone":"Surat Commercial","city":"Surat","discom":"MGVCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Highest per-capita income city, fleet operators, good power quality"},
+        ]
+    },
+    "Telangana": {
+        "discom": "TSSPDCL / TSNPDCL",
+        "ev_stations_total": 1100, "grid_avail_pct": 94,
+        "power_context": "Hyderabad metro has 220kV and 400kV. TSSPDCL has dedicated feeders in HITEC City and Gachibowli. ToD pricing available.",
+        "corridors": [
+            {"name":"NH-44 Hyderabad → Bengaluru","distance_km":570,"stations_existing":14,"stations_per_100km":2.5,"opportunity":"High","gap_towns":["Kurnool","Anantapur"]},
+        ],
+        "zones": [
+            {"zone":"HITEC City / Gachibowli","city":"Hyderabad","discom":"TSSPDCL","opportunity_score":9,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"India's 2nd largest IT hub, EV adoption growing 80% YoY"},
+            {"zone":"Outer Ring Road","city":"Hyderabad","discom":"TSSPDCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"158km ring with industrial nodes, sparse DC fast charging"},
+        ]
+    },
+    "Rajasthan": {
+        "discom": "JDVVNL / JVVNL",
+        "ev_stations_total": 980, "grid_avail_pct": 88,
+        "power_context": "Rajasthan has abundant solar but rural grid reliability is lower (88%). Jaipur urban area is reliable. RUVNL actively procuring BESS — good backdrop for solar+charging co-location.",
+        "corridors": [
+            {"name":"NH-48 Jaipur → Delhi","distance_km":280,"stations_existing":9,"stations_per_100km":3.2,"opportunity":"High","gap_towns":["Kotputli"]},
+        ],
+        "zones": [
+            {"zone":"Jaipur Commercial","city":"Jaipur","discom":"JVVNL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Tourism + growing IT hub, aggressive state EV policy, Delhi corridor"},
+        ]
+    },
+    "Kerala": {
+        "discom": "KSEB",
+        "ev_stations_total": 780, "grid_avail_pct": 97,
+        "power_context": "Kerala has India's 2nd-highest grid availability (97%). KSEB infrastructure well-maintained. High EV adoption due to high literacy and environmental awareness.",
+        "corridors": [
+            {"name":"NH-66 Thiruvananthapuram → Kozhikode","distance_km":450,"stations_existing":24,"stations_per_100km":5.3,"opportunity":"Medium","gap_towns":["Thrissur-Kozhikode gap"]},
+        ],
+        "zones": [
+            {"zone":"Infopark / SmartCity","city":"Kochi","discom":"KSEB","opportunity_score":8,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"110kV","reason":"Rapidly growing IT hub, high-income workforce, EV-friendly state policy"},
+        ]
+    },
+    "Andhra Pradesh": {
+        "discom": "APSPDCL / APEPDCL",
+        "ev_stations_total": 1240, "grid_avail_pct": 93,
+        "power_context": "AP has significant renewable capacity (solar, wind). Grid reliability good in Visakhapatnam and Amaravati capital region.",
+        "corridors": [
+            {"name":"NH-16 Chennai → Vijayawada → Vizag","distance_km":800,"stations_existing":18,"stations_per_100km":2.3,"opportunity":"High","gap_towns":["Ongole","Rajahmundry"]},
+        ],
+        "zones": [
+            {"zone":"Visakhapatnam Port / IT","city":"Visakhapatnam","discom":"APEPDCL","opportunity_score":8,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"Steel + IT hub, NH-16 corridor, growing EV adoption"},
+        ]
+    },
+    "Uttar Pradesh": {
+        "discom": "UPPCL (multiple DISCOMs)",
+        "ev_stations_total": 1200, "grid_avail_pct": 85,
+        "power_context": "UP has large geographic spread with variable grid quality (85% avg). Lucknow, Noida, Agra urban areas are reliable. Rural areas face load-shedding. New expressway corridors (Yamuna, Purvanchal, Bundelkhand) are the key EV opportunity.",
+        "corridors": [
+            {"name":"Yamuna Expressway (Delhi-Agra)","distance_km":165,"stations_existing":8,"stations_per_100km":4.8,"opportunity":"Medium","gap_towns":[]},
+            {"name":"Lucknow-Kanpur Highway","distance_km":80,"stations_existing":4,"stations_per_100km":5.0,"opportunity":"Medium","gap_towns":[]},
+            {"name":"NH-19 Agra → Varanasi","distance_km":560,"stations_existing":6,"stations_per_100km":1.1,"opportunity":"High","gap_towns":["Allahabad","Mirzapur"]},
+        ],
+        "zones": [
+            {"zone":"Gomti Nagar IT / Commercial","city":"Lucknow","discom":"LECO","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"State capital IT corridor, growing EV fleet, good urban grid"},
+            {"zone":"Sector 62 / 63","city":"Noida (NCR)","discom":"PVVNL","opportunity_score":8,"ev_demand":"Very High","power_reliability":"High","supply_voltage":"110kV","reason":"NCR tech corridor, high EV adoption, NH-24 connectivity"},
+        ]
+    },
+    "West Bengal": {
+        "discom": "WBSEDCL / CESC (Kolkata)",
+        "ev_stations_total": 890, "grid_avail_pct": 92,
+        "power_context": "CESC serves Kolkata metro with reliable 220kV grid. WBSEDCL covers rest of state with variable quality. Among the highest tariff states (Rs 8.50/unit) — affects EV charging economics.",
+        "corridors": [
+            {"name":"NH-12 Kolkata → Siliguri","distance_km":600,"stations_existing":8,"stations_per_100km":1.3,"opportunity":"High","gap_towns":["Burdwan","Durgapur","Asansol"]},
+        ],
+        "zones": [
+            {"zone":"Salt Lake / Sector V","city":"Kolkata","discom":"CESC","opportunity_score":7,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"220kV","reason":"IT hub, high-income area, CESC reliable grid — tariff is the constraint"},
+            {"zone":"Durgapur Industrial","city":"Durgapur","discom":"WBSEDCL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"High","supply_voltage":"110kV","reason":"Industrial corridor, fleet opportunity, NH-12 highway node"},
+        ]
+    },
+    "Haryana": {
+        "discom": "DHBVN / UHBVN",
+        "ev_stations_total": 890, "grid_avail_pct": 91,
+        "power_context": "Haryana benefits from NCR proximity. Gurugram and Faridabad have 220kV infrastructure. NH-48 and NH-44 are key corridors. Good EV policy — 100% road tax waiver on EVs.",
+        "corridors": [
+            {"name":"NH-48 Delhi-Gurugram-Jaipur","distance_km":270,"stations_existing":18,"stations_per_100km":6.7,"opportunity":"Medium","gap_towns":[]},
+            {"name":"NH-44 Delhi-Ambala-Chandigarh","distance_km":250,"stations_existing":12,"stations_per_100km":4.8,"opportunity":"Medium-High","gap_towns":["Karnal","Panipat"]},
+        ],
+        "zones": [
+            {"zone":"Cyber Hub / DLF Gurugram","city":"Gurugram","discom":"DHBVN","opportunity_score":8,"ev_demand":"Very High","power_reliability":"Very High","supply_voltage":"220kV","reason":"NCR financial hub, premium market, Delhi spillover demand"},
+            {"zone":"IMT Manesar","city":"Manesar","discom":"DHBVN","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"Auto + manufacturing hub, fleet EV adoption, NH-48 corridor"},
+        ]
+    },
+    "Madhya Pradesh": {
+        "discom": "MPPKVVCL / MPMKVVCL / MPPKVVCL",
+        "ev_stations_total": 650, "grid_avail_pct": 90,
+        "power_context": "MP has variable grid quality by region. Indore and Bhopal urban areas are reliable (110kV). Expressway corridors are the main EV opportunity — MP has India's longest expressway network.",
+        "corridors": [
+            {"name":"NH-3 Agra-Indore-Mumbai","distance_km":860,"stations_existing":10,"stations_per_100km":1.2,"opportunity":"High","gap_towns":["Gwalior","Shivpuri","Ujjain"]},
+            {"name":"NH-12 Bhopal-Jabalpur","distance_km":290,"stations_existing":5,"stations_per_100km":1.7,"opportunity":"High","gap_towns":["Sagar","Damoh"]},
+        ],
+        "zones": [
+            {"zone":"Vijay Nagar / Super Corridor","city":"Indore","discom":"MPMKVVCL","opportunity_score":8,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"India's cleanest city, high EV awareness, IT/commercial growth"},
+            {"zone":"Bhopal IT Park","city":"Bhopal","discom":"MPPKVVCL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"State capital, growing IT sector, NH-12 hub"},
+        ]
+    },
+    "Punjab": {
+        "discom": "PSPCL",
+        "ev_stations_total": 650, "grid_avail_pct": 93,
+        "power_context": "Punjab has good urban grid reliability (93%) and low domestic tariff (Rs 4.80/unit) due to agricultural subsidies. NH-44 Delhi-Amritsar is the primary EV corridor. High commercial vehicle traffic.",
+        "corridors": [
+            {"name":"NH-44 Delhi-Amritsar (Grand Trunk Road)","distance_km":450,"stations_existing":14,"stations_per_100km":3.1,"opportunity":"Medium-High","gap_towns":["Ambala-Ludhiana gap","Jalandhar bypass"]},
+        ],
+        "zones": [
+            {"zone":"Industrial Area Phase 8-9","city":"Mohali","discom":"PSPCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"110kV","reason":"IT and pharma hub, Chandigarh proximity, growing EV adoption"},
+            {"zone":"Focal Point Industrial","city":"Ludhiana","discom":"PSPCL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"Largest industrial city, hosiery/auto ancillary, NH-44 node"},
+        ]
+    },
+    "Bihar": {
+        "discom": "NBPDCL / SBPDCL",
+        "ev_stations_total": 320, "grid_avail_pct": 78,
+        "power_context": "Bihar has improving but still unreliable grid (78% avg availability). Patna urban area is more reliable. Low EV density creates opportunity but grid quality is a real constraint for DC fast charging.",
+        "corridors": [
+            {"name":"NH-30 Patna-Ranchi-Raipur","distance_km":680,"stations_existing":4,"stations_per_100km":0.6,"opportunity":"Very High","gap_towns":["Gaya","Aurangabad","Hazaribagh"]},
+        ],
+        "zones": [
+            {"zone":"Patna City / Bailey Road","city":"Patna","discom":"SBPDCL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"State capital, growing commercial area, first-mover opportunity in underserved market"},
+        ]
+    },
+    "Odisha": {
+        "discom": "TPSODL / TPCODL",
+        "ev_stations_total": 420, "grid_avail_pct": 89,
+        "power_context": "Odisha has large renewable capacity and improving grid (TPCODL/TPSODL after Tata Power privatisation). Bhubaneswar-Cuttack corridor is the primary urban EV market.",
+        "corridors": [
+            {"name":"NH-16 Kolkata-Bhubaneswar-Chennai","distance_km":500,"stations_existing":6,"stations_per_100km":1.2,"opportunity":"High","gap_towns":["Balasore","Bhadrak","Berhampur"]},
+        ],
+        "zones": [
+            {"zone":"Infocity / IT Park","city":"Bhubaneswar","discom":"TPCODL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"High","supply_voltage":"110kV","reason":"Smart city, growing IT sector, NH-16 corridor node, low competition"},
+        ]
+    },
+    "Jharkhand": {
+        "discom": "JBVNL",
+        "ev_stations_total": 190, "grid_avail_pct": 82,
+        "power_context": "Jharkhand has significant coal and hydro capacity but distribution is underdeveloped (82% availability). Ranchi urban area is reliable. Mining and steel corridor creates fleet EV opportunity.",
+        "corridors": [
+            {"name":"NH-33 Ranchi-Dhanbad-Asansol","distance_km":215,"stations_existing":3,"stations_per_100km":1.4,"opportunity":"High","gap_towns":["Bokaro","Dhanbad area"]},
+        ],
+        "zones": [
+            {"zone":"Ranchi Commercial District","city":"Ranchi","discom":"JBVNL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"State capital, first-mover opportunity, mining industry fleet vehicles"},
+        ]
+    },
+    "Chhattisgarh": {
+        "discom": "CSPDCL",
+        "ev_stations_total": 280, "grid_avail_pct": 87,
+        "power_context": "Chhattisgarh is a power-surplus state with low tariff (Rs 5.80/unit). Industrial corridor (Raipur-Bhilai) is the primary market. Good grid for industrial connections.",
+        "corridors": [
+            {"name":"NH-53 Raipur-Nagpur","distance_km":290,"stations_existing":4,"stations_per_100km":1.4,"opportunity":"High","gap_towns":["Durg","Rajnandgaon"]},
+        ],
+        "zones": [
+            {"zone":"Raipur Industrial / Commercial","city":"Raipur","discom":"CSPDCL","opportunity_score":7,"ev_demand":"Medium","power_reliability":"High","supply_voltage":"110kV","reason":"State capital, steel industry fleet, low tariff advantageous for charging economics"},
+        ]
+    },
+    "Assam": {
+        "discom": "APDCL",
+        "ev_stations_total": 180, "grid_avail_pct": 80,
+        "power_context": "Assam has improving but challenging grid (80% availability, higher tariff Rs 7.00/unit). Guwahati urban area is most reliable. NH-27 and NH-37 are key corridors for EV charging. Tea estate and oil industry creates captive fleet opportunity.",
+        "corridors": [
+            {"name":"NH-27 Guwahati-Shillong","distance_km":105,"stations_existing":3,"stations_per_100km":2.9,"opportunity":"Medium-High","gap_towns":[]},
+        ],
+        "zones": [
+            {"zone":"Guwahati Commercial / NH-37","city":"Guwahati","discom":"APDCL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"Northeast hub city, growing commercial activity, NH-37 corridor"},
+        ]
+    },
+    "Himachal Pradesh": {
+        "discom": "HPSEBL",
+        "ev_stations_total": 220, "grid_avail_pct": 98,
+        "power_context": "HP has the cleanest and most reliable grid in India (98%, 85% hydro-based). Very low tariff (Rs 4.20/unit). NH-1 Chandigarh-Manali and NH-5 are primary tourist-driven EV corridors.",
+        "corridors": [
+            {"name":"NH-1 Chandigarh-Shimla-Manali","distance_km":275,"stations_existing":8,"stations_per_100km":2.9,"opportunity":"High","gap_towns":["Mandi","Kullu-Bhuntar"]},
+        ],
+        "zones": [
+            {"zone":"The Mall / Commercial Core","city":"Shimla","discom":"HPSEBL","opportunity_score":7,"ev_demand":"Medium-High","power_reliability":"Very High","supply_voltage":"33kV","reason":"Tourism capital, reliable hydro grid, EV adoption growing with state incentives"},
+        ]
+    },
+    "Uttarakhand": {
+        "discom": "UPCL",
+        "ev_stations_total": 280, "grid_avail_pct": 96,
+        "power_context": "Uttarakhand has excellent grid reliability (96%, 72% hydro). Low tariff (Rs 4.50/unit). NH-58 Delhi-Haridwar-Rishikesh and NH-7 Rishikesh-Badrinath are key pilgrimage and tourism EV corridors.",
+        "corridors": [
+            {"name":"NH-58 Delhi-Haridwar-Rishikesh","distance_km":250,"stations_existing":9,"stations_per_100km":3.6,"opportunity":"Medium-High","gap_towns":["Muzaffarnagar","Roorkee"]},
+        ],
+        "zones": [
+            {"zone":"Haridwar-Rishikesh Corridor","city":"Haridwar","discom":"UPCL","opportunity_score":7,"ev_demand":"High","power_reliability":"High","supply_voltage":"66kV","reason":"10M+ annual pilgrims, growing EV fleet, reliable hydro grid, low tariff"},
+        ]
+    },
+    "Goa": {
+        "discom": "Goa Electricity Dept",
+        "ev_stations_total": 210, "grid_avail_pct": 99,
+        "power_context": "Goa has India's best grid availability (tied 99%) and the lowest commercial vehicle density. Tourism-driven EV demand — two-wheelers and taxis dominate. NH-66 is the primary corridor.",
+        "corridors": [
+            {"name":"NH-66 Goa Coastal Highway","distance_km":107,"stations_existing":8,"stations_per_100km":7.5,"opportunity":"Medium","gap_towns":["South Goa beaches stretch"]},
+        ],
+        "zones": [
+            {"zone":"Panaji / Calangute Area","city":"Panaji","discom":"Goa Electricity Dept","opportunity_score":7,"ev_demand":"High","power_reliability":"Very High","supply_voltage":"66kV","reason":"Tourism hub, high-value EV rental market, excellent grid reliability"},
+        ]
+    },
+    "Jammu and Kashmir": {
+        "discom": "JKPDCL",
+        "ev_stations_total": 120, "grid_avail_pct": 85,
+        "power_context": "J&K has low tariff (Rs 3.50/unit, heavily subsidised) and improving grid (85%). Srinagar and Jammu urban areas are most reliable. NH-44 Jammu-Srinagar is the critical corridor.",
+        "corridors": [
+            {"name":"NH-44 Jammu-Srinagar","distance_km":270,"stations_existing":4,"stations_per_100km":1.5,"opportunity":"High","gap_towns":["Banihal tunnel","Udhampur","Qazigund"]},
+        ],
+        "zones": [
+            {"zone":"Jammu Commercial","city":"Jammu","discom":"JKPDCL","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"66kV","reason":"Fastest-growing city in J&K, NH-44 starting point, government fleet EV push"},
+        ]
+    },
+    "Meghalaya": {
+        "discom": "MePDCL",
+        "ev_stations_total": 32, "grid_avail_pct": 75,
+        "power_context": "Meghalaya has improving but limited grid (75%). Shillong is the main urban market. NH-6 and NH-27 are key corridors. Very low EV station count — first-mover opportunity.",
+        "corridors": [
+            {"name":"NH-6 Guwahati-Shillong","distance_km":105,"stations_existing":2,"stations_per_100km":1.9,"opportunity":"High","gap_towns":["Jorabat","Byrnihat"]},
+        ],
+        "zones": [
+            {"zone":"Shillong Commercial","city":"Shillong","discom":"MePDCL","opportunity_score":5,"ev_demand":"Medium","power_reliability":"Medium","supply_voltage":"33kV","reason":"State capital, tourism, but limited grid and small market size — early mover"},
+        ]
+    },
+    "Manipur": {
+        "discom": "MSPDCL",
+        "ev_stations_total": 28, "grid_avail_pct": 72,
+        "power_context": "Manipur has the most challenging grid in northeast India (72%). Imphal urban area has partial reliability. Central government push for EV adoption but infrastructure is nascent.",
+        "corridors": [
+            {"name":"NH-2 Imphal-Moreh","distance_km":110,"stations_existing":1,"stations_per_100km":0.9,"opportunity":"Very High (first-mover)","gap_towns":["Pallel","Moreh"]},
+        ],
+        "zones": [
+            {"zone":"Imphal Commercial","city":"Imphal","discom":"MSPDCL","opportunity_score":4,"ev_demand":"Low-Medium","power_reliability":"Low","supply_voltage":"33kV","reason":"State capital, first-mover opportunity but grid is significant constraint — diesel backup needed"},
+        ]
+    },
+    "Sikkim": {
+        "discom": "Energy & Power Dept",
+        "ev_stations_total": 45, "grid_avail_pct": 99,
+        "power_context": "Sikkim has India's best grid reliability (tied 99%) and lowest tariff (Rs 3.40/unit) due to abundant hydro. Tourism EV opportunity on NH-10 Siliguri-Gangtok. Small market but 100% clean energy.",
+        "corridors": [
+            {"name":"NH-10 Siliguri-Gangtok","distance_km":114,"stations_existing":5,"stations_per_100km":4.4,"opportunity":"Medium-High","gap_towns":["Melli","Singtam"]},
+        ],
+        "zones": [
+            {"zone":"MG Marg / Commercial","city":"Gangtok","discom":"Energy & Power Dept","opportunity_score":6,"ev_demand":"Medium","power_reliability":"Very High","supply_voltage":"33kV","reason":"Tourism capital, 100% hydro power, lowest tariff in India — premium eco-tourism EV market"},
+        ]
+    },
+    "Tripura": {
+        "discom": "TSECL",
+        "ev_stations_total": 55, "grid_avail_pct": 80,
+        "power_context": "Tripura has improving grid (80%) and moderate tariff (Rs 6.20/unit). Small state with Agartala as the primary market. Bangladesh border creates logistics demand.",
+        "corridors": [
+            {"name":"NH-44 Agartala-Sabroom","distance_km":115,"stations_existing":2,"stations_per_100km":1.7,"opportunity":"High (first-mover)","gap_towns":["Belonia","Sabroom"]},
+        ],
+        "zones": [
+            {"zone":"Agartala Commercial","city":"Agartala","discom":"TSECL","opportunity_score":5,"ev_demand":"Low-Medium","power_reliability":"Medium","supply_voltage":"33kV","reason":"State capital, Bangladesh border trade, first-mover in very underserved market"},
+        ]
+    },
+    "Nagaland": {
+        "discom": "Dept of Power",
+        "ev_stations_total": 22, "grid_avail_pct": 70,
+        "power_context": "Nagaland has the lowest grid availability in India (70%). Dimapur (plains) is more reliable than Kohima (hills). Very nascent EV market — any station is a first-mover.",
+        "corridors": [
+            {"name":"NH-29 Dimapur-Kohima","distance_km":74,"stations_existing":1,"stations_per_100km":1.4,"opportunity":"Very High (first-mover)","gap_towns":["Chumoukedima"]},
+        ],
+        "zones": [
+            {"zone":"Dimapur Commercial","city":"Dimapur","discom":"Dept of Power","opportunity_score":4,"ev_demand":"Low","power_reliability":"Low-Medium","supply_voltage":"33kV","reason":"Gateway city, most reliable grid in state, but diesel backup essential — early pilot only"},
+        ]
+    },
+    "Mizoram": {
+        "discom": "Power & Electricity Dept",
+        "ev_stations_total": 18, "grid_avail_pct": 74,
+        "power_context": "Mizoram has 72% renewable but limited distribution reliability (74%). Aizawl is almost entirely hilly — challenging for charging infrastructure. Myanmar border trade is a long-term opportunity.",
+        "corridors": [
+            {"name":"NH-54 Silchar-Aizawl","distance_km":180,"stations_existing":1,"stations_per_100km":0.6,"opportunity":"High (first-mover)","gap_towns":["Lunglei","Kolasib"]},
+        ],
+        "zones": [
+            {"zone":"Aizawl Commercial","city":"Aizawl","discom":"Power & Electricity Dept","opportunity_score":4,"ev_demand":"Low","power_reliability":"Low-Medium","supply_voltage":"33kV","reason":"State capital, early pilot opportunity, very underserved market — long payback expected"},
+        ]
+    },
+    "Arunachal Pradesh": {
+        "discom": "APDCL",
+        "ev_stations_total": 45, "grid_avail_pct": 78,
+        "power_context": "Arunachal has massive hydro potential (88% renewables) but limited distribution infrastructure (78%). Itanagar corridor is the main market. Central government push for EV adoption.",
+        "corridors": [
+            {"name":"NH-415 Itanagar-Naharlagun","distance_km":15,"stations_existing":1,"stations_per_100km":6.7,"opportunity":"Medium","gap_towns":[]},
+        ],
+        "zones": [
+            {"zone":"Itanagar Commercial","city":"Itanagar","discom":"APDCL","opportunity_score":5,"ev_demand":"Low-Medium","power_reliability":"Medium","supply_voltage":"33kV","reason":"State capital, government fleet EV opportunity, NH-415 growing corridor"},
+        ]
+    },
+}
+
+
+@app.get("/api/ev-zones")
+def ev_zones_list():
+    """List all states that have zone data."""
+    return {
+        "states": sorted(list(EV_ZONES_DATA.keys())),
+        "count": len(EV_ZONES_DATA),
+        "coverage": "All 30 Indian states — detailed for 9 key EV markets, summary for remaining 21",
+        "last_verified": "July 2026"
+    }
+
+
+@app.get("/api/ev-zones/{state}")
+def ev_zones_state(state: str):
+    """Zone data for a specific state."""
+    # Try exact match first
+    d = EV_ZONES_DATA.get(state)
+    if not d:
+        # Try case-insensitive match
+        for k in EV_ZONES_DATA:
+            if k.lower() == state.lower():
+                d = EV_ZONES_DATA[k]
+                break
+    if not d:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No zone data for state: '{state}'. Available states: {', '.join(sorted(EV_ZONES_DATA.keys()))}"
+        )
+    return {"state": state, **d}
+
+
+
+
+# ── Coverage definitions ───────────────────────────────────────────────────────
+COVERAGE_LABELS = {
+    "live":     "Live — KPTCL SLDC",
+    "verified": "Verified — DISCOM reports",
+    "partial":  "Partial — city aggregate",
+    "estimate": "Estimate — secondary data",
+}
+COVERAGE_NOTES = {
+    "live":     "Real-time substation loading from KPTCL SLDC, refreshed every 5 minutes. Seed capacity figures manually verified July 2026.",
+    "verified": "Substation loading cross-referenced against DISCOM published loading schedules and CEA substation data. Manually verified July 2026. Not real-time.",
+    "partial":  "City-level aggregate published by DISCOM or SLDC. No per-substation breakdown available publicly. Use directionally, not for site-specific decisions.",
+    "estimate": "Estimated from CEA state-wise capacity reports, NITI Aayog EV data, and state energy statistics. NOT verified against DISCOM source data. Treat as indicative only.",
+}
+PARTIAL_STATES = {
+    "Maharashtra","Tamil Nadu","Gujarat","Delhi","Telangana",
+    "Kerala","Haryana","West Bengal","Andhra Pradesh","Uttar Pradesh",
+    "Madhya Pradesh","Punjab","Rajasthan","Odisha","Jharkhand",
+    "Chhattisgarh","Bihar","Assam","Uttarakhand",
+}
+
+def _one_liner_ev(headroom, density, coverage):
+    h = {"high":"High headroom","medium":"Moderate headroom","low":"Constrained grid"}[headroom]
+    d = {"underserved":"underserved market","moderate":"moderate competition","saturated":"saturated market"}[density]
+    c = {"live":"live data","verified":"verified estimates","partial":"partial data — city aggregate","estimate":"estimated data — treat as directional"}[coverage]
+    return f"{h}, {d} — {c}"
+
+def _one_liner_bess(loading_pct, headroom, coverage):
+    if loading_pct >= 78:
+        base = f"High load ({loading_pct}%) — strong arbitrage and peak-shaving signal"
+    elif loading_pct >= 65:
+        base = f"Moderate load ({loading_pct}%) — demand charge reduction likely more attractive than arbitrage"
+    else:
+        base = f"Low base load ({loading_pct}%) — limited arbitrage window, best as backup/firming play"
+    c = {"live":"live data","verified":"verified estimates","partial":"partial data","estimate":"estimated"}[coverage]
+    return f"{base} — {c}"
+
+def _ev_card(loc, city, state, tier, discom, coverage, loading_pct, headroom, density, ev_stations,
+             fast_dc, zones, corridors, query_suffix):
+    h_score = {"high":3,"medium":2,"low":1}[headroom]
+    d_score = {"underserved":3,"moderate":2,"saturated":1}.get(density, 2)
+    score   = h_score + d_score
+    verdict = "VIABLE" if score>=4 else "MARGINAL" if score>=3 else "NOT VIABLE"
+    bess_s  = 3 if loading_pct>=78 else 2 if loading_pct>=65 else 1
+    return {
+        "id": f"{state.lower().replace(' ','_')}_{city.lower().replace(' ','_')}_{loc.lower().replace(' ','_').replace('/','_')}",
+        "location": loc, "city": city, "state": state, "tier": tier, "discom": discom,
+        "coverage": coverage, "coverage_label": COVERAGE_LABELS[coverage], "coverage_note": COVERAGE_NOTES[coverage],
+        "ev": {"score":score,"headroom":headroom,"loading_pct":loading_pct,"competition":density,
+               "stations":ev_stations,"fast_dc":fast_dc,
+               "one_liner":_one_liner_ev(headroom,density,coverage),"verdict":verdict},
+        "bess": {"score":bess_s,"headroom":headroom,"loading_pct":loading_pct,
+                 "one_liner":_one_liner_bess(loading_pct,headroom,coverage),
+                 "verdict":"VIABLE" if bess_s>=2 else "MARGINAL"},
+        "zones": zones, "corridors": corridors, "query": query_suffix,
+    }
+
+
+@app.get("/api/opportunities")
+def get_opportunities(
+    state: str = Query(None), tier: int = Query(None),
+    business: str = Query("ev"), coverage: str = Query(None),
+    headroom: str = Query(None),
+):
+    cards = []
+
+    # ── Bengaluru zone-level (LIVE) ──────────────────────────────────────────
+    for ss_key, ss in SUBSTATIONS.items():
+        ev  = EV_DENSITY.get(ss_key, {})
+        zone_name = ss["name"].replace(" 220kV SS","").replace(" 110kV SS","").replace(" 66kV SS","")
+        cards.append(_ev_card(
+            loc=zone_name, city="Bengaluru", state="Karnataka", tier=1,
+            discom="BESCOM", coverage="live",
+            loading_pct=ss["loading_pct"], headroom=ss["headroom"],
+            density=ev.get("density","moderate"),
+            ev_stations=ev.get("count_2km",0), fast_dc=ev.get("fast_dc_2km",0),
+            zones=[], corridors=[],
+            query_suffix=f"area={ss_key}&business={business}",
+        ))
+
+    # ── City-level (from CITY_DATA) ──────────────────────────────────────────
+    for sname, scities in CITY_DATA.items():
+        for cname, cd in scities.items():
+            if sname == "Karnataka" and cname == "Bengaluru":
+                continue  # Already covered zone-level above
+            if sname == "Karnataka":
+                cov = "verified"
+            elif sname in PARTIAL_STATES:
+                cov = "partial"
+            else:
+                cov = "estimate"
+            cards.append(_ev_card(
+                loc=cname, city=cname, state=sname, tier=cd.get("tier",2),
+                discom=cd["discom"], coverage=cov,
+                loading_pct=cd["loading_pct"], headroom=cd["headroom"],
+                density=cd["ev_density"], ev_stations=cd["ev_stations"], fast_dc=0,
+                zones=cd.get("zones",[]), corridors=cd.get("corridors",[]),
+                query_suffix=f"state={sname}&city={cname}&business={business}",
+            ))
+
+    # ── Apply filters ────────────────────────────────────────────────────────
+    result = cards
+    if state:    result = [c for c in result if c["state"] == state]
+    if tier:     result = [c for c in result if c["tier"] == tier]
+    if coverage: result = [c for c in result if c["coverage"] == coverage]
+    if headroom:
+        result = [c for c in result if c.get(business,{}).get("headroom") == headroom]
+    biz = business if business in ("ev","bess") else "ev"
+    result.sort(key=lambda c: c.get(biz,{}).get("score",0), reverse=True)
+
+    # Unique states for filter UI
+    all_states = sorted({c["state"] for c in cards})
+
+    return {
+        "opportunities": result,
+        "total": len(result),
+        "all_states": all_states,
+        "coverage_counts": {
+            k: sum(1 for c in cards if c["coverage"]==k)
+            for k in ("live","verified","partial","estimate")
+        },
+    }
+
+@app.get("/api/cities")
+def cities_all():
+    return {"states": sorted(list(CITY_DATA.keys())), "count": len(CITY_DATA)}
+
+@app.get("/api/cities/{state}")
+def cities_for_state(state: str):
+    d = CITY_DATA.get(state)
+    if not d:
+        for k in CITY_DATA:
+            if k.lower() == state.lower():
+                d = CITY_DATA[k]; state = k; break
+    if not d:
+        raise HTTPException(status_code=404,
+            detail=f"State '{state}' not found. Available: {', '.join(sorted(CITY_DATA.keys()))}")
+    cities = []
+    for city_name, cd in d.items():
+        cities.append({
+            "city": city_name,
+            "tier": cd.get("tier", 2),
+            "discom": cd.get("discom","—"),
+            "ev_stations": cd.get("ev_stations", 0),
+            "headroom": cd.get("headroom", "medium"),
+            "grid_avail_pct": cd.get("grid_avail_pct", 90),
+        })
+    cities.sort(key=lambda x: (x["tier"], x["city"]))
+    return {"state": state, "cities": cities, "count": len(cities)}
+
+
 @app.get("/api/substations")
 def substations():
     return {
@@ -405,7 +1040,110 @@ def substations():
 
 
 @app.get("/api/feasibility")
-def feasibility(area: str = Query(...), business: str = Query("ev")):
+def feasibility(
+    city: str = Query(None),
+    state: str = Query(None),
+    area: str = Query(None),
+    business: str = Query("ev")
+):
+    """
+    Two modes:
+    1. city + state (new) — city-level feasibility, all India
+    2. area only (legacy) — Bengaluru substation-level feasibility
+    """
+    # ── Mode 1: city + state ───────────────────────────────────
+    if city and state:
+        state_data = CITY_DATA.get(state)
+        if not state_data:
+            for k in CITY_DATA:
+                if k.lower() == state.lower():
+                    state_data = CITY_DATA[k]; state = k; break
+        if not state_data:
+            raise HTTPException(status_code=404, detail=f"State not found: {state}")
+        cd = state_data.get(city)
+        if not cd:
+            for k in state_data:
+                if k.lower() == city.lower():
+                    cd = state_data[k]; city = k; break
+        if not cd:
+            raise HTTPException(status_code=404, detail=f"City not found: {city} in {state}")
+
+        headroom = cd["headroom"]
+        ev_dens  = cd["ev_density"]
+        h_score  = {"high":2,"medium":1,"low":0}[headroom]
+        d_score  = {"underserved":2,"moderate":1,"saturated":0}[ev_dens]
+        total    = h_score + d_score
+
+        if business == "ev":
+            verdict_status = "VIABLE" if total>=4 else "MARGINAL" if total>=2 else "NOT VIABLE"
+            reasons = []
+            if headroom == "high":    reasons.append(f"High grid headroom — new connections fast-tracked")
+            if headroom == "low":     reasons.append(f"Constrained grid ({cd['loading_pct']}% loaded) — HT connection delays likely")
+            if ev_dens == "underserved": reasons.append(f"{cd['ev_stations']} stations across city — DC fast charging severely underserved")
+            if ev_dens == "saturated":   reasons.append(f"{cd['ev_stations']} stations — market saturated, high competition")
+            reasons.append(cd["power_context"])
+            summaries = {
+                "VIABLE": f"{city} looks viable for EV charging — {headroom} grid headroom, {ev_dens} market. Use the calculator below with local tariff.",
+                "MARGINAL": f"{city} is borderline — {headroom} headroom, {ev_dens} competition. Specific site selection and utilisation assumption are critical.",
+                "NOT VIABLE": f"{city} does not pencil out easily at current assumptions — {headroom} headroom and {ev_dens} competition are both unfavourable.",
+            }
+        elif business == "bess":
+            bess_score  = 3 if cd["loading_pct"]>=78 else 2 if cd["loading_pct"]>=62 else 1
+            verdict_status = "VIABLE" if bess_score>=2 else "MARGINAL"
+            reasons = [f"Grid loading {cd['loading_pct']}% — {'strong arbitrage window' if cd['loading_pct']>=78 else 'moderate ToD spread'}", cd["power_context"]]
+            summaries = {
+                "VIABLE": f"BESS in {city}: high load area with strong arbitrage and peak-shaving opportunity.",
+                "MARGINAL": f"BESS in {city}: moderate economics — demand charge reduction is likely more attractive than arbitrage here.",
+            }
+        else:
+            verdict_status = "MARGINAL"
+            reasons = ["Battery manufacturing siting is driven by land, logistics, and PLI tier — not local substation. See the Manufacturing module."]
+            summaries = {"MARGINAL": "Battery manufacturing: check PLI eligibility and capex analysis in the Manufacturing module rather than substation data."}
+
+        summary = summaries.get(verdict_status, summaries.get("MARGINAL", ""))
+
+        return {
+            "area": city, "area_key": city.lower().replace(" ","_"),
+            "city": city, "state": state,
+            "substation": {
+                "name": f"{city} — {cd['discom']}",
+                "voltage": "110–220kV (varies by zone)",
+                "discom": cd["discom"],
+                "loading_pct": cd["loading_pct"],
+                "headroom": headroom,
+                "ht_outlook": cd["power_context"],
+                "applicable_tariffs": ["LT-6(b)","LT-6(c)","HT-2(f)"],
+                "tariff_rate_ev": 6.00,
+                "data_source": "State DISCOM published data + CEA reports — city-level estimate",
+                "last_verified": "July 2026",
+            },
+            "competition": {
+                "area": city, "state": state,
+                "count_2km": max(1, cd["ev_stations"]//15),
+                "count_5km": max(2, cd["ev_stations"]//5),
+                "fast_dc_2km": max(0, cd["ev_stations"]//40),
+                "operators": ["Check local OEM locators"],
+                "density": ev_dens,
+                "notes": f"{city} has approximately {cd['ev_stations']} public EV stations citywide. {cd.get('zones',[{}])[0].get('reason','') if cd.get('zones') else ''}",
+            },
+            "verdict": {
+                "status": verdict_status,
+                "summary": summary,
+                "reasons": reasons,
+            },
+            "zones": cd.get("zones", []),
+            "corridors": cd.get("corridors", []),
+            "defaults": {
+                "tariff_category": "LT-6(c)",
+                "tariff_rate": 6.00,
+                "demand_charge_rate": 100,
+            },
+            "business": business,
+        }
+
+    # ── Mode 2: Bengaluru area-level (legacy) ──────────────────
+    if not area:
+        raise HTTPException(status_code=422, detail="Provide 'city+state' or 'area' parameter")
     """Main feasibility endpoint. area = Bengaluru area name."""
     area_key = area.strip().lower()
     ss_key   = AREA_LOOKUP.get(area_key)
