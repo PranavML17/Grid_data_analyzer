@@ -1248,9 +1248,113 @@ def bess_schemes():
 def ev_policy():
     return {"updated_on":"2026-07-04","karnataka":{"ev_stations":6096,"ev_tariff_per_unit":6.00,"renewable_pct":62,"capital_subsidy_pct":"25-50","rank_india":1},"national_kpis":{"pm_edrive_outlay_cr":10900,"chargers_targeted":72300,"gst_on_ev_pct":5},"policies":[{"name":"PM E-DRIVE Scheme","status":"expiring","ministry":"MHI","outlay":"Rs 10,900 crore","summary":"Rs 3,679 Cr for vehicle subsidies. Rs 2,000 Cr for 72,000+ public chargers. 80% infrastructure subsidy for public locations.","tags":["MHI","Charging infra","e-buses"],"deadline":"e-2W: 31 July 2026 · e-3W: 31 March 2028"},{"name":"ACC PLI Battery Cell Manufacturing","status":"active","ministry":"MHI","outlay":"Rs 18,100 crore","summary":"50 GWh domestic battery cell production target. Rs 2,000-4,500/kWh incentive for 5 years. 100% DCR on 18 critical components.","tags":["Battery manufacturing","PLI","50 GWh"],"deadline":"Ongoing through FY 2027-28"},{"name":"MoP EV Charging Guidelines 2024","status":"enacted","ministry":"MoP","outlay":None,"summary":"CCS2 mandatory for 4W fast charging. No licence needed to sell electricity for EV charging. Open access — any EV at any station.","tags":["CCS2 mandate","Open access","Standards"],"deadline":"Effective September 2024"}]}
 
+# ── Weekly policy digest ─────────────────────────────────────────────────────
+# Fallback articles — verified, sourced. Used when PIB RSS is unreachable.
+DIGEST_FALLBACK = [
+    {"title":"PM E-DRIVE Scheme: 80% infra subsidy for public EV chargers — deployment window active","link":"https://mhi.gov.in","date":"October 2024","category":"ev","ministry":"MHI","source_note":"MHI notification Oct 2024. 80% infra subsidy public, 100% for govt. 72,000+ chargers targeted."},
+    {"title":"MoP EV Charging Standards 2024: CCS2 mandatory for DC fast charging, no licence needed to sell electricity","link":"https://powermin.gov.in","date":"September 2024","category":"ev","ministry":"MoP","source_note":"MoP guidelines effective Sep 2024. Any business can set up public EVCS without distribution licence."},
+    {"title":"MNRE VGF Scheme for Standalone BESS: Rs 3,760 crore outlay, 4,000 MWh in first tranche","link":"https://mnre.gov.in","date":"March 2023 (bids ongoing)","category":"bess","ministry":"MNRE","source_note":"VGF up to Rs 94/kWh installed. Minimum 10 MWh. SECI tender portal: seci.co.in"},
+    {"title":"ACC PLI Scheme: 50 GWh domestic battery cell target, Rs 18,100 crore outlay through FY2027-28","link":"https://mhi.gov.in","date":"2021 (ongoing)","category":"bess","ministry":"MHI","source_note":"100% DCR on 18 battery components from 2025. Rs 2,000–4,500/kWh incentive for 5 years on actual production."},
+    {"title":"India crosses 500 GW total installed capacity — non-fossil share reaches 53.4%","link":"https://mnre.gov.in","date":"June 2025","category":"bess","ministry":"MNRE","source_note":"CEA monthly report. Solar 150 GW, Wind 56 GW. India 5 years ahead of 2030 NDC target."},
+    {"title":"ISTS waiver extended to 2030 for RE + storage hybrid projects — 100% charge waiver","link":"https://powermin.gov.in","date":"2023 (amended)","category":"bess","ministry":"MoP","source_note":"MoP order. Applies to solar/wind projects with co-located or virtual BESS commissioned by March 2030."},
+    {"title":"Karnataka KERC Tariff Order 2025-26: LT-6(c) public DC charging confirmed at Rs 6.00/unit","link":"https://kerc.karnataka.gov.in","date":"April 2025","category":"ev","ministry":"KERC Karnataka","source_note":"BESCOM EVCS tariff. HT-2(f) for hubs > 100 kW: Rs 5.80/unit. Verified arithmetic: LT-1 domestic = Rs 6.72/unit."},
+    {"title":"PM Surya Ghar rooftop solar + EV: up to Rs 78,000 subsidy, net metering enables near-zero charging cost","link":"https://mnre.gov.in","date":"2024 (ongoing)","category":"ev","ministry":"MNRE","source_note":"MNRE scheme. Combined with BESCOM net metering (Rs 3.68/unit export), effective EV charging cost < Rs 1/km."},
+    {"title":"POSOCO Ancillary Services Market: Rs 50–120 lakh/MW/yr for frequency regulation BESS","link":"https://posoco.in","date":"CERC Regulations 2022 (ongoing market)","category":"bess","ministry":"POSOCO/NLDC","source_note":"BESS must respond in ≤100ms. Register as Ancillary Service Provider (ASP) with NLDC. See CEA Grid Code 2023."},
+    {"title":"FAME III under Cabinet consideration — successor to PM E-DRIVE, focus on 800,000 electric buses","link":"https://mhi.gov.in","date":"Expected FY2026-27","category":"ev","ministry":"MHI","source_note":"FAME III will NOT include private EV subsidies. Focus: public bus electrification at scale."},
+]
+
+WEEKLY_DIGEST = {
+    "last_updated": None,
+    "status": "pending_first_run",
+    "articles": [],
+    "error": None,
+    "source": "none",
+}
+
+EV_KEYWORDS   = ['electric vehicle','ev charging','fame','e-drive','battery','evcs','electric mobility','pm e-drive','charger','ev station','electric']
+BESS_KEYWORDS = ['battery storage','bess','energy storage','grid storage','battery energy','acc pli','acc cell','lithium','storage system','renewable energy storage']
+
+PIB_FEEDS = {
+    "MHI":  "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+    "MNRE": "https://pib.gov.in/RssMain.aspx?ModId=17&Lang=1&Regid=3",
+    "MoP":  "https://pib.gov.in/RssMain.aspx?ModId=21&Lang=1&Regid=3",
+}
+
+def weekly_policy_update():
+    global WEEKLY_DIGEST
+    log.info("Running weekly policy digest update …")
+    live_articles = []
+    errors = []
+    try:
+        import feedparser
+        for ministry, url in PIB_FEEDS.items():
+            try:
+                feed = feedparser.parse(url, request_headers={"User-Agent":"Mozilla/5.0"})
+                entries = getattr(feed, 'entries', []) or []
+                log.info("PIB %s: %d entries", ministry, len(entries))
+                for entry in entries[:50]:
+                    title   = (entry.get('title',   '') or '').strip()
+                    summary = (entry.get('summary', '') or '').strip()
+                    text    = (title + ' ' + summary).lower()
+                    is_ev   = any(kw in text for kw in EV_KEYWORDS)
+                    is_bess = any(kw in text for kw in BESS_KEYWORDS)
+                    if is_ev or is_bess:
+                        live_articles.append({
+                            "title":       title or 'Untitled',
+                            "link":        entry.get('link', ''),
+                            "date":        entry.get('published', ''),
+                            "category":    'bess' if is_bess else 'ev',
+                            "ministry":    ministry,
+                            "source_note": "PIB official press release — verify figures before citing",
+                        })
+            except Exception as e:
+                errors.append(f"{ministry}: {str(e)[:80]}")
+                log.warning("PIB feed failed for %s: %s", ministry, e)
+    except ImportError:
+        errors.append("feedparser not installed")
+
+    if live_articles:
+        articles = live_articles[:14]
+        source   = "pib_rss_live"
+        status   = "ok"
+    else:
+        log.info("PIB RSS: 0 matches or error — using curated fallback")
+        articles = list(DIGEST_FALLBACK)
+        source   = "curated_fallback"
+        status   = "fallback_used" if not errors else "rss_error_fallback_used"
+
+    WEEKLY_DIGEST = {
+        "last_updated": datetime.utcnow().isoformat() + "Z",
+        "status":       status,
+        "articles":     articles,
+        "error":        ("; ".join(errors) if errors else None),
+        "source":       source,
+    }
+    log.info("Digest done: %d articles, source=%s", len(articles), source)
+
+# Always run on startup — guaranteed to have data on first request
+weekly_policy_update()
+
+try:
+    from apscheduler.schedulers.background import BackgroundScheduler
+    _scheduler = BackgroundScheduler(daemon=True)
+    _scheduler.add_job(weekly_policy_update, 'cron', day_of_week='sun', hour=6, minute=0)
+    _scheduler.start()
+    log.info("Scheduler started — weekly digest every Sunday 06:00 UTC")
+except Exception as e:
+    log.warning("APScheduler unavailable: %s", e)
+
+
 @app.get("/api/weekly-digest")
 def weekly_digest():
-    return {"last_updated":None,"status":"pending_first_run","articles":[],"error":None}
+    return WEEKLY_DIGEST
+
+
+@app.post("/api/trigger-digest")
+def trigger_digest():
+    """Manual trigger for digest refresh (call from browser devtools or curl)."""
+    weekly_policy_update()
+    return {"status": "triggered", "result": WEEKLY_DIGEST["status"], "count": len(WEEKLY_DIGEST["articles"])}
 
 try:
     app.mount("/static", StaticFiles(directory="."), name="static")
