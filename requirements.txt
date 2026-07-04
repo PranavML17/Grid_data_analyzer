@@ -2,3 +2,5 @@ requests>=2.31
 beautifulsoup4>=4.12
 fastapi>=0.111
 uvicorn[standard]>=0.29
+apscheduler>=3.10
+feedparser>=6.0

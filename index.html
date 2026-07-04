@@ -301,22 +301,46 @@ h1,h2{font-family:var(--head)}
               <option value="gbt-60">DC GB/T — 60 kW</option>
               <option value="ac-7">AC Type 2 — 7.2 kW</option>
               <option value="ac-22">AC Type 2 — 22 kW</option>
+              <option value="custom">Custom / Proprietary charger</option>
             </select>
+          </div>
+
+          <!-- Custom charger fields — shown only for 'custom' option -->
+          <div id="ev-custom-fields" style="display:none;background:rgba(200,112,10,.08);border:1px solid rgba(200,112,10,.3);border-radius:6px;padding:12px 14px;margin-bottom:12px">
+            <div style="font-size:11px;font-weight:600;color:#E8860C;margin-bottom:10px">Custom / Proprietary charger parameters</div>
+            <div class="input-row">
+              <div class="input-group">
+                <label>Power per gun (kW)</label>
+                <input type="number" id="ev-custom-kw" value="60" min="1" step="0.5"/>
+              </div>
+              <div class="input-group">
+                <label>Capex per gun (₹ lakh)</label>
+                <input type="number" id="ev-custom-capex" value="15" min="0.5" step="0.5"/>
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Applicable tariff category</label>
+              <select id="ev-custom-tariff">
+                <option value="6.50">LT-6(b) Commercial — ₹6.50/unit</option>
+                <option value="6.00" selected>LT-6(c) Public fast charging — ₹6.00/unit</option>
+                <option value="5.80">HT-2(f) High-tension hub — ₹5.80/unit</option>
+              </select>
+            </div>
           </div>
 
           <div class="input-row">
             <div class="input-group">
-              <label>Number of charge points</label>
+              <label class="info-wrap">Number of charge points <span class="info" tabindex="0" data-tip="Each 'charge point' is one gun/socket that can serve one vehicle at a time. A station can have multiple charge points. More points = more vehicles served simultaneously but also more capex.">?</span></label>
               <input type="number" id="ev-points" value="4" min="1" max="200"/>
             </div>
             <div class="input-group">
-              <label>Operating hours / day</label>
+              <label class="info-wrap">Operating hours / day <span class="info" tabindex="0" data-tip="How many hours per day your station will be open and able to accept customers. 18 hours/day is typical for a public station (6am–midnight). 24h is possible for highway locations.">?</span></label>
               <input type="number" id="ev-hours" value="18" min="1" max="24"/>
             </div>
           </div>
 
           <div class="input-group">
-            <label>Expected utilisation (%)</label>
+            <label class="info-wrap">Expected utilisation % <span class="info" tabindex="0" data-tip="What % of your total available charging time is actually spent charging a vehicle. 100% means a car is always plugged in — impossible. Real-world public stations average 15–35% in India (2025). Higher utilisation = faster payback.">?</span></label>
             <input type="range" id="ev-util" min="5" max="80" value="25" oninput="document.getElementById('ev-util-val').textContent=this.value+'%'"/>
             <div style="font-family:var(--mono);font-size:13px;color:var(--text);margin-top:3px" id="ev-util-val">25%</div>
             <div class="caption">Industry benchmark: 15–35% for public stations in Tier-1 cities (2025)</div>
@@ -324,11 +348,11 @@ h1,h2{font-family:var(--head)}
 
           <div class="input-row">
             <div class="input-group">
-              <label>Land / lease cost (₹/month)</label>
+              <label class="info-wrap">Land / lease cost ₹/month <span class="info" tabindex="0" data-tip="Monthly rent or land cost for the charging station site. Petrol station land in Bengaluru: ₹80,000–₹3,00,000/month. Mall/mall parking: ₹30,000–₹1,00,000/month. Highway land (owned): near zero.">?</span></label>
               <input type="number" id="ev-lease" value="60000"/>
             </div>
             <div class="input-group">
-              <label>Retail price to customer (₹/unit)</label>
+              <label class="info-wrap">Retail price to customer ₹/unit <span class="info" tabindex="0" data-tip="What you charge your customers per kWh of electricity. 1 unit = 1 kWh. Your profit per unit = retail price minus BESCOM tariff (your energy cost). Industry range: ₹15–25/unit for DC fast charging (2025).">?</span></label>
               <input type="number" id="ev-retail" value="18" step="0.5"/>
             </div>
           </div>
@@ -339,7 +363,7 @@ h1,h2{font-family:var(--head)}
           </div>
 
           <div class="input-group">
-            <label>Additional monthly opex (₹) — staffing, maintenance</label>
+            <label class="info-wrap">Additional monthly opex ₹ <span class="info" tabindex="0" data-tip="Everything besides energy cost and rent: staff salary, maintenance, software/OCPP platform fees, internet, insurance. For an unstaffed automated station: ~₹15,000–25,000/month. Staffed: ₹35,000–60,000/month.">?</span></label>
             <input type="number" id="ev-opex-extra" value="25000"/>
           </div>
 
@@ -476,6 +500,41 @@ h1,h2{font-family:var(--head)}
         </table>
         <div class="arithmetic-note">
           LT-1 domestic base: ₹5.80 + P&amp;G surcharge: ₹0.36 + FY25 true-up: ₹0.56 = <strong style="color:var(--text)">₹6.72/unit total</strong> (effective domestic rate, verified arithmetic) · 6% electricity duty applies on top of all categories above
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- State targeting section -->
+    <div>
+      <div class="section-title">Target state — power quality & zone opportunity</div>
+      <div class="section-sub">Select a state to see which cities and highway corridors have the best combination of grid reliability, EV demand, and supply gap.</div>
+
+      <div class="state-select-wrap">
+        <select id="ev-state-select" onchange="loadEVZones()">
+          <option value="">— Select a state —</option>
+          <option>Karnataka</option><option>Maharashtra</option>
+          <option>Tamil Nadu</option><option>Delhi</option>
+          <option>Gujarat</option><option>Telangana</option>
+          <option>Rajasthan</option><option>Kerala</option>
+          <option>Andhra Pradesh</option>
+        </select>
+        <div class="bdg bdg-info" id="ev-zone-status" style="display:none">Loading…</div>
+      </div>
+
+      <div id="ev-zone-content" style="display:none">
+        <!-- State overview -->
+        <div class="card" style="margin-bottom:14px" id="ev-state-overview"></div>
+
+        <!-- Zone tabs -->
+        <div class="card">
+          <div class="zone-tabs">
+            <button class="ztab active" onclick="switchZoneTab('zones')">High-opportunity zones</button>
+            <button class="ztab" onclick="switchZoneTab('corridors')">Highway corridors</button>
+          </div>
+          <div class="ztab-pane active" id="zt-zones" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px"></div>
+          <div class="ztab-pane" id="zt-corridors"></div>
         </div>
       </div>
     </div>
@@ -671,36 +730,36 @@ h1,h2{font-family:var(--head)}
           <div class="lbl" style="margin-bottom:14px">Project parameters</div>
           <div class="input-row">
             <div class="input-group">
-              <label>Storage capacity (MWh)</label>
+              <label class="info-wrap">Storage capacity (MWh) <span class="info" tabindex="0" data-tip="Total energy your battery system can store, in megawatt-hours. 1 MWh = 1,000 kWh. A 10 MWh system can deliver 5 MW for 2 hours, or 10 MW for 1 hour. Larger capacity = more revenue from longer discharge windows.">?</span></label>
               <input type="number" id="bess-mwh" value="10" min="0.5" step="0.5"/>
             </div>
             <div class="input-group">
-              <label>Power rating (MW)</label>
+              <label class="info-wrap">Power rating (MW) <span class="info" tabindex="0" data-tip="Maximum rate of charge or discharge in megawatts. A 5 MW / 10 MWh system can discharge 5 MW for 2 hours (C-rate = 0.5C). Higher power = faster response = better for frequency regulation. Lower power relative to capacity = better for arbitrage.">?</span></label>
               <input type="number" id="bess-mw" value="5" min="0.25" step="0.25"/>
             </div>
           </div>
           <div class="input-row">
             <div class="input-group">
-              <label>Cycles per day</label>
+              <label class="info-wrap">Cycles per day <span class="info" tabindex="0" data-tip="How many full charge–discharge cycles per day. 1 cycle = charge from 0% to 100%, then discharge back to 0%. 1–2 cycles/day is typical for arbitrage. Frequency regulation may use partial cycles but equivalent to 0.5–1.5 full cycles/day. More cycles = more revenue but faster battery degradation.">?</span></label>
               <input type="number" id="bess-cycles" value="1.5" step="0.5" min="0.5"/>
             </div>
             <div class="input-group">
-              <label>Round-trip efficiency (%)</label>
+              <label class="info-wrap">Round-trip efficiency % <span class="info" tabindex="0" data-tip="What % of energy you put INTO the battery comes back out. 88% means for every 100 kWh stored, you recover 88 kWh. The remaining 12% is lost as heat. Li-ion NMC: 88–93%. LFP: 92–96%. Lower RTE = higher effective energy cost per cycle.">?</span></label>
               <input type="number" id="bess-rte" value="88" min="70" max="98"/>
             </div>
           </div>
           <div class="input-row">
             <div class="input-group">
-              <label>Off-peak buy price (₹/unit)</label>
+              <label class="info-wrap">Off-peak buy price ₹/unit <span class="info" tabindex="0" data-tip="What you pay BESCOM for electricity during off-peak hours (typically 10pm–6am). BESCOM ToD tariff: off-peak rate is ~20–35% lower than peak. You charge the battery cheap at night, sell the power back during peak hours. The bigger the gap between buy and sell price, the more profitable arbitrage becomes.">?</span></label>
               <input type="number" id="bess-buy" value="4.50" step="0.1"/>
             </div>
             <div class="input-group">
-              <label>Peak sell price (₹/unit)</label>
+              <label class="info-wrap">Peak sell price ₹/unit <span class="info" tabindex="0" data-tip="What you sell or the value you capture during peak demand hours (typically 6pm–10pm). For arbitrage: this is your energy price to the grid or direct consumer. For demand charge reduction: this is the demand charge rate (₹/kW/month) converted to per-unit equivalent.">?</span></label>
               <input type="number" id="bess-sell" value="9.50" step="0.1"/>
             </div>
           </div>
           <div class="input-group">
-            <label>Total project capex (₹ crore)</label>
+            <label class="info-wrap">Total project capex ₹ crore <span class="info" tabindex="0" data-tip="All-in cost: battery system + power electronics (inverter/PCS) + civil & installation + grid connection + commissioning. Benchmark 2025: Li-ion NMC = ₹0.6–1.0 Cr/MWh. Li-ion LFP = ₹0.5–0.85 Cr/MWh. LFP is cheaper but slightly lower RTE. VGF subsidy can reduce effective capex by up to ₹94/kWh.">?</span></label>
             <input type="number" id="bess-capex" value="8.5" step="0.5"/>
             <div class="caption">Benchmark: ₹0.6–1.0 Cr/MWh installed (Li-NMC, India 2025)</div>
           </div>
@@ -727,6 +786,39 @@ h1,h2{font-family:var(--head)}
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- BESS schemes -->
+    <div>
+      <div class="section-title">Government schemes — check your eligibility</div>
+      <div class="section-sub">Based on your project size from the calculator above. Schemes that may apply to your parameters are highlighted.</div>
+      <div id="bess-scheme-eligibility" style="font-size:12px;color:var(--muted);margin-bottom:12px">Run the calculator above first to see personalised eligibility.</div>
+      <div class="two-col">
+        <div id="bess-schemes-list"><div style="font-size:12px;color:var(--muted)">Loading schemes…</div></div>
+        <div>
+          <div class="lbl" style="margin-bottom:10px">Who is deploying BESS in India?</div>
+          <div id="bess-deployments"></div>
+          <hr class="divider"/>
+          <div class="lbl" style="margin-bottom:10px">BESS use cases — current market share</div>
+          <div id="bess-use-cases"></div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- Weekly policy digest -->
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div class="section-title">Policy digest — auto-updated every Sunday</div>
+        <div style="font-size:10px;font-family:var(--mono);color:var(--muted)" id="digest-ts">Last update: checking…</div>
+      </div>
+      <div class="section-sub">Latest press releases from MHI, MNRE, and MoP relevant to BESS and EV — fetched from PIB official RSS feeds every Sunday at 06:00 UTC.</div>
+      <div class="card" id="digest-content">
+        <div style="font-size:12px;color:var(--muted)">Loading this week's policy updates…</div>
       </div>
     </div>
 
@@ -1151,8 +1243,200 @@ function showSD(name){
 // ─────────────────────────────────────────────
 // Start on landing page — all modules hidden
 selectModule(null);
-// Pre-render state grid for when EV module opens
+// Pre-render state grid
 renderStateGrid();
+// Load BESS schemes + weekly digest (displayed when BESS module opens)
+loadBESSSchemes();
+loadWeeklyDigest();
+
+
+// ─────────────────────────────────────────────
+// CUSTOM CONNECTOR TOGGLE
+// ─────────────────────────────────────────────
+(function(){
+  const connSel = document.getElementById('ev-connector');
+  if(!connSel) return;
+  connSel.addEventListener('change', function(){
+    const isCustom = this.value === 'custom';
+    const cf = document.getElementById('ev-custom-fields');
+    if(cf) cf.style.display = isCustom ? 'block' : 'none';
+    updateEVTariff();
+  });
+  const customTariff = document.getElementById('ev-custom-tariff');
+  if(customTariff) customTariff.addEventListener('change', updateEVTariff);
+})();
+
+// Extend EV_CONNECTORS with custom + wrap calcEV
+EV_CONNECTORS['custom'] = {kw:60, capex_per_gun:15, tariff:6.00, label:'Custom / Proprietary'};
+
+const _origCalcEV = calcEV;
+function calcEV(){
+  const sel = document.getElementById('ev-connector').value;
+  if(sel === 'custom'){
+    EV_CONNECTORS['custom'].kw            = +(document.getElementById('ev-custom-kw')?.value || 60);
+    EV_CONNECTORS['custom'].capex_per_gun = +(document.getElementById('ev-custom-capex')?.value || 15);
+    EV_CONNECTORS['custom'].tariff        = +(document.getElementById('ev-custom-tariff')?.value || 6.00);
+  }
+  _origCalcEV();
+}
+
+// ─────────────────────────────────────────────
+// ZONE TAB SWITCHING
+// ─────────────────────────────────────────────
+function switchZoneTab(tab, btn){
+  document.querySelectorAll('.ztab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const zones = document.getElementById('zt-zones');
+  const corridors = document.getElementById('zt-corridors');
+  if(zones) zones.style.display = tab==='zones' ? 'grid' : 'none';
+  if(corridors) corridors.style.display = tab==='corridors' ? 'block' : 'none';
+}
+
+// ─────────────────────────────────────────────
+// EV ZONE LOADER
+// ─────────────────────────────────────────────
+async function loadEVZones(){
+  const state = document.getElementById('ev-state-select').value;
+  if(!state){ document.getElementById('ev-zone-content').style.display='none'; return; }
+  const statusEl = document.getElementById('ev-zone-status');
+  statusEl.style.display='inline-flex'; statusEl.textContent='Loading…';
+  document.getElementById('ev-zone-content').style.display='none';
+  try{
+    const r = await fetch('/api/ev-zones/'+encodeURIComponent(state));
+    if(!r.ok) throw new Error('HTTP '+r.status+' — no zone data for '+state);
+    const d = await r.json();
+    renderEVZones(state, d);
+    statusEl.style.display='none';
+    document.getElementById('ev-zone-content').style.display='block';
+  }catch(e){
+    statusEl.textContent=e.message;
+    statusEl.style.background='rgba(192,48,48,.1)';
+    statusEl.style.color='#FF7070';
+  }
+}
+
+function renderEVZones(state, d){
+  // Overview
+  document.getElementById('ev-state-overview').innerHTML=
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">'
+    +'<div><div class="lbl">State</div><div style="font-size:16px;font-weight:700;color:var(--text);margin-top:4px">'+state+'</div></div>'
+    +'<div><div class="lbl">DISCOM(s)</div><div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">'+d.discom+'</div></div>'
+    +'<div><div class="lbl">Grid availability</div><div style="font-family:var(--mono);font-size:22px;font-weight:700;color:'+(d.grid_avail_pct>=95?'#22A864':d.grid_avail_pct>=85?'#E8860C':'#FF7070')+';margin-top:4px">'+d.grid_avail_pct+'%</div></div>'
+    +'<div><div class="lbl">EV stations</div><div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);margin-top:4px">'+((d.ev_stations_total||0).toLocaleString())+'</div></div>'
+    +'</div>'
+    +'<div style="margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6;padding:9px 11px;background:var(--s2);border-radius:5px;border-left:2px solid var(--blue-l)">'+d.power_context+'</div>';
+
+  // Zone cards
+  const zt = document.getElementById('zt-zones');
+  if(!zt) return;
+  zt.innerHTML=(d.zones||[]).map(function(z){
+    const c=z.opportunity_score>=9?'#22A864':z.opportunity_score>=7?'#E8860C':'var(--muted)';
+    const bg=z.opportunity_score>=9?'rgba(26,120,76,.12)':z.opportunity_score>=7?'rgba(200,112,10,.1)':'rgba(90,128,168,.08)';
+    return '<div class="zone-card '+(z.opportunity_score>=9?'high':z.opportunity_score>=6?'medium':'low')+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">'
+      +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">'+z.zone+'</div>'
+      +'<div style="font-size:10px;font-family:var(--mono);color:var(--muted)">'+z.city+' · '+z.discom+'</div></div>'
+      +'<div style="text-align:center;background:'+bg+';border-radius:4px;padding:3px 8px">'
+      +'<div style="font-family:var(--mono);font-size:18px;font-weight:700;color:'+c+'">'+z.opportunity_score+'/10</div>'
+      +'<div style="font-size:9px;color:var(--muted)">opportunity</div></div></div>'
+      +'<div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:8px">'+z.reason+'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;font-size:10px;font-family:var(--mono)">'
+      +'<div style="background:var(--s1);border-radius:3px;padding:4px 6px"><div style="color:var(--muted)">EV demand</div><div style="color:var(--text);font-weight:600">'+z.ev_demand+'</div></div>'
+      +'<div style="background:var(--s1);border-radius:3px;padding:4px 6px"><div style="color:var(--muted)">Grid power</div><div style="color:var(--text);font-weight:600">'+z.power_reliability+'</div></div>'
+      +'<div style="background:var(--s1);border-radius:3px;padding:4px 6px"><div style="color:var(--muted)">Supply V</div><div style="color:var(--text);font-weight:600">'+z.supply_voltage+'</div></div>'
+      +'</div></div>';
+  }).join('');
+
+  // Corridors
+  const zc = document.getElementById('zt-corridors');
+  if(!zc) return;
+  zc.innerHTML='<table class="tariff-table"><thead><tr><th>Corridor</th><th>Distance</th><th>Stations</th><th>Per 100km</th><th>Opportunity</th><th>Gap towns</th></tr></thead><tbody>'
+    +(d.corridors||[]).map(function(c){
+      const oc=c.opportunity.includes('High')?'#22A864':c.opportunity.includes('Med')?'#E8860C':'var(--muted)';
+      return '<tr><td style="font-weight:600;color:var(--text)">'+c.name+'</td><td>'+c.distance_km+' km</td><td>'+c.stations_existing+'</td><td style="font-family:var(--mono)">'+c.stations_per_100km.toFixed(1)+'</td><td style="color:'+oc+';font-weight:600">'+c.opportunity+'</td><td style="font-size:11px;color:var(--muted)">'+(c.gap_towns||[]).join(', ')||'—'+'</td></tr>';
+    }).join('')+'</tbody></table>';
+}
+
+// ─────────────────────────────────────────────
+// BESS SCHEMES
+// ─────────────────────────────────────────────
+var _bessUserMWh = 0;
+
+async function loadBESSSchemes(){
+  try{
+    const r = await fetch('/api/bess-schemes');
+    if(!r.ok) throw new Error();
+    renderBESSSchemes(await r.json(), _bessUserMWh);
+  }catch(e){ console.warn('BESS schemes:', e); }
+}
+
+function renderBESSSchemes(d, userMWh){
+  const sEl = document.getElementById('bess-schemes-list');
+  if(sEl) sEl.innerHTML=(d.schemes||[]).map(function(s){
+    const q = userMWh===0 ? null : userMWh >= s.min_size_mwh;
+    const qC = q===null?'se-check':q?'se-yes':'se-no';
+    const qL = q===null?'Enter capacity to check':q?'✓ Eligible':'Below minimum ('+s.min_size_mwh+' MWh)';
+    return '<div class="scheme-card">'
+      +'<div class="scheme-head"><div class="scheme-name">'+s.name+'</div>'
+      +'<span class="scheme-eligible '+qC+'">'+qL+'</span></div>'
+      +'<div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:6px">'+s.ministry+' · '+s.outlay+'</div>'
+      +'<div class="scheme-body"><strong>Benefit:</strong> '+s.benefit+'<br><strong>Apply:</strong> '+s.how_to_apply.slice(0,100)+'...</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px">'
+      +'<div class="scheme-meta">Deadline: <span>'+s.deadline+'</span></div>'
+      +'<a href="'+s.source_url+'" target="_blank" class="src">'+s.source.slice(0,35)+'</a></div>'
+      +'</div>';
+  }).join('');
+
+  const dEl = document.getElementById('bess-deployments');
+  if(dEl) dEl.innerHTML='<table class="tariff-table"><thead><tr><th>Entity</th><th>MWh</th><th>Use case</th><th>Status</th></tr></thead><tbody>'
+    +(d.major_deployments||[]).map(function(dep){
+      return '<tr><td style="font-weight:600;color:var(--text)">'+dep.entity+'</td><td style="font-family:var(--mono)">'+dep.capacity_mwh+'</td><td style="font-size:11px;color:var(--muted)">'+dep.use_case+'</td><td><span class="bdg '+(dep.status.includes('pera')?'bdg-ok':'bdg-info')+'">'+dep.status+'</span></td></tr>';
+    }).join('')+'</tbody></table>';
+
+  const uEl = document.getElementById('bess-use-cases');
+  if(uEl) uEl.innerHTML=(d.use_cases||[]).map(function(u){
+    return '<div style="margin-bottom:8px">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;font-weight:500;color:var(--text)">'+u.name+'</span><span style="font-family:var(--mono);font-size:12px;color:var(--muted)">'+u.share_pct+'%</span></div>'
+      +'<div style="height:5px;background:var(--dim);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+u.share_pct+'%;background:var(--blue-l);border-radius:2px"></div></div>'
+      +'<div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px">'+u.who+' · '+u.revenue_model+'</div></div>';
+  }).join('');
+}
+
+// Wrap calcBESS to update eligibility
+const _origCalcBESS = calcBESS;
+function calcBESS(){
+  _bessUserMWh = +(document.getElementById('bess-mwh')?.value || 0);
+  _origCalcBESS();
+  fetch('/api/bess-schemes').then(function(r){return r.json();}).then(function(d){renderBESSSchemes(d,_bessUserMWh);}).catch(function(){});
+}
+
+// ─────────────────────────────────────────────
+// WEEKLY DIGEST
+// ─────────────────────────────────────────────
+async function loadWeeklyDigest(){
+  try{
+    const r = await fetch('/api/weekly-digest');
+    if(!r.ok) throw new Error();
+    const d = await r.json();
+    const tsEl = document.getElementById('digest-ts');
+    if(tsEl) tsEl.textContent = d.last_updated
+      ? 'Last update: '+new Date(d.last_updated).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+      : 'Not yet run';
+    const cEl = document.getElementById('digest-content');
+    if(!cEl) return;
+    if(!d.articles || d.articles.length===0){
+      cEl.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">'+(d.status==='no_matches'?'No relevant press releases this week. Check back next Sunday.':d.error?'PIB feed error: '+d.error:'Digest runs every Sunday at 06:00 UTC.')+'</div>';
+      return;
+    }
+    cEl.innerHTML='<div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:10px">Source: PIB official RSS (MHI · MNRE · MoP) · Auto-filtered for EV & BESS keywords · Updates every Sunday 06:00 UTC</div>'
+      +d.articles.map(function(a){
+        return '<div class="digest-item"><div class="dig-cat '+(a.category==='bess'?'dig-bess':'dig-ev')+'">'+a.category.toUpperCase()+'</div>'
+          +'<div><a href="'+a.link+'" target="_blank" style="text-decoration:none;color:inherit"><div class="dig-title">'+a.title+'</div></a>'
+          +'<div class="dig-meta">'+a.ministry+' · '+(a.date||'Recent')+'</div></div></div>';
+      }).join('');
+  }catch(e){ console.warn('Digest:', e); }
+}
+
 </script>
 </body>
 </html>
