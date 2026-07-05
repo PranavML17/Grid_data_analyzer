@@ -701,16 +701,22 @@ function showTab(tab, btn){
   if(btn) btn.classList.add('active');
   else document.querySelector('[data-tab="'+tab+'"]')?.classList.add('active');
   if(tab==='grid') initGrid();
-  if(tab==='explore'&&leafMap){ setTimeout(function(){ leafMap.invalidateSize(); },80); }
+  if(tab==='explore'){ setTimeout(function(){ if(leafMap) leafMap.invalidateSize(); },80); }
   if(tab==='policy'){ renderStateGrid(); loadPolicySchemes(); }
 }
 
 function enterExplore(){
   showTab('explore', document.querySelector('[data-tab="explore"]'));
-  // Always start in map view
-  setView('map');
-  if(leafMap){ setTimeout(function(){ leafMap.invalidateSize(); renderMapMarkers(); }, 80); }
-  else if(allOpps.length){ initMap(); renderMapMarkers(); }
+  // Init map after pane is visible (timeout ensures layout is complete)
+  setTimeout(function(){
+    if(typeof L !== 'undefined'){
+      setView('map');
+      if(!leafMap){ initMap(); }
+      if(leafMap){ leafMap.invalidateSize(); renderMapMarkers(); }
+    } else {
+      setView('list');
+    }
+  }, 100);
 }
 function enterCalc(){    showTab('calc',    document.querySelector('[data-tab="calc"]')); }
 function enterIntel(){   showTab('intel',   document.querySelector('[data-tab="intel"]')); loadDigest(); }
@@ -747,11 +753,12 @@ async function initExplorer(){
     const sfEl = document.getElementById('f-state');
     d.all_states.forEach(function(s){ const o=document.createElement('option'); o.value=s; o.textContent=s; sfEl.appendChild(o); });
     renderExplorer();
-    initMap();
-    renderMapMarkers();
   }catch(e){
-    document.getElementById('opp-grid').innerHTML='<div class="empty"><h3>Could not load opportunities</h3><p>'+e.message+'</p></div>';
-    document.getElementById('fcount').textContent='Error';
+    console.error('initExplorer failed:', e);
+    const og = document.getElementById('opp-grid');
+    if(og) og.innerHTML='<div class="empty"><h3>Could not load opportunities</h3><p>'+e.message+'</p></div>';
+    const fc = document.getElementById('fcount');
+    if(fc) fc.textContent='Error';
   }
 }
 
@@ -969,6 +976,12 @@ function setView(v){
 
 function initMap(){
   if(leafMap) return;
+  if(typeof L === 'undefined'){
+    console.warn('Leaflet not loaded — map unavailable, using list view');
+    setView('list');
+    return;
+  }
+  try{
   leafMap = L.map('india-map', {
     center: [20.5937, 78.9629],
     zoom: 5,
@@ -979,6 +992,11 @@ function initMap(){
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 13,
   }).addTo(leafMap);
+  }catch(mapErr){
+    console.warn('Leaflet map init failed:', mapErr);
+    leafMap = null;
+    setView('list');
+  }
 }
 
 function mrkColor(score, maxScore){
@@ -989,7 +1007,7 @@ function mrkColor(score, maxScore){
 }
 
 function renderMapMarkers(){
-  if(!leafMap) return;
+  if(!leafMap || typeof L === 'undefined') return;
   const biz = fState.biz || 'ev';
   // Clear existing markers
   mapMarkers.forEach(function(m){ leafMap.removeLayer(m); });
