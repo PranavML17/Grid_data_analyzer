@@ -6,463 +6,443 @@
 <title>India Energy Site Intelligence</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F8FAFC; --s1:#FFFFFF; --s2:#F1F5F9; --s3:#E8EFF7; --border:#E2E8F0;
-  --text:#0F172A; --sub:#334155; --muted:#64748B; --dim:#CBD5E1;
-  --ev:#0D9488; --ev-l:#14B8A6; --ev-bg:#F0FDFA;
-  --bess:#2563EB; --bess-l:#3B82F6; --bess-bg:#EFF6FF;
-  --mfg:#D97706; --mfg-l:#F59E0B;
-  --green:#16A34A; --red:#DC2626; --amber:#D97706;
+  --bg:#F8FAFC;--s1:#fff;--s2:#F1F5F9;--s3:#E8EFF7;--border:#E2E8F0;
+  --text:#0F172A;--sub:#334155;--muted:#64748B;--dim:#CBD5E1;
+  --ev:#0D9488;--ev-l:#14B8A6;--bess:#2563EB;--bess-l:#3B82F6;
+  --mfg:#D97706;--green:#16A34A;--red:#DC2626;
   --sans:'IBM Plex Sans',system-ui,sans-serif;
   --mono:'IBM Plex Mono','Courier New',monospace;
   --head:'Space Grotesk','IBM Plex Sans',sans-serif;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 16px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.05);
-  --shadow-lg:0 10px 40px rgba(0,0,0,.12);
+  --sh:0 1px 3px rgba(0,0,0,.08);--sh2:0 4px 16px rgba(0,0,0,.1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5}
 h1,h2,h3{font-family:var(--head)}
 :focus-visible{outline:2px solid var(--ev);outline-offset:2px}
 
-/* ── HEADER ── */
-.app-header{background:var(--s1);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:80;box-shadow:var(--shadow)}
-.logo{display:flex;align-items:center;gap:8px;cursor:pointer}
-.logo-icon{width:28px;height:28px;background:var(--ev);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+/* header */
+.app-hdr{background:var(--s1);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:80;box-shadow:var(--sh)}
+.logo{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.logo-icon{width:28px;height:28px;background:var(--ev);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
 .logo-text{font-size:13px;font-weight:700;color:var(--text)}
-.logo-tagline{font-size:9px;color:var(--muted);font-family:var(--mono);display:block;margin-top:1px}
-.header-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
-.glossary-btn{background:none;border:1.5px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-family:var(--mono);padding:5px 11px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s}
-.glossary-btn:hover{border-color:var(--ev);color:var(--ev)}
-.nav-tabs{display:flex;padding:0 20px;background:var(--s1);border-bottom:1px solid var(--border);overflow-x:auto}
-.nav-tab{background:none;border:none;padding:9px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s}
+.logo-tag{font-size:9px;color:var(--muted);font-family:var(--mono);display:block;margin-top:1px}
+.gls-btn{margin-left:auto;background:none;border:1.5px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-family:var(--mono);padding:5px 11px;cursor:pointer}
+.gls-btn:hover{border-color:var(--ev);color:var(--ev)}
+
+/* nav */
+.app-nav{display:none;background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;overflow-x:auto}
+.nav-tab{background:none;border:none;padding:9px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
 .nav-tab:hover{color:var(--text)}
 .nav-tab.active{color:var(--ev);border-bottom-color:var(--ev)}
-.pane{display:none}.pane.active{display:block}
+
+/* panes */
+.pane{display:none}
 .main{max-width:1280px;margin:0 auto;padding:24px 20px 64px}
 
-/* ── LANDING ── */
-.landing{background:var(--s1);border-bottom:2px solid var(--border)}
-.landing-inner{max-width:980px;margin:0 auto;padding:52px 24px 48px}
-.land-eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ev);margin-bottom:16px;display:flex;align-items:center;gap:7px}
-.land-eyebrow::before{content:'';width:24px;height:2px;background:var(--ev);display:inline-block}
-.land-h1{font-size:clamp(28px,4.5vw,50px);font-weight:700;color:var(--text);line-height:1.1;margin-bottom:14px}
+/* cards / atoms */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:18px 20px;box-shadow:var(--sh)}
+.lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.bdg{display:inline-flex;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;font-family:var(--mono)}
+.bdg-ok{background:#DCFCE7;color:#15803D}.bdg-warn{background:#FEF3C7;color:#B45309}.bdg-info{background:#DBEAFE;color:#1D4ED8}
+.src{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-family:var(--mono);color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:1px 7px;text-decoration:none;background:var(--s2)}
+.src::before{content:'\\2197';font-size:9px}
+.info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--s2);border:1px solid var(--border);color:var(--muted);font-size:9px;cursor:help;position:relative;font-family:var(--mono);vertical-align:middle;margin-left:3px}
+.info::after{content:attr(data-tip);position:absolute;z-index:200;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:var(--text);color:#fff;font-size:11px;font-family:var(--sans);padding:9px 13px;border-radius:6px;width:240px;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.2);pointer-events:none;display:none}
+.info:hover::after{display:block}
+hr.div{border:none;border-top:1px solid var(--border);margin:18px 0}
+.btn{display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--border);color:var(--bess);font-size:11px;font-family:var(--mono);padding:4px 11px;border-radius:4px;cursor:pointer;text-decoration:none}
+
+/* landing */
+#landing{background:var(--s1)}
+.land-inner{max-width:920px;margin:0 auto;padding:52px 24px 48px}
+.land-ey{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ev);margin-bottom:16px;display:flex;align-items:center;gap:7px}
+.land-ey::before{content:'';width:24px;height:2px;background:var(--ev);display:block}
+.land-h1{font-size:clamp(28px,4.5vw,48px);font-weight:700;line-height:1.1;margin-bottom:14px}
 .land-h1 em{font-style:normal;color:var(--ev)}
-.land-body{font-size:16px;color:var(--muted);max-width:600px;line-height:1.65;margin-bottom:36px}
+.land-body{font-size:16px;color:var(--muted);max-width:580px;line-height:1.65;margin-bottom:36px}
 .entry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px}
-.entry-card{background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:22px 20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;text-align:left}
-.entry-card:hover{border-color:currentColor;transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.entry-card.ev-entry{color:var(--ev)}.entry-card.calc-entry{color:var(--bess)}.entry-card.intel-entry{color:var(--mfg)}
-.entry-icon{font-size:28px;margin-bottom:12px;display:block}
-.entry-title{font-family:var(--head);font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.2}
-.entry-q{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:14px}
-.entry-cta{font-size:12px;font-weight:700;font-family:var(--mono);display:flex;align-items:center;gap:5px}
-.entry-arrow{font-size:16px;transition:transform .2s}
-.entry-card:hover .entry-arrow{transform:translateX(4px)}
-.entry-data{font-size:10px;font-family:var(--mono);color:var(--dim);margin-top:8px;border-top:1px solid var(--border);padding-top:8px;line-height:1.6}
-.land-caveats{font-size:11px;color:var(--muted);line-height:1.75;border-top:1px solid var(--border);padding-top:18px;display:flex;gap:24px;flex-wrap:wrap}
-.caveat-item{display:flex;align-items:flex-start;gap:7px;flex:1;min-width:200px}
-.caveat-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.ec{background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:22px 20px;cursor:pointer;transition:all .2s;text-align:left;position:relative}
+.ec:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.ec.ev-e{color:var(--ev)}.ec.ca-e{color:var(--bess)}.ec.in-e{color:var(--mfg)}
+.ec:hover{border-color:currentColor}
+.ec-icon{font-size:28px;margin-bottom:12px;display:block}
+.ec-title{font-family:var(--head);font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.ec-q{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:14px}
+.ec-cta{font-size:12px;font-weight:700;font-family:var(--mono);display:flex;align-items:center;gap:5px;transition:gap .2s}
+.ec:hover .ec-cta{gap:9px}
+.ec-data{font-size:10px;font-family:var(--mono);color:var(--dim);margin-top:8px;border-top:1px solid var(--border);padding-top:8px;line-height:1.6}
+.land-cav{font-size:11px;color:var(--muted);line-height:1.75;border-top:1px solid var(--border);padding-top:18px;display:flex;gap:22px;flex-wrap:wrap}
+.cav{display:flex;align-items:flex-start;gap:7px;flex:1;min-width:200px}
+.cav-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
 
-/* ── FILTER BAR ── */
-.filter-bar{background:var(--s1);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;gap:7px;align-items:center;flex-wrap:wrap;position:sticky;top:82px;z-index:40;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.fsel{background:var(--s2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:11px;padding:6px 10px;outline:none;cursor:pointer;transition:border-color .15s}
-.fsel:focus,.fsel.active{border-color:var(--ev)}
-.filter-count{font-size:11px;font-family:var(--mono);color:var(--muted);margin-left:auto;white-space:nowrap}
-.clear-btn{background:none;border:none;font-size:10px;font-family:var(--mono);color:var(--muted);cursor:pointer;padding:3px 7px;border-radius:4px}
-.clear-btn:hover{background:var(--s2);color:var(--text)}
+/* filter bar */
+.fbar{background:var(--s1);border-bottom:1px solid var(--border);padding:9px 20px;display:flex;gap:7px;align-items:center;flex-wrap:wrap;position:sticky;top:49px;z-index:40;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.fsel{background:var(--s2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:11px;padding:6px 10px;outline:none;cursor:pointer}
+.fsel:focus{border-color:var(--ev)}
+.fcount{font-size:11px;font-family:var(--mono);color:var(--muted);margin-left:auto;white-space:nowrap}
+.vt{display:flex;gap:0;background:var(--s2);border-radius:6px;padding:2px}
+.vt-b{background:none;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-family:var(--mono);font-weight:600;color:var(--muted);cursor:pointer}
+.vt-b.active{background:var(--s1);color:var(--ev);box-shadow:var(--sh)}
+.clr-btn{background:none;border:none;font-size:10px;font-family:var(--mono);color:var(--muted);cursor:pointer;padding:3px 7px;border-radius:4px}
+.clr-btn:hover{background:var(--s2);color:var(--text)}
 
-/* ── HOW-TO-READ ACCORDION ── */
-.htr{background:var(--s2);border-radius:8px;margin-bottom:14px}
-.htr-hdr{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;cursor:pointer;font-size:12px;font-weight:600;color:var(--sub)}
-.htr-hdr span{font-size:11px;color:var(--muted);font-weight:400}
-.htr-body{padding:0 15px 13px;display:none}
-.htr-body.open{display:block}
-.htr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:6px}
-.htr-item{background:var(--s1);border-radius:6px;padding:10px 12px}
-.htr-term{font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:5px}
-.htr-def{font-size:11px;color:var(--muted);line-height:1.6}
+/* map layout */
+.map-layout{display:grid;grid-template-columns:1fr 390px;height:calc(100vh - 132px)}
+#india-map{height:100%;width:100%;background:#EFF6FF;z-index:1}
+.map-panel{height:100%;overflow-y:auto;border-left:1px solid var(--border);background:var(--s1)}
+.map-panel-inner{padding:16px 18px}
+.map-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:30px;color:var(--muted)}
+.map-ph h3{font-size:14px;font-weight:600;margin-bottom:7px;color:var(--sub)}
+.map-ph p{font-size:12px;line-height:1.6;max-width:240px}
+.map-leg{position:absolute;bottom:24px;left:12px;z-index:10;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:9px 12px;box-shadow:var(--sh);font-size:11px}
+.leg-row{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.leg-row:last-child{margin-bottom:0}
+.leg-dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff;flex-shrink:0}
 
-/* ── OPPORTUNITY CARDS ── */
+/* list layout */
+#list-view{padding:16px 20px 48px;max-width:1280px;margin:0 auto}
 .opp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px}
-.opp-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 17px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s;position:relative}
-.opp-card:hover{box-shadow:var(--shadow-md)}
-.opp-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-.opp-loc{font-size:14px;font-weight:700;color:var(--text);line-height:1.25}
-.opp-sub{font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px}
-.score-pill{flex-shrink:0;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;line-height:1}
-.sp-hi{background:#DCFCE7;color:#15803D}
-.sp-md{background:#FEF3C7;color:#B45309}
-.sp-lo{background:#FEE2E2;color:#B91C1C}
-.opp-badges{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.tier-tag{font-size:9px;font-weight:700;font-family:var(--mono);padding:2px 7px;border-radius:3px}
+.sk{background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:10px}
+@keyframes sk{0%{background-position:200%}100%{background-position:-200%}}
+
+/* opp card */
+.opp-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:15px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:9px}
+.opp-card:hover{box-shadow:var(--sh2)}
+.oc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.oc-loc{font-size:14px;font-weight:700;color:var(--text);line-height:1.2}
+.oc-sub{font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px}
+.sp{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;flex-shrink:0}
+.sp-hi{background:#DCFCE7;color:#15803D}.sp-md{background:#FEF3C7;color:#B45309}.sp-lo{background:#FEE2E2;color:#B91C1C}
+.oc-bdgs{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.tt{font-size:9px;font-weight:700;font-family:var(--mono);padding:2px 7px;border-radius:3px}
 .t1{background:#F0FAFB;color:var(--ev)}.t2{background:#EFF6FF;color:var(--bess)}.t3{background:var(--s2);color:var(--muted)}
-/* signal bars */
-.sig-row{display:flex;align-items:center;gap:7px;font-size:10px}
-.sig-lbl{color:var(--muted);width:88px;flex-shrink:0;font-family:var(--mono)}
-.sig-track{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
-.sig-fill{height:100%;border-radius:2px}
-.sig-val{font-family:var(--mono);font-size:10px;font-weight:700;width:68px;text-align:right;flex-shrink:0}
-/* one-liner */
-.one-liner{font-size:11px;color:var(--sub);line-height:1.6;border-left:2px solid var(--border);padding-left:9px}
-/* coverage badge */
 .cov{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;font-family:var(--mono);cursor:help;position:relative}
-.cov::after{content:attr(data-note);position:absolute;z-index:100;bottom:calc(100%+5px);left:0;background:var(--text);color:#fff;font-size:11px;font-family:var(--sans);font-weight:400;line-height:1.55;padding:9px 12px;border-radius:6px;width:270px;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.2);pointer-events:none;display:none}
+.cov::after{content:attr(data-note);position:absolute;z-index:100;bottom:calc(100%+5px);left:0;background:var(--text);color:#fff;font-size:11px;font-family:var(--sans);padding:9px 12px;border-radius:6px;width:260px;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.2);pointer-events:none;display:none}
 .cov:hover::after{display:block}
 .cd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .cov-live{background:#DCFCE7;color:#15803D}.cov-live .cd{background:#15803D}
 .cov-verified{background:#DBEAFE;color:#1D4ED8}.cov-verified .cd{background:#1D4ED8}
 .cov-partial{background:#FEF3C7;color:#B45309}.cov-partial .cd{background:#D97706}
 .cov-estimate{background:var(--s2);color:var(--muted)}.cov-estimate .cd{background:var(--dim)}
-/* evaluate button */
-.eval-btn{width:100%;background:var(--ev);color:#fff;border:none;border-radius:7px;padding:9px 14px;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:background .15s;margin-top:2px}
+.sig-row{display:flex;align-items:center;gap:7px;font-size:10px}
+.sig-lbl{color:var(--muted);width:88px;flex-shrink:0;font-family:var(--mono)}
+.sig-bar{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.sig-fill{height:100%;border-radius:2px}
+.sig-val{font-family:var(--mono);font-size:10px;font-weight:700;width:68px;text-align:right;flex-shrink:0}
+.one-liner{font-size:11px;color:var(--sub);line-height:1.6;border-left:2px solid var(--border);padding-left:9px;font-style:italic}
+.eval-btn{width:100%;background:var(--ev);color:#fff;border:none;border-radius:7px;padding:9px;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;transition:background .15s}
 .eval-btn:hover{background:var(--ev-l)}
-.eval-btn.bess-btn{background:var(--bess)}.eval-btn.bess-btn:hover{background:var(--bess-l)}
-/* empty state */
-.empty{text-align:center;padding:56px 20px;color:var(--muted)}
-.empty h3{font-size:15px;font-weight:600;margin-bottom:8px;color:var(--sub)}
-/* skeleton */
-.sk{background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px}
-@keyframes sk{0%{background-position:200%}100%{background-position:-200%}}
+.eval-btn.bess{background:var(--bess)}.eval-btn.bess:hover{background:var(--bess-l)}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state h3{font-size:14px;font-weight:600;margin-bottom:7px;color:var(--sub)}
 
-/* ── GLOSSARY MODAL ── */
-.gls-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:200;display:none;align-items:flex-start;justify-content:flex-end}
-.gls-overlay.open{display:flex}
-.gls-panel{width:min(480px,100vw);height:100vh;background:var(--s1);overflow-y:auto;box-shadow:var(--shadow-lg);display:flex;flex-direction:column}
-.gls-hdr{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--s1);z-index:10}
-.gls-title{font-family:var(--head);font-size:17px;font-weight:700}
-.gls-close{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px}
-.gls-close:hover{background:var(--s2);color:var(--text)}
-.gls-body{padding:8px 20px 28px;flex:1}
-.gls-section{margin-bottom:4px}
-.gls-section-hdr{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:14px 0 8px;border-bottom:1px solid var(--border);margin-bottom:2px}
-.term{padding:13px 0;border-bottom:.5px solid var(--border)}
-.term:last-child{border-bottom:none}
-.term-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px;display:flex;align-items:center;gap:7px}
-.term-tag{font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:var(--s2);color:var(--muted);font-weight:700}
-.term-def{font-size:12px;color:var(--sub);line-height:1.7}
-.term-example{font-size:11px;color:var(--muted);font-family:var(--mono);background:var(--s2);padding:7px 10px;border-radius:4px;margin-top:7px;line-height:1.6}
+/* how-to-read */
+.htr{background:var(--s2);border-radius:8px;margin-bottom:14px}
+.htr-hdr{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;cursor:pointer;font-size:12px;font-weight:600;color:var(--sub);user-select:none}
+.htr-body{padding:0 15px 14px;display:none}
+.htr-body.open{display:block}
+.htr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:8px}
+.htr-item{background:var(--s1);border-radius:6px;padding:10px 12px}
+.htr-term{font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px}
+.htr-def{font-size:11px;color:var(--muted);line-height:1.6}
 
-/* ── CALCULATOR TAB ── */
+/* calculator */
 .prefill-banner{background:#ECFDF5;border:1.5px solid #16A34A;border-radius:8px;padding:11px 15px;margin-bottom:16px;display:none;justify-content:space-between;align-items:center;gap:10px}
-.prefill-text{font-size:12px;color:#15803D;line-height:1.5}
-.prefill-clear{background:none;border:none;font-size:11px;font-family:var(--mono);color:var(--muted);cursor:pointer;text-decoration:underline dotted;flex-shrink:0}
-.calc-sub-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px}
+.pftext{font-size:12px;color:#15803D;line-height:1.5}
+.pfclear{background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline dotted;flex-shrink:0}
+.calc-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
 .ctab{background:none;border:none;padding:9px 17px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
 .ctab.active{color:var(--ev);border-bottom-color:var(--ev)}
-.ctab.bess-active.active{color:var(--bess);border-bottom-color:var(--bess)}
+.ctab.ba.active{color:var(--bess);border-bottom-color:var(--bess)}
 .ctab-pane{display:none}.ctab-pane.active{display:block}
-.calc-grid{display:grid;grid-template-columns:400px 1fr;gap:18px;align-items:start}
-.card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:18px 20px;box-shadow:var(--shadow)}
+.cgrid{display:grid;grid-template-columns:400px 1fr;gap:18px;align-items:start}
 .ig{margin-bottom:12px}
 .ig label{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--sub);margin-bottom:4px}
-.ig input,.ig select{width:100%;background:var(--s2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;transition:border-color .15s}
+.ig input,.ig select{width:100%;background:var(--s2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none}
 .ig input:focus,.ig select:focus{border-color:var(--ev)}
 .ig input[readonly]{opacity:.65}
 .ir{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .cust-box{background:#FFFBEB;border:1px solid #FDE68A;border-radius:7px;padding:12px 14px;margin-bottom:11px;display:none}
 .cust-box-title{font-size:10px;font-weight:700;color:#92400E;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
-.calc-btn{width:100%;background:var(--ev);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:700;padding:11px;cursor:pointer;margin-top:6px;transition:background .15s}
-.calc-btn:hover{background:var(--ev-l)}
-.calc-btn-bess{background:var(--bess)}.calc-btn-bess:hover{background:var(--bess-l)}
+.calc-btn{width:100%;background:var(--ev);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:700;padding:11px;cursor:pointer;margin-top:6px}
+.calc-btn:hover{background:var(--ev-l)}.calc-btn.bess{background:var(--bess)}.calc-btn.bess:hover{background:var(--bess-l)}
 .out-empty{font-size:12px;color:var(--muted);padding:14px 0}
-.og2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.og-tile{background:var(--s2);border-radius:6px;padding:10px 12px}
-.og-tile .tl{font-size:10px;color:var(--muted);margin-bottom:2px}
-.og-tile .tv{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--text)}
-.formula-btn{font-size:11px;font-family:var(--mono);color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline dotted;padding:0;margin-bottom:5px}
-.formula-box{background:var(--s2);border-radius:5px;padding:9px 11px;font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.9;display:none;margin-bottom:6px}
-.formula-box.show{display:block}
+.og{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.og-t{background:var(--s2);border-radius:6px;padding:10px 12px}
+.og-t .tl{font-size:10px;color:var(--muted);margin-bottom:2px}
+.og-t .tv{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--text)}
+.fml-btn{font-size:11px;font-family:var(--mono);color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline dotted;padding:0;margin-bottom:5px}
+.fml-box{background:var(--s2);border-radius:5px;padding:9px 11px;font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.9;display:none;margin-bottom:6px}
+.fml-box.show{display:block}
 .fv{color:var(--ev);font-weight:600}.fvb{color:var(--bess);font-weight:600}
-.bsens-row{display:flex;align-items:center;gap:7px;margin-bottom:3px;font-size:10px}
-.bsl{color:var(--muted);width:110px;flex-shrink:0}
-.bst{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
-.bsf{height:100%;border-radius:3px}
-.bsv{font-family:var(--mono);font-size:10px;color:var(--sub);width:45px;text-align:right}
-.sens-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
-.sens-table th{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:center;padding:6px 8px;border-bottom:1px solid var(--border)}
-.sens-table td{padding:6px 8px;border-bottom:.5px solid var(--border);font-family:var(--mono);text-align:center}
-.sens-table .rh{text-align:left;font-weight:600;color:var(--sub)}
+.br{display:flex;align-items:center;gap:7px;margin-bottom:4px;font-size:10px}
+.br-l{color:var(--muted);width:110px;flex-shrink:0}
+.br-t{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.br-f{height:100%;border-radius:3px}
+.br-v{font-family:var(--mono);font-size:10px;color:var(--sub);width:45px;text-align:right}
+.sens-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.sens-tbl th{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);text-align:center;padding:6px 8px;border-bottom:1px solid var(--border)}
+.sens-tbl td{padding:6px 8px;border-bottom:.5px solid var(--border);font-family:var(--mono);text-align:center}
+.sens-tbl .rh{text-align:left;font-weight:600;color:var(--sub)}
 .sg{color:#15803D;font-weight:700}.sa{color:#B45309;font-weight:600}.sr{color:#B91C1C}
-.lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--s2);border:1px solid var(--border);color:var(--muted);font-size:9px;font-weight:700;cursor:help;position:relative;font-family:var(--mono);flex-shrink:0;vertical-align:middle;margin-left:3px}
-.info::after{content:attr(data-tip);position:absolute;z-index:200;bottom:calc(100%+7px);left:50%;transform:translateX(-50%);background:var(--text);color:#fff;font-size:11px;font-family:var(--sans);font-weight:400;line-height:1.55;padding:9px 13px;border-radius:6px;width:240px;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.2);pointer-events:none;display:none}
-.info:hover::after,.info:focus::after{display:block}
-hr.div{border:none;border-top:1px solid var(--border);margin:18px 0}
-.btn{display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--border);color:var(--bess);font-size:11px;font-family:var(--mono);padding:4px 11px;border-radius:4px;cursor:pointer;text-decoration:none}
-.btn:hover{border-color:var(--bess)}
-.src{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-family:var(--mono);color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:1px 7px;text-decoration:none;background:var(--s2)}
-.src:hover{color:var(--bess)}.src::before{content:'↗';font-size:9px}
+
+/* policy */
 .stale{display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--mono);color:var(--muted);padding:5px 9px;background:var(--s2);border-radius:4px;margin-bottom:12px}
-.stale-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .stale a{color:var(--bess);text-decoration:none}
-.tt{width:100%;border-collapse:collapse;font-size:12px}
-.tt th{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:2px solid var(--border)}
-.tt td{padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--mono)}
-.tt tr:last-child td{border-bottom:none}.tt tr:hover td{background:var(--s2)}.tt .rate{font-weight:700;color:var(--text)}
-.arith-note{font-size:11px;color:var(--muted);margin-top:8px;padding:7px 10px;background:var(--s2);border-radius:4px;font-family:var(--mono)}
-/* reg steps */
-.reg-steps{display:flex;flex-direction:column}
-.reg-step{display:grid;grid-template-columns:26px 1fr;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
-.reg-step:last-child{border-bottom:none}
-.sn{width:24px;height:24px;border-radius:50%;background:var(--ev);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.st{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
-.sb{font-size:11px;color:var(--muted);line-height:1.6}
-.sm{font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:3px}
-.sm span{color:var(--mfg)}
-.dc{background:var(--s2);color:var(--muted);font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:3px;display:inline-block;margin:2px 3px 2px 0}
-/* state map */
-#state-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:7px}
-.sc{background:var(--s1);border:1.5px solid var(--border);border-left-width:4px;border-radius:7px;padding:8px 10px;cursor:pointer;transition:box-shadow .12s}
-.sc:hover{box-shadow:var(--shadow-md)}
-.sc .sn2{font-size:11px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
-.sc .sv{font-family:var(--mono);font-size:14px;font-weight:700;line-height:1}
-.sc .smini{display:grid;grid-template-columns:1fr 1fr;gap:1px;font-size:9px;color:var(--muted);font-family:var(--mono);margin-top:3px}
-.tgl{background:var(--s2);border:1.5px solid var(--border);color:var(--muted);font-size:11px;font-family:var(--mono);padding:4px 12px;border-radius:20px;cursor:pointer}
-.tgl.active{background:#E0F2FE;border-color:#0284C7;color:#0369A1}
-/* scheme card */
-.sc-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px 15px;margin-bottom:8px;box-shadow:var(--shadow)}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:2px solid var(--border)}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--mono)}
+.tbl tr:last-child td{border-bottom:none}.tbl tr:hover td{background:var(--s2)}.tbl .rate{font-weight:700;color:var(--text)}
+.an{font-size:11px;color:var(--muted);margin-top:8px;padding:7px 10px;background:var(--s2);border-radius:4px;font-family:var(--mono)}
+.sc-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px 15px;margin-bottom:8px;box-shadow:var(--sh)}
 .sc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:9px;margin-bottom:6px}
 .sc-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.3}
 .sc-body{font-size:11px;color:var(--sub);line-height:1.6}
-.bdg{display:inline-flex;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;font-family:var(--mono)}
-.bdg-ok{background:#DCFCE7;color:#15803D}.bdg-warn{background:#FEF3C7;color:#B45309}.bdg-info{background:#DBEAFE;color:#1D4ED8}
-/* intel tab */
-.draft-warn{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:12px 15px;margin-bottom:18px}
-.draft-warn-h{font-size:11px;font-weight:700;color:#92400E;margin-bottom:4px}
-.draft-warn-b{font-size:11px;color:#B45309;line-height:1.65}
+.tgl{background:var(--s2);border:1.5px solid var(--border);color:var(--muted);font-size:11px;font-family:var(--mono);padding:4px 12px;border-radius:20px;cursor:pointer}
+.tgl.active{background:#E0F2FE;border-color:#0284C7;color:#0369A1}
+#sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:7px}
+.sc2{background:var(--s1);border:1.5px solid var(--border);border-left-width:4px;border-radius:7px;padding:8px 10px;cursor:pointer}
+.sc2:hover{box-shadow:var(--sh2)}
+.sc2 .sn{font-size:11px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.sc2 .sv{font-family:var(--mono);font-size:14px;font-weight:700;line-height:1}
+.sc2 .sm{display:grid;grid-template-columns:1fr 1fr;gap:1px;font-size:9px;color:var(--muted);font-family:var(--mono);margin-top:3px}
+.reg-step{display:grid;grid-template-columns:26px 1fr;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
+.reg-step:last-child{border-bottom:none}
+.rsn{width:24px;height:24px;border-radius:50%;background:var(--ev);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.rst{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+.rsb{font-size:11px;color:var(--muted);line-height:1.6}
+.rsm{font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:3px}
+.rsm span{color:var(--mfg)}
+.dc{background:var(--s2);color:var(--muted);font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:3px;display:inline-block;margin:2px 3px 2px 0}
+
+/* intel */
+.draft-box{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:12px 15px;margin-bottom:18px}
+.draft-title{font-size:11px;font-weight:700;color:#92400E;margin-bottom:4px}
+.draft-body{font-size:11px;color:#B45309;line-height:1.65}
 .dig-item{padding:11px 0;border-bottom:1px solid var(--border);display:flex;gap:9px;align-items:flex-start}
 .dig-item:last-child{border-bottom:none}
 .dig-cat{min-width:36px;height:18px;border-radius:3px;font-size:9px;font-weight:700;font-family:var(--mono);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.dig-ev{background:#CCFBF1;color:#0F766E}.dig-bess{background:#DBEAFE;color:#1D4ED8}
+.dev{background:#CCFBF1;color:#0F766E}.dbs{background:#DBEAFE;color:#1D4ED8}
 .dig-title{font-size:12px;color:var(--text);line-height:1.4}
 .dig-meta{font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px}
-.dig-snote{font-size:10px;color:var(--muted);margin-top:3px;padding:3px 7px;background:var(--s2);border-radius:3px;font-family:var(--mono);line-height:1.5}
-.dig-source{font-size:10px;font-family:var(--mono);color:var(--muted)}
-.dig-source-tag{font-size:9px;background:#DCFCE7;color:#15803D;padding:1px 6px;border-radius:3px;font-weight:700;font-family:var(--mono);margin-right:5px}
-.dig-source-tag.fallback{background:#FEF3C7;color:#B45309}
-/* grid monitor */
-.grid-row4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.grid-tile{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px 14px;box-shadow:var(--shadow)}
-.gt-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-.gt-val{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1;color:var(--text)}
-.gt-unit{font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:2px}
-.osc-wrap{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;overflow:hidden;height:56px;margin:10px 0}
-#oscCanvas{width:100%;height:100%;display:block}
-.escom-t{width:100%;border-collapse:collapse;font-size:12px}
-.escom-t th{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);text-align:left;padding:7px 8px;border-bottom:2px solid var(--border)}
-.escom-t td{padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--mono)}
-.escom-t tr:last-child td{border-bottom:none}
-.escom-t tr:hover td{background:var(--s2)}
+.dig-snote{font-size:10px;color:var(--muted);margin-top:3px;padding:3px 7px;background:var(--s2);border-radius:3px;font-family:var(--mono)}
+.src-tag{font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700;font-family:var(--mono);margin-right:5px}
+.src-live{background:#DCFCE7;color:#15803D}.src-cur{background:#FEF3C7;color:#B45309}
 
-/* ── MAP EXPLORE LAYOUT ──────────────────────────────────────────────────── */
-.explore-layout{display:grid;grid-template-columns:1fr 390px;height:calc(100vh - 132px);overflow:hidden}
-.map-wrap{position:relative;height:100%}
-#india-map{height:100%;width:100%;background:#EFF6FF;z-index:1}
-.map-detail{height:100%;overflow-y:auto;border-left:1px solid var(--border);background:var(--s1)}
-.map-detail-inner{padding:16px 18px}
-.map-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:30px;color:var(--muted)}
-.map-placeholder h3{font-size:14px;font-weight:600;margin-bottom:6px;color:var(--sub)}
-.map-placeholder p{font-size:12px;line-height:1.6;max-width:240px}
-/* Leaflet overrides */
-.leaflet-container{font-family:var(--sans)!important}
-.leaflet-popup-content-wrapper{border-radius:8px!important;box-shadow:var(--shadow-md)!important;border:1px solid var(--border)!important}
-.leaflet-popup-content{margin:10px 13px!important;font-size:12px!important}
-/* Pulsing live dot */
-@keyframes pulse{0%{transform:scale(1);opacity:.9}70%{transform:scale(2.5);opacity:0}100%{transform:scale(1);opacity:0}}
-.live-pulse{width:10px;height:10px;border-radius:50%;background:#15803D;position:absolute;top:-5px;left:-5px;animation:pulse 2s infinite}
-/* View toggle */
-.view-toggle{display:flex;gap:0;background:var(--s2);border-radius:6px;padding:2px}
-.vt-btn{background:none;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-family:var(--mono);font-weight:600;color:var(--muted);cursor:pointer}
-.vt-btn.active{background:var(--s1);color:var(--ev);box-shadow:var(--shadow)}
-/* Detail card in panel */
-.detail-opp-card{background:var(--s2);border-radius:8px;padding:13px 15px;margin-bottom:12px}
-.detail-zones{margin-top:14px}
-.detail-zones-title{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.dzone{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--ev);border-radius:6px;padding:10px 12px;margin-bottom:6px}
-.dzone-name{font-size:12px;font-weight:700;color:var(--text)}
-.dzone-sub{font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:4px}
-.dzone-reason{font-size:11px;color:var(--muted);line-height:1.55}
-.dzone-score{float:right;font-family:var(--mono);font-size:14px;font-weight:700}
+/* grid monitor */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.gt{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px 14px;box-shadow:var(--sh)}
+.gtl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.gtv{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1;color:var(--text)}
+.gtu{font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:2px}
+.osc-w{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;overflow:hidden;height:56px;margin:10px 0}
+#osc{width:100%;height:100%;display:block}
+.escom-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.escom-tbl th{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);text-align:left;padding:7px 8px;border-bottom:2px solid var(--border)}
+.escom-tbl td{padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--mono)}
+.escom-tbl tr:last-child td{border-bottom:none}
+.escom-tbl tr:hover td{background:var(--s2)}
+
+/* glossary */
+.gls-ov{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:none;align-items:flex-start;justify-content:flex-end}
+.gls-ov.open{display:flex}
+.gls-pnl{width:min(480px,100vw);height:100vh;background:var(--s1);overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.gls-hdr{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--s1)}
+.gls-title{font-family:var(--head);font-size:17px;font-weight:700}
+.gls-close{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.gls-close:hover{background:var(--s2);color:var(--text)}
+.gls-body{padding:8px 20px 28px}
+.gls-sh{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:14px 0 8px;border-bottom:1px solid var(--border);margin-bottom:2px}
+.term{padding:13px 0;border-bottom:.5px solid var(--border)}
+.term:last-child{border-bottom:none}
+.term-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px}
+.term-tag{font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:var(--s2);color:var(--muted);font-weight:700;margin-left:5px}
+.term-def{font-size:12px;color:var(--sub);line-height:1.7}
+.term-ex{font-size:11px;color:var(--muted);font-family:var(--mono);background:var(--s2);padding:7px 10px;border-radius:4px;margin-top:7px;line-height:1.6}
 </style>
 </head>
 <body>
 
-<!-- ════════ APP HEADER ════════ -->
-<header class="app-header">
-  <div class="logo" onclick="goHome()">
-    <div class="logo-icon">⚡</div>
+<header class="app-hdr">
+  <a class="logo" onclick="goHome()" href="javascript:void(0)">
+    <div class="logo-icon">&#9889;</div>
     <div>
       <div class="logo-text">India Energy Site Intelligence</div>
-      <span class="logo-tagline">EV · BESS · Battery · 70+ cities</span>
+      <span class="logo-tag">EV &middot; BESS &middot; Battery &middot; 70+ cities</span>
     </div>
-  </div>
-  <div class="header-actions">
-    <button class="glossary-btn" onclick="openGlossary()">📖 Glossary — key terms explained</button>
-  </div>
+  </a>
+  <button class="gls-btn" onclick="openGlossary()">&#128218; Glossary &mdash; key terms explained</button>
 </header>
 
-<!-- ════════ LANDING (shown first) ════════ -->
-<section class="landing" id="landing">
-  <div class="landing-inner">
-    <div class="land-eyebrow">For EV charging operators, BESS developers &amp; battery investors</div>
+<!-- NAV (hidden until user enters) -->
+<nav class="app-nav" id="app-nav">
+  <button class="nav-tab" data-tab="explore" onclick="goto('explore')">&#128269; Explore</button>
+  <button class="nav-tab" data-tab="calc"    onclick="goto('calc')">&#128202; Calculator</button>
+  <button class="nav-tab" data-tab="policy"  onclick="goto('policy')">&#128203; Policy</button>
+  <button class="nav-tab" data-tab="intel"   onclick="goto('intel')">&#128240; Intelligence</button>
+  <button class="nav-tab" data-tab="grid"    onclick="goto('grid')">&#9889; Grid Monitor</button>
+</nav>
+
+<!-- LANDING -->
+<section id="landing">
+  <div class="land-inner">
+    <div class="land-ey">For EV charging operators, BESS developers &amp; battery investors</div>
     <h1 class="land-h1">Before you commit capital,<br/>check if the <em>location makes sense</em>.</h1>
-    <p class="land-body">This tool answers three questions that matter before any financial model: Is the local grid ready for a high-power connection? Is the market already saturated with competitors? And what are the economics at a specific site?</p>
+    <p class="land-body">Grid headroom, competitor density, tariffs, and economics &mdash; for 70+ Indian cities. All data labelled so you know exactly what you&rsquo;re working with.</p>
     <div class="entry-grid">
-      <div class="entry-card ev-entry" onclick="enterExplore()" tabindex="0" onkeydown="if(event.key==='Enter')enterExplore()">
-        <span class="entry-icon">🗺️</span>
-        <div class="entry-title">Explore where to invest</div>
-        <div class="entry-q">Which cities and corridors have high grid headroom, low competitor density, and real opportunity — right now?</div>
-        <div class="entry-cta">Show me the opportunity map <span class="entry-arrow">→</span></div>
-        <div class="entry-data">70+ cities · 30 states · Grid + market data · Coverage labelled</div>
+      <div class="ec ev-e" onclick="goto('explore')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')goto('explore')">
+        <span class="ec-icon">&#128506;</span>
+        <div class="ec-title">Explore where to invest</div>
+        <div class="ec-q">Which cities have high grid headroom, low competitor density, and real opportunity &mdash; right now?</div>
+        <div class="ec-cta">Show me the map <span>&#8594;</span></div>
+        <div class="ec-data">70+ cities &middot; 30 states &middot; Grid + market data &middot; Coverage labelled</div>
       </div>
-      <div class="entry-card calc-entry" onclick="enterCalc()" tabindex="0" onkeydown="if(event.key==='Enter')enterCalc()">
-        <span class="entry-icon">📊</span>
-        <div class="entry-title">Calculate a specific site</div>
-        <div class="entry-q">I have a location in mind. What's the payback period, breakeven utilisation, and sensitivity to key assumptions?</div>
-        <div class="entry-cta">Open the calculator <span class="entry-arrow">→</span></div>
-        <div class="entry-data">EV charging · BESS demand charge · Second-life battery · V2G (flagged — not modellable)</div>
+      <div class="ec ca-e" onclick="goto('calc')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')goto('calc')">
+        <span class="ec-icon">&#128202;</span>
+        <div class="ec-title">Calculate a specific site</div>
+        <div class="ec-q">I have a location in mind. What&rsquo;s the payback period, breakeven utilisation, and sensitivity?</div>
+        <div class="ec-cta">Open the calculator <span>&#8594;</span></div>
+        <div class="ec-data">EV charging &middot; BESS demand charge &middot; Second-life battery</div>
       </div>
-      <div class="entry-card intel-entry" onclick="enterIntel()" tabindex="0" onkeydown="if(event.key==='Enter')enterIntel()">
-        <span class="entry-icon">📰</span>
-        <div class="entry-title">Track policy &amp; schemes</div>
-        <div class="entry-q">What subsidies are live, what's changing, and which government schemes can reduce my effective capex?</div>
-        <div class="entry-cta">See this week's digest <span class="entry-arrow">→</span></div>
-        <div class="entry-data">PIB official RSS · PM E-DRIVE · ACC PLI · MNRE VGF · Weekly auto-refresh</div>
+      <div class="ec in-e" onclick="goto('intel')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')goto('intel')">
+        <span class="ec-icon">&#128240;</span>
+        <div class="ec-title">Track policy &amp; schemes</div>
+        <div class="ec-q">What subsidies are live, what&rsquo;s changing, and which schemes reduce effective capex?</div>
+        <div class="ec-cta">See this week&rsquo;s digest <span>&#8594;</span></div>
+        <div class="ec-data">PM E-DRIVE &middot; ACC PLI &middot; MNRE VGF &middot; Weekly auto-refresh</div>
       </div>
     </div>
-    <div class="land-caveats">
-      <div class="caveat-item"><div class="caveat-dot" style="background:var(--ev)"></div><div><strong style="color:var(--sub)">Coverage is honest.</strong> Every data point is labelled: Live (KPTCL SLDC real-time), Verified (DISCOM-checked), Partial (city aggregate), or Estimate (secondary data). You always know what you're working with.</div></div>
-      <div class="caveat-item"><div class="caveat-dot" style="background:var(--amber)"></div><div><strong style="color:var(--sub)">Not investment advice.</strong> All figures are for orientation. Verify tariffs with your DISCOM and run a site feasibility study before committing capital.</div></div>
-      <div class="caveat-item"><div class="caveat-dot" style="background:var(--bess)"></div><div><strong style="color:var(--sub)">Glossary available.</strong> Unfamiliar with "grid headroom" or "loading %"? Hit the <em>Glossary</em> button (top right) any time for plain-English definitions.</div></div>
+    <div class="land-cav">
+      <div class="cav"><div class="cav-dot" style="background:var(--ev)"></div><div><strong style="color:var(--sub)">Coverage is honest.</strong> Every data point is labelled Live, Verified, Partial, or Estimate. You always know what you&rsquo;re working with.</div></div>
+      <div class="cav"><div class="cav-dot" style="background:var(--mfg)"></div><div><strong style="color:var(--sub)">Not investment advice.</strong> Verify tariffs with your DISCOM and run a site feasibility study before committing capital.</div></div>
+      <div class="cav"><div class="cav-dot" style="background:var(--bess)"></div><div><strong style="color:var(--sub)">Glossary available.</strong> Unfamiliar with &ldquo;grid headroom&rdquo; or &ldquo;loading %&rdquo;? Hit Glossary (top right) any time.</div></div>
     </div>
   </div>
 </section>
 
-<!-- ════════ NAV TABS ════════ -->
-<nav class="nav-tabs" id="nav-tabs" style="display:none">
-  <button class="nav-tab" data-tab="explore" onclick="showTab('explore',this)">🔍 Explore Opportunities</button>
-  <button class="nav-tab" data-tab="calc" onclick="showTab('calc',this)">📊 Economics Calculator</button>
-  <button class="nav-tab" data-tab="policy" onclick="showTab('policy',this)">📋 Policy &amp; Regulatory</button>
-  <button class="nav-tab" data-tab="intel" onclick="showTab('intel',this)">📰 Weekly Intelligence</button>
-  <button class="nav-tab" data-tab="grid" onclick="showTab('grid',this)">⚡ Grid Monitor</button>
-</nav>
-
-<!-- ════════ PANE: EXPLORE ════════ -->
+<!-- PANE: EXPLORE -->
 <div id="pane-explore" class="pane">
-  <!-- Filter bar -->
-  <div class="filter-bar">
-    <select class="fsel" id="f-biz" onchange="setF('biz',this.value)">
+  <div class="fbar">
+    <select class="fsel" id="f-biz" onchange="applyFilters()">
       <option value="ev">EV Charging</option>
       <option value="bess">BESS / Grid Storage</option>
     </select>
-    <select class="fsel" id="f-state" onchange="setF('state',this.value)">
-      <option value="">All states</option>
-    </select>
-    <select class="fsel" id="f-tier" onchange="setF('tier',this.value)">
+    <select class="fsel" id="f-state" onchange="applyFilters()"><option value="">All states</option></select>
+    <select class="fsel" id="f-tier" onchange="applyFilters()">
       <option value="">All tiers</option>
-      <option value="1">Tier 1 — metros</option>
-      <option value="2">Tier 2 — large cities</option>
+      <option value="1">Tier 1 &mdash; metros</option>
+      <option value="2">Tier 2 &mdash; large cities</option>
     </select>
-    <select class="fsel" id="f-headroom" onchange="setF('headroom',this.value)">
+    <select class="fsel" id="f-headroom" onchange="applyFilters()">
       <option value="">All headroom</option>
       <option value="high">High headroom</option>
-      <option value="medium">Medium headroom</option>
+      <option value="medium">Medium</option>
       <option value="low">Low / constrained</option>
     </select>
-    <select class="fsel" id="f-cov" onchange="setF('coverage',this.value)">
+    <select class="fsel" id="f-cov" onchange="applyFilters()">
       <option value="">All coverage</option>
       <option value="live">Live data only</option>
       <option value="verified">Verified only</option>
     </select>
-    <div class="filter-count" id="fcount">Loading…</div>
-    <div class="view-toggle" style="margin-left:8px">
-      <button class="vt-btn active" id="vt-map" onclick="setView('map')">🗺 Map</button>
-      <button class="vt-btn" id="vt-list" onclick="setView('list')">≡ List</button>
+    <span class="fcount" id="fcount">Loading&hellip;</span>
+    <div class="vt">
+      <button class="vt-b active" id="vt-map"  onclick="setView('map')">&#128506; Map</button>
+      <button class="vt-b"        id="vt-list" onclick="setView('list')">&#8801; List</button>
     </div>
-    <button class="clear-btn" onclick="clearF()">✕ Clear</button>
+    <button class="clr-btn" onclick="clearFilters()">&#10005; Clear</button>
   </div>
 
   <!-- MAP VIEW -->
-  <div id="explore-map-view" class="explore-layout">
-    <div class="map-wrap">
-      <div id="india-map"></div>
-      <!-- Legend -->
-      <div style="position:absolute;bottom:24px;left:12px;z-index:10;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:9px 12px;box-shadow:var(--shadow);font-size:11px">
+  <div id="map-view" style="display:grid;grid-template-columns:1fr 390px;height:calc(100vh - 132px)">
+    <div style="position:relative;height:100%">
+      <div id="india-map" style="height:100%;width:100%;background:#EFF6FF;z-index:1"></div>
+      <div class="map-leg">
         <div style="font-weight:700;color:var(--sub);margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:.08em">Opportunity</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <div style="display:flex;align-items:center;gap:7px"><div style="width:12px;height:12px;border-radius:50%;background:#16A34A;border:2px solid #fff;box-shadow:0 0 0 1px #16A34A"></div><span style="color:var(--sub)">High (5–6/6)</span></div>
-          <div style="display:flex;align-items:center;gap:7px"><div style="width:12px;height:12px;border-radius:50%;background:#D97706;border:2px solid #fff;box-shadow:0 0 0 1px #D97706"></div><span style="color:var(--sub)">Medium (3–4/6)</span></div>
-          <div style="display:flex;align-items:center;gap:7px"><div style="width:12px;height:12px;border-radius:50%;background:#DC2626;border:2px solid #fff;box-shadow:0 0 0 1px #DC2626"></div><span style="color:var(--sub)">Low (1–2/6)</span></div>
-          <div style="display:flex;align-items:center;gap:7px;border-top:1px solid var(--border);padding-top:4px;margin-top:2px">
-            <div style="width:12px;height:12px;border-radius:50%;background:#16A34A;border:2px solid #fff;box-shadow:0 0 0 2px #16A34A,0 0 0 4px rgba(22,163,74,.25)"></div>
-            <span style="color:var(--sub)">Live data</span>
-          </div>
+        <div class="leg-row"><div class="leg-dot" style="background:#16A34A;box-shadow:0 0 0 1px #16A34A"></div><span style="color:var(--sub);font-size:11px">High (5&ndash;6/6)</span></div>
+        <div class="leg-row"><div class="leg-dot" style="background:#D97706;box-shadow:0 0 0 1px #D97706"></div><span style="color:var(--sub);font-size:11px">Medium (3&ndash;4/6)</span></div>
+        <div class="leg-row"><div class="leg-dot" style="background:#DC2626;box-shadow:0 0 0 1px #DC2626"></div><span style="color:var(--sub);font-size:11px">Low (1&ndash;2/6)</span></div>
+        <div class="leg-row" style="border-top:1px solid var(--border);padding-top:4px;margin-top:2px">
+          <div class="leg-dot" style="background:#16A34A;box-shadow:0 0 0 2px #16A34A,0 0 0 4px rgba(22,163,74,.25)"></div>
+          <span style="color:var(--sub);font-size:11px">Live data</span>
         </div>
       </div>
     </div>
-    <!-- Detail panel -->
-    <div class="map-detail">
-      <div class="map-detail-inner" id="map-detail-inner">
-        <div class="map-placeholder">
-          <div style="font-size:36px;margin-bottom:14px">📍</div>
+    <div class="map-panel" id="map-panel">
+      <div style="padding:16px 18px" id="map-panel-content">
+        <div class="map-ph">
+          <div style="font-size:36px;margin-bottom:14px">&#128205;</div>
           <h3>Click any marker to explore</h3>
-          <p>Each dot on the map is a city or zone. Click it to see grid headroom, competition data, and a button to evaluate the economics.</p>
+          <p>Each dot is a city or zone. Click to see grid headroom, competition, and a button to evaluate the economics.</p>
           <div style="margin-top:16px;font-size:11px;font-family:var(--mono);color:var(--dim);line-height:1.7;text-align:left;background:var(--s2);border-radius:6px;padding:10px 12px">
-            <strong style="color:var(--sub)">Green</strong> = high opportunity (good grid + open market)<br/>
+            <strong style="color:var(--sub)">Green</strong> = high headroom + open market<br/>
             <strong style="color:var(--muted)">Amber</strong> = worth investigating<br/>
-            <strong style="color:var(--muted)">Red</strong> = constrained grid or saturated market<br/>
-            <strong style="color:var(--ev)">Pulsing ring</strong> = live KPTCL SLDC data
+            <strong style="color:var(--muted)">Red</strong> = constrained or saturated<br/>
+            <strong style="color:var(--ev)">Pulsing ring</strong> = live KPTCL data
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- LIST VIEW (hidden by default) -->
-  <div id="explore-list-view" style="display:none">
-    <div style="max-width:1280px;margin:0 auto;padding:16px 20px 60px">
-      <div id="opp-grid" class="opp-grid">
-        <div class="sk" style="height:200px;border-radius:10px"></div>
-        <div class="sk" style="height:200px;border-radius:10px"></div>
-        <div class="sk" style="height:200px;border-radius:10px"></div>
-        <div class="sk" style="height:200px;border-radius:10px"></div>
-        <div class="sk" style="height:200px;border-radius:10px"></div>
-        <div class="sk" style="height:200px;border-radius:10px"></div>
+  <!-- LIST VIEW (hidden) -->
+  <div id="list-view" style="display:none">
+    <div class="htr" style="margin:14px 20px 0">
+      <div class="htr-hdr" onclick="toggleHtr()">
+        <span>&#128218; How to read these cards &mdash; grid headroom, coverage badges, opportunity score</span>
+        <span id="htr-arrow" style="font-size:11px;color:var(--muted)">&#9660; expand</span>
       </div>
+      <div class="htr-body" id="htr-body">
+        <div class="htr-grid">
+          <div class="htr-item"><div class="htr-term">Grid headroom <span style="font-size:9px;background:#DCFCE7;color:#15803D;padding:1px 5px;border-radius:3px;font-weight:700">KEY</span></div><div class="htr-def">Spare electricity capacity at the local substation. High (&lt;65% loaded) = new connections fast and easy. Low (&gt;85%) = delays or refusals. Think of it like motorway capacity.</div></div>
+          <div class="htr-item"><div class="htr-term">Loading %</div><div class="htr-def">Current demand as a % of maximum capacity. 60% = comfortable. 85%+ = constrained. 93%+ = effectively full, new HT connections blocked.</div></div>
+          <div class="htr-item"><div class="htr-term">Competition density</div><div class="htr-def"><strong>Underserved</strong> = market open. <strong>Moderate</strong> = room for more. <strong>Saturated</strong> = crowded, new entrants face stiff competition.</div></div>
+          <div class="htr-item"><div class="htr-term">Score (X/6)</div><div class="htr-def">Headroom + market density combined. 6/6 = best case. Does NOT include financial analysis &mdash; use the Calculator tab for that.</div></div>
+          <div class="htr-item"><div class="htr-term">Coverage badges</div><div class="htr-def"><strong>Live</strong> = KPTCL SLDC real-time. <strong>Verified</strong> = DISCOM-checked. <strong>Partial</strong> = city aggregate only. <strong>Estimate</strong> = secondary sources.</div></div>
+          <div class="htr-item"><div class="htr-term">DISCOM</div><div class="htr-def">Distribution Company &mdash; your electricity utility. Sets tariffs and approves connections. BESCOM (Bengaluru), MSEDCL (Mumbai), TANGEDCO (Chennai).</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="opp-grid" class="opp-grid" style="padding:12px 20px 48px">
+      <div class="sk" style="height:200px"></div>
+      <div class="sk" style="height:200px"></div>
+      <div class="sk" style="height:200px"></div>
+      <div class="sk" style="height:200px"></div>
+      <div class="sk" style="height:200px"></div>
+      <div class="sk" style="height:200px"></div>
     </div>
   </div>
 </div>
 
-<!-- ════════ PANE: CALCULATOR ════════ -->
+<!-- PANE: CALCULATOR -->
 <div id="pane-calc" class="pane">
 <div class="main">
-  <div class="prefill-banner" id="prefill-banner">
-    <div class="prefill-text">Pre-filled from: <strong id="prefill-loc">—</strong> &nbsp;<span id="prefill-cov"></span><br/>Tariff applied from this location's DISCOM. Edit any field.</div>
-    <button class="prefill-clear" onclick="clearPrefill()">Clear ✕</button>
+  <div class="prefill-banner" id="pf-banner">
+    <div class="pftext">Pre-filled from: <strong id="pf-loc">&mdash;</strong> &nbsp;<span id="pf-cov"></span><br/>Edit any field below.</div>
+    <button class="pfclear" onclick="clearPrefill()">Clear &times;</button>
   </div>
-  <div class="calc-sub-tabs">
+  <div class="calc-tabs">
     <button class="ctab active" onclick="showCtab('ev',this)">EV Charging Station</button>
-    <button class="ctab bess-active" onclick="showCtab('dbess',this)">BESS — Demand Charge</button>
-    <button class="ctab bess-active" onclick="showCtab('sl',this)">Second-Life Battery</button>
+    <button class="ctab ba" onclick="showCtab('dbess',this)">BESS &mdash; Demand Charge</button>
+    <button class="ctab ba" onclick="showCtab('sl',this)">Second-Life Battery</button>
     <button class="ctab" onclick="showCtab('v2g',this)">V2G / Arbitrage</button>
   </div>
   <div class="ctab-pane active" id="ctab-ev">
-    <div class="calc-grid">
+    <div class="cgrid">
       <div class="card">
         <div class="lbl" style="margin-bottom:12px">Station parameters</div>
         <div class="ig">
-          <label>Connector type <span class="info" data-tip="CCS2 is the mandatory standard for new public DC fast chargers (MoP Sep 2024). Custom option for proprietary or non-standard specs.">?</span></label>
+          <label>Connector type <span class="info" data-tip="CCS2 is mandatory for new public DC fast chargers (MoP Sep 2024). Custom option for proprietary specs.">?</span></label>
           <select id="ev-conn" onchange="onConn()">
-            <option value="ccs2-50">DC CCS2 — 50 kW</option>
-            <option value="ccs2-120">DC CCS2 — 120 kW</option>
-            <option value="ccs2-240">DC CCS2 — 240 kW</option>
-            <option value="gbt-60">DC GB/T — 60 kW</option>
-            <option value="ac-7">AC Type 2 — 7.2 kW</option>
-            <option value="ac-22">AC Type 2 — 22 kW</option>
+            <option value="ccs2-50">DC CCS2 &mdash; 50 kW</option>
+            <option value="ccs2-120">DC CCS2 &mdash; 120 kW</option>
+            <option value="ccs2-240">DC CCS2 &mdash; 240 kW</option>
+            <option value="gbt-60">DC GB/T &mdash; 60 kW</option>
+            <option value="ac-7">AC Type 2 &mdash; 7.2 kW</option>
+            <option value="ac-22">AC Type 2 &mdash; 22 kW</option>
             <option value="custom">Custom / Proprietary</option>
           </select>
         </div>
@@ -482,695 +462,1017 @@ hr.div{border:none;border-top:1px solid var(--border);margin:18px 0}
           </div>
         </div>
         <div class="ir">
-          <div class="ig"><label>Charge points <span class="info" data-tip="Guns that can serve vehicles simultaneously. 4 points = 4 vehicles charging at once.">?</span></label><input type="number" id="ev-pts" value="4" min="1"/></div>
-          <div class="ig"><label>Hours open/day <span class="info" data-tip="Station operating hours. 18h (6am–midnight) is typical for public stations.">?</span></label><input type="number" id="ev-hrs" value="18" min="1" max="24"/></div>
+          <div class="ig"><label>Charge points <span class="info" data-tip="Guns serving vehicles simultaneously.">?</span></label><input type="number" id="ev-pts" value="4" min="1"/></div>
+          <div class="ig"><label>Hours open/day <span class="info" data-tip="18h (6am-midnight) is typical.">?</span></label><input type="number" id="ev-hrs" value="18" min="1" max="24"/></div>
         </div>
         <div class="ig">
-          <label>Utilisation % <span class="info" data-tip="% of available charging time when a vehicle is actually plugged in. India average 2025: 15–35% for public stations. Higher = faster payback.">?</span></label>
+          <label>Utilisation % <span class="info" data-tip="% of time a vehicle is actually charging. India avg: 15-35% for public stations.">?</span></label>
           <input type="range" id="ev-util" min="5" max="80" value="25" style="width:100%;margin-bottom:3px" oninput="document.getElementById('ev-util-v').textContent=this.value+'%'"/>
           <span style="font-family:var(--mono);font-size:13px" id="ev-util-v">25%</span>
         </div>
         <div class="ir">
-          <div class="ig"><label>Lease Rs/month <span class="info" data-tip="Monthly site cost. Bengaluru petrol stn: Rs80k–3L. Mall parking: Rs30k–1L.">?</span></label><input type="number" id="ev-lease" value="60000"/></div>
-          <div class="ig"><label>Retail Rs/unit <span class="info" data-tip="What you charge customers per kWh. India DC fast range: Rs15–25/unit (2025). Your gross margin = retail minus BESCOM tariff.">?</span></label><input type="number" id="ev-retail" value="18" step="0.5"/></div>
+          <div class="ig"><label>Lease Rs/month <span class="info" data-tip="Bengaluru petrol stn: Rs80k-3L. Mall: Rs30k-1L.">?</span></label><input type="number" id="ev-lease" value="60000"/></div>
+          <div class="ig"><label>Retail Rs/unit <span class="info" data-tip="What you charge customers. India DC fast: Rs15-25/unit.">?</span></label><input type="number" id="ev-retail" value="18" step="0.5"/></div>
         </div>
         <div class="ig">
-          <label>BESCOM tariff Rs/unit <span class="info" data-tip="Your energy cost from BESCOM — what YOU pay, not what customers pay. Auto-filled from connector type. LT-6(c) public DC = Rs6.00/unit.">?</span></label>
+          <label>BESCOM tariff Rs/unit <span class="info" data-tip="Your energy cost from BESCOM. Auto-filled from connector type.">?</span></label>
           <input type="number" id="ev-tariff" value="6.00" step="0.01" readonly/>
           <div style="font-size:10px;color:var(--muted);margin-top:2px" id="ev-tariff-src">LT-6(c) Public DC fast charging</div>
         </div>
-        <div class="ig"><label>Other opex Rs/month <span class="info" data-tip="Staff, maintenance, OCPP software, insurance. Unstaffed automated: Rs15k–25k/month. Staffed: Rs35k–60k/month.">?</span></label><input type="number" id="ev-opex" value="25000"/></div>
+        <div class="ig"><label>Other opex Rs/month <span class="info" data-tip="Staff, maintenance, software. Unstaffed: Rs15k-25k. Staffed: Rs35k-60k.">?</span></label><input type="number" id="ev-opex" value="25000"/></div>
         <button class="calc-btn" onclick="calcEV()">Calculate payback period</button>
       </div>
-      <div class="card" id="ev-out"><div class="lbl" style="margin-bottom:12px;color:var(--ev)">Results</div><div class="out-empty">Fill in parameters and click "Calculate payback period."</div></div>
+      <div class="card" id="ev-out"><div class="lbl" style="margin-bottom:12px;color:var(--ev)">Results</div><div class="out-empty">Fill in parameters and click &ldquo;Calculate payback period.&rdquo;</div></div>
     </div>
   </div>
   <div class="ctab-pane" id="ctab-dbess">
-    <div class="calc-grid">
+    <div class="cgrid">
       <div class="card">
         <div class="lbl" style="margin-bottom:12px">Facility &amp; BESS parameters</div>
         <div class="ir">
-          <div class="ig"><label>Facility peak demand kW <span class="info" data-tip="Your facility's highest recorded power demand. Check your BESCOM bill — it shows 'sanctioned demand' and 'actual peak demand'. The BESS reduces this peak.">?</span></label><input type="number" id="dc-peak" value="500" min="50"/></div>
-          <div class="ig"><label>Demand charge Rs/kVA/mo <span class="info" data-tip="The fixed monthly fee charged per kW of peak demand — separate from energy units consumed. BESCOM HT-1: Rs120–140/kVA. HT-2: Rs100–120/kVA. Often 30–50% of your total bill.">?</span></label><input type="number" id="dc-rate" value="120" min="50"/></div>
+          <div class="ig"><label>Facility peak demand kW <span class="info" data-tip="Your highest recorded power demand. Check your BESCOM bill.">?</span></label><input type="number" id="dc-peak" value="500" min="50"/></div>
+          <div class="ig"><label>Demand charge Rs/kVA/mo <span class="info" data-tip="Fixed monthly fee per kW of peak demand. BESCOM HT-1: Rs120-140/kVA. Often 30-50% of total bill.">?</span></label><input type="number" id="dc-rate" value="120" min="50"/></div>
         </div>
         <div class="ir">
-          <div class="ig"><label>BESS power kW <span class="info" data-tip="Maximum BESS discharge rate. Size this to cut peak demand by 20–35%. Larger BESS power = bigger peak reduction = bigger monthly savings.">?</span></label><input type="number" id="dc-bkw" value="150" min="25"/></div>
-          <div class="ig"><label>BESS capacity kWh <span class="info" data-tip="Total energy storage. Must sustain the peak shaving window (typically 1–3 hours). 150kW power × 2hrs window = 300kWh minimum capacity.">?</span></label><input type="number" id="dc-bkwh" value="300" min="50"/></div>
+          <div class="ig"><label>BESS power kW <span class="info" data-tip="Max discharge rate. Size to cut peak demand by 20-35%.">?</span></label><input type="number" id="dc-bkw" value="150" min="25"/></div>
+          <div class="ig"><label>BESS capacity kWh <span class="info" data-tip="Must sustain the peak window (typically 1-3 hrs).">?</span></label><input type="number" id="dc-bkwh" value="300" min="50"/></div>
         </div>
         <div class="ir">
-          <div class="ig"><label>Round-trip efficiency % <span class="info" data-tip="Energy recovered / energy stored × 100. 93% RTE means if you store 100 kWh, you get 93 kWh back — 7% is lost as heat. LFP cells: 92–96%. NMC: 88–93%.">?</span></label><input type="number" id="dc-rte" value="93" min="70" max="98"/></div>
-          <div class="ig"><label>Peak window hrs/day <span class="info" data-tip="How many hours per day your facility is at peak demand — typically 2–4 hours in the 6pm–10pm window.">?</span></label><input type="number" id="dc-phrs" value="3" min="0.5" max="8" step="0.5"/></div>
+          <div class="ig"><label>RTE % <span class="info" data-tip="Round-trip efficiency. LFP: 92-96%. NMC: 88-93%.">?</span></label><input type="number" id="dc-rte" value="93" min="70" max="98"/></div>
+          <div class="ig"><label>Peak window hrs/day <span class="info" data-tip="Hours at peak demand. Typically 2-4h in 6pm-10pm window.">?</span></label><input type="number" id="dc-phrs" value="3" min="0.5" max="8" step="0.5"/></div>
         </div>
-        <div class="ig"><label>BESS total capex Rs crore <span class="info" data-tip="All-in: battery + inverter/PCS + civil + grid connection. India 2025 benchmark: LFP Rs0.5–0.85 Cr/MWh. So 300 kWh ≈ Rs0.15–0.26 Cr. VGF scheme can reduce effective cost by Rs94/kWh.">?</span></label><input type="number" id="dc-capex" value="0.25" step="0.05"/></div>
-        <button class="calc-btn calc-btn-bess" onclick="calcDemandBESS()">Calculate demand savings</button>
+        <div class="ig"><label>BESS capex Rs crore <span class="info" data-tip="All-in. India 2025 benchmark: LFP Rs0.5-0.85 Cr/MWh.">?</span></label><input type="number" id="dc-capex" value="0.25" step="0.05"/></div>
+        <button class="calc-btn bess" onclick="calcBESS()">Calculate demand savings</button>
       </div>
-      <div class="card" id="dc-out"><div class="lbl" style="margin-bottom:12px;color:var(--bess)">Results</div><div class="out-empty">Fill in facility and BESS parameters to see savings and sensitivity analysis.</div></div>
+      <div class="card" id="dc-out"><div class="lbl" style="margin-bottom:12px;color:var(--bess)">Results</div><div class="out-empty">Fill in parameters to see savings and sensitivity analysis.</div></div>
     </div>
   </div>
   <div class="ctab-pane" id="ctab-sl">
-    <div class="calc-grid">
+    <div class="cgrid">
       <div class="card">
         <div class="lbl" style="margin-bottom:12px">Battery comparison inputs</div>
-        <div class="ig"><label>New battery cost Rs/kWh <span class="info" data-tip="Current market rate for new Li-ion. LFP (India 2025): Rs25,000–35,000/kWh. NMC: Rs28,000–40,000/kWh.">?</span></label><input type="number" id="sl-nc" value="30000" step="500"/></div>
-        <div class="ig"><label>Second-life cost Rs/kWh <span class="info" data-tip="Acquisition cost for refurbished EV packs at 70–80% state of health. India 2025 range: Rs12,000–18,000/kWh. Varies widely by source, certification, and SoH.">?</span></label><input type="number" id="sl-sc" value="15000" step="500"/></div>
+        <div class="ig"><label>New battery Rs/kWh <span class="info" data-tip="India 2025: LFP Rs25,000-35,000. NMC Rs28,000-40,000.">?</span></label><input type="number" id="sl-nc" value="30000" step="500"/></div>
+        <div class="ig"><label>Second-life Rs/kWh <span class="info" data-tip="Refurbished EV packs at 70-80% SoH. India 2025: Rs12,000-18,000.">?</span></label><input type="number" id="sl-sc" value="15000" step="500"/></div>
         <div class="ir">
-          <div class="ig"><label>New battery cycles <span class="info" data-tip="Warranted cycle life for new cells. LFP: 3,000–6,000 cycles. NMC: 1,500–3,000 cycles. One full charge–discharge = one cycle.">?</span></label><input type="number" id="sl-ncyc" value="4000" step="100"/></div>
-          <div class="ig"><label>Second-life remaining cycles <span class="info" data-tip="Estimated remaining useful cycles for the second-life pack. Typically 800–2,000 for 70–80% SoH. Use a conservative estimate — this is the biggest source of uncertainty.">?</span></label><input type="number" id="sl-scyc" value="1200" step="100"/></div>
+          <div class="ig"><label>New battery cycles <span class="info" data-tip="LFP warranted: 3,000-6,000. NMC: 1,500-3,000.">?</span></label><input type="number" id="sl-ncyc" value="4000" step="100"/></div>
+          <div class="ig"><label>Second-life remaining cycles <span class="info" data-tip="Typically 800-2,000 for 70-80% SoH packs. Use conservative estimate.">?</span></label><input type="number" id="sl-scyc" value="1200" step="100"/></div>
         </div>
         <div class="ir">
           <div class="ig"><label>New RTE %</label><input type="number" id="sl-nrte" value="94" min="70" max="99"/></div>
           <div class="ig"><label>Second-life RTE %</label><input type="number" id="sl-srte" value="89" min="60" max="98"/></div>
         </div>
-        <div class="ig"><label>Annual cycles planned <span class="info" data-tip="Full charge–discharge cycles per year in your application. Arbitrage: 300–500/yr. Frequency regulation: 500–700/yr equivalent.">?</span></label><input type="number" id="sl-acyc" value="400" step="50"/></div>
-        <button class="calc-btn calc-btn-bess" onclick="calcSL()">Compare lifecycle cost</button>
+        <div class="ig"><label>Annual cycles planned <span class="info" data-tip="Arbitrage: 300-500/yr. Frequency regulation: 500-700/yr.">?</span></label><input type="number" id="sl-acyc" value="400" step="50"/></div>
+        <button class="calc-btn bess" onclick="calcSL()">Compare lifecycle cost</button>
       </div>
       <div class="card" id="sl-out"><div class="lbl" style="margin-bottom:12px;color:var(--bess)">Results</div><div class="out-empty">Enter parameters to compare levelized cost per kWh cycled.</div></div>
     </div>
   </div>
   <div class="ctab-pane" id="ctab-v2g">
     <div class="card" style="max-width:620px">
-      <div style="font-size:14px;font-weight:700;color:var(--mfg);margin-bottom:10px">⚠ V2G / Interconnection Queue Arbitrage — not modelled here</div>
-      <div style="font-size:12px;color:var(--sub);line-height:1.8">V2G aggregation economics and interconnection queue position depend on DISCOM-specific contractual terms and aggregator agreements — none of which are in any public data feed.<br><br>Building a calculator on those assumptions would imply precision that doesn't exist. The output would look rigorous but the inputs would be fabricated.<br><br><strong>What to actually do:</strong> Engage directly with BESCOM or POSOCO for V2G pilot terms. POSOCO is piloting V2G through Ancillary Service Providers (ASPs). CEA Grid Code 2023 defines technical requirements.</div>
-      <div style="margin-top:12px;display:flex;gap:8px"><a href="https://posoco.in" target="_blank" class="src">POSOCO ASP registration</a><a href="https://cea.nic.in" target="_blank" class="src">CEA Grid Code 2023</a></div>
+      <div style="font-size:14px;font-weight:700;color:var(--mfg);margin-bottom:10px">&#9888; V2G / Interconnection Queue Arbitrage &mdash; not modelled here</div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.8">V2G economics depend on DISCOM-specific contractual terms and aggregator agreements &mdash; none of which are in any public data feed. Building a calculator here would imply false precision.<br><br><strong>What to actually do:</strong> Engage directly with BESCOM or POSOCO for V2G pilot terms. CEA Grid Code 2023 defines technical requirements.</div>
+      <div style="margin-top:12px;display:flex;gap:8px"><a href="https://posoco.in" target="_blank" class="src">POSOCO</a><a href="https://cea.nic.in" target="_blank" class="src">CEA Grid Code 2023</a></div>
     </div>
   </div>
 </div>
 </div>
 
-<!-- ════════ PANE: POLICY ════════ -->
+<!-- PANE: POLICY -->
 <div id="pane-policy" class="pane">
 <div class="main">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px">
     <div>
-      <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:3px">BESCOM (Karnataka) connection process</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:13px">5 steps to energise an EV charging hub. Verified June 2026. <a href="https://bescom.karnataka.gov.in" target="_blank" class="src">bescom.karnataka.gov.in</a></div>
+      <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:3px">BESCOM connection &mdash; 5 steps</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:13px">Verified June 2026. <a href="https://bescom.karnataka.gov.in" target="_blank" class="src">bescom.karnataka.gov.in</a></div>
       <div class="card" style="padding:0 0 0 18px">
-        <div class="reg-steps">
-          <div class="reg-step"><div class="sn">1</div><div><div class="st">Site feasibility check</div><div class="sb">Visit BESCOM sub-division. Request load availability at nearest 11kV feeder for your required kVA. This tells you if a dedicated transformer is needed and how loaded the feeder is.</div><div class="sm">Timeline: <span>1–3 days</span></div></div></div>
-          <div class="reg-step"><div class="sn">2</div><div><div class="st">Submit LT-6 / HT-2 application</div><div class="sb">Apply at bescom.karnataka.gov.in → New Service Connection. Choose LT-6(c) for public DC fast charging. HT-2(f) if your aggregate load exceeds 100 kW.</div><div class="sm">Timeline: <span>7–15 working days</span></div><div style="margin-top:4px"><span class="dc">Property docs / lease</span><span class="dc">Site plan</span><span class="dc">Load schedule</span><span class="dc">PAN / GST</span></div></div></div>
-          <div class="reg-step"><div class="sn">3</div><div><div class="st">BESCOM demand note + payment</div><div class="sb">BESCOM issues a demand note: 3-month security deposit + service line charges + DT contribution if a new transformer is needed at your feeder.</div><div class="sm">New DT cost: <span>Rs 4–12 lakh if required</span></div></div></div>
-          <div class="reg-step"><div class="sn">4</div><div><div class="st">CEA electrical safety compliance</div><div class="sb">CEA Installation Regulations 2006 apply. A BESCOM-licensed wiring supervisor is required. Get an electrical test certificate before energisation.</div><div style="margin-top:4px"><span class="dc">Wiring certificate</span><span class="dc">Electrical test report</span><span class="dc">BIS-certified charger invoice</span></div></div></div>
-          <div class="reg-step"><div class="sn">5</div><div><div class="st">ToD meter install + energisation</div><div class="sb">BESCOM installs a Time-of-Day meter. No separate electricity distribution licence is needed to sell electricity for EV charging (MoP Sep 2024 order).</div><div class="sm">End-to-end: <span>6–10 weeks</span> no new DT · <span>3–5 months</span> if new DT needed</div></div></div>
+        <div>
+          <div class="reg-step"><div class="rsn">1</div><div><div class="rst">Site feasibility check</div><div class="rsb">Visit BESCOM sub-division. Request load availability at nearest 11kV feeder for your required kVA.</div><div class="rsm">Timeline: <span>1&ndash;3 days</span></div></div></div>
+          <div class="reg-step"><div class="rsn">2</div><div><div class="rst">Submit LT-6 / HT-2 application</div><div class="rsb">Apply at bescom.karnataka.gov.in &rarr; New Service Connection. LT-6(c) for public DC; HT-2(f) if aggregate &gt;100 kW.</div><div class="rsm">Timeline: <span>7&ndash;15 working days</span></div><div style="margin-top:4px"><span class="dc">Property docs</span><span class="dc">Site plan</span><span class="dc">Load schedule</span><span class="dc">PAN/GST</span></div></div></div>
+          <div class="reg-step"><div class="rsn">3</div><div><div class="rst">BESCOM demand note + payment</div><div class="rsb">Security deposit (3 months) + service line charges + DT contribution if new transformer needed.</div><div class="rsm">New DT: <span>Rs 4&ndash;12 lakh if required</span></div></div></div>
+          <div class="reg-step"><div class="rsn">4</div><div><div class="rst">CEA electrical safety compliance</div><div class="rsb">CEA Installation Regulations 2006. Licensed wiring supervisor + electrical test certificate.</div><div style="margin-top:4px"><span class="dc">Wiring cert</span><span class="dc">Electrical test report</span><span class="dc">BIS charger invoice</span></div></div></div>
+          <div class="reg-step"><div class="rsn">5</div><div><div class="rst">Meter + energisation</div><div class="rsb">BESCOM installs ToD meter. No separate licence needed to sell electricity for EV charging (MoP Sep 2024).</div><div class="rsm">End-to-end: <span>6&ndash;10 weeks</span> (no new DT) &middot; <span>3&ndash;5 months</span> (new DT)</div></div></div>
         </div>
       </div>
     </div>
     <div>
-      <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:3px">Active government schemes</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:13px">EV charging + BESS. Verified July 2026.</div>
-      <div id="policy-schemes"><div style="font-size:12px;color:var(--muted)">Loading…</div></div>
+      <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:3px">Active schemes</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:13px">EV + BESS. Verified July 2026.</div>
+      <div id="pol-schemes"><div style="font-size:12px;color:var(--muted)">Loading&hellip;</div></div>
     </div>
   </div>
   <hr class="div"/>
-  <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:3px">BESCOM LT-6 tariff reference</div>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Segmented by connection type — not a flat rate. <a href="https://kerc.karnataka.gov.in" target="_blank" class="src">KERC order 2025-26</a></div>
-  <div class="stale"><div class="stale-dot" style="background:var(--green)"></div>Last verified June 2026 · <a href="https://kerc.karnataka.gov.in" target="_blank">Verify at source →</a></div>
+  <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:3px">BESCOM LT-6 tariff</div>
+  <div class="stale"><div class="sdot" style="background:var(--green)"></div>Verified June 2026 &middot; <a href="https://kerc.karnataka.gov.in" target="_blank">KERC 2025-26 &rarr;</a></div>
   <div class="card" style="padding:0;overflow:hidden;margin-bottom:22px">
-    <table class="tt"><thead><tr><th>Category</th><th>Type</th><th>Energy Rs/unit</th><th>Fixed charge</th><th>Applicable to</th></tr></thead>
+    <table class="tbl">
+      <thead><tr><th>Category</th><th>Type</th><th>Energy Rs/unit</th><th>Fixed charge</th><th>Applicable to</th></tr></thead>
       <tbody>
-        <tr><td>LT-6(a)</td><td>Domestic home charging</td><td class="rate">Rs 5.50</td><td class="rate">Rs 50/kW/mo</td><td>Residential AC ≤7.2 kW</td></tr>
+        <tr><td>LT-6(a)</td><td>Domestic home charging</td><td class="rate">Rs 5.50</td><td class="rate">Rs 50/kW/mo</td><td>Residential AC &le;7.2 kW</td></tr>
         <tr><td>LT-6(b)</td><td>Commercial / workplace</td><td class="rate">Rs 6.50</td><td class="rate">Rs 80/kW/mo</td><td>Commercial premises, fleet</td></tr>
         <tr><td>LT-6(c)</td><td>Public DC fast charging</td><td class="rate">Rs 6.00</td><td class="rate">Rs 100/kW/mo</td><td>Public EVCS, CCS2/GB-T</td></tr>
         <tr><td>HT-2(f)</td><td>High-tension hub</td><td class="rate">Rs 5.80</td><td class="rate">Rs 350/kVA/mo</td><td>Hubs &gt;100 kW, 11 kV supply</td></tr>
       </tbody>
     </table>
-    <div class="arith-note" style="border-top:1px solid var(--border);border-radius:0">LT-1 domestic: Rs5.80 + Rs0.36 P&amp;G + Rs0.56 true-up = <strong>Rs6.72/unit</strong> (verified arithmetic) · +6% electricity duty on all categories</div>
+    <div class="an" style="border-top:1px solid var(--border);border-radius:0">LT-1 domestic: Rs5.80 + Rs0.36 P&amp;G + Rs0.56 true-up = <strong>Rs6.72/unit</strong> (verified) &middot; +6% electricity duty on all categories</div>
   </div>
   <hr class="div"/>
-  <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:3px">India state tariff comparison</div>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:10px">30 states — click for tariff, EV cost, and ranking.</div>
+  <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:8px">India state tariff comparison</div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
     <button class="tgl active" id="sbtn-tariff" onclick="setSM('tariff')">Tariff</button>
-    <button class="tgl" id="sbtn-avail" onclick="setSM('avail')">Grid %</button>
-    <button class="tgl" id="sbtn-renew" onclick="setSM('renew')">RE %</button>
-    <button class="tgl" id="sbtn-ev" onclick="setSM('ev')">EV stations</button>
+    <button class="tgl" id="sbtn-avail"  onclick="setSM('avail')">Grid %</button>
+    <button class="tgl" id="sbtn-renew"  onclick="setSM('renew')">RE %</button>
+    <button class="tgl" id="sbtn-ev"     onclick="setSM('ev')">EV stations</button>
   </div>
   <div style="display:grid;grid-template-columns:1fr 270px;gap:12px;align-items:start">
-    <div id="state-grid"></div>
-    <div class="card" id="state-detail" style="position:sticky;top:74px"><div class="lbl" style="margin-bottom:7px">State details</div><div style="font-size:12px;color:var(--muted)">Click a state card.</div></div>
+    <div id="sg"></div>
+    <div class="card" id="sd" style="position:sticky;top:74px"><div class="lbl" style="margin-bottom:7px">State details</div><div style="font-size:12px;color:var(--muted)">Click a state card.</div></div>
   </div>
 </div>
 </div>
 
-<!-- ════════ PANE: INTELLIGENCE ════════ -->
+<!-- PANE: INTELLIGENCE -->
 <div id="pane-intel" class="pane">
 <div class="main">
-  <div class="draft-warn">
-    <div class="draft-warn-h">⚠ DRAFT — Auto-generated, pending human review before treating as authoritative</div>
-    <div class="draft-warn-b">This digest is auto-generated from PIB official RSS feeds (MHI, MNRE, MoP) filtered by keyword. <strong>Any specific figure (Rs amount, percentage, deadline) should be verified against the linked original source</strong> before citing or making a decision. When live RSS is unavailable, this tab shows a curated set of verified recent policies — those are labelled "<span style="background:#FEF3C7;color:#B45309;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700">CURATED</span>" vs "<span style="background:#DCFCE7;color:#15803D;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700">PIB LIVE</span>".</div>
+  <div class="draft-box">
+    <div class="draft-title">&#9888; DRAFT &mdash; Auto-generated, pending human review before treating as authoritative</div>
+    <div class="draft-body">This digest is generated from PIB official RSS feeds filtered by keyword. <strong>Any specific figure (Rs amount, percentage, deadline) should be verified against the linked source</strong> before citing. When live RSS is unavailable, verified curated articles are shown &mdash; labelled <span class="src-tag src-cur">CURATED</span> vs <span class="src-tag src-live">PIB LIVE</span>.</div>
   </div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
     <div>
       <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:2px">Weekly Sector Intelligence</div>
-      <div style="font-size:12px;color:var(--muted)">India EV / BESS policy updates. Auto-refreshed every Sunday 06:00 UTC.</div>
+      <div style="font-size:12px;color:var(--muted)">India EV / BESS policy. Auto-refreshed every Sunday 06:00 UTC.</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
-      <div style="font-size:10px;font-family:var(--mono);color:var(--muted)" id="dig-ts">Checking…</div>
-      <button class="btn" style="font-size:10px" onclick="triggerDigest()">↻ Refresh now</button>
+      <div style="font-size:10px;font-family:var(--mono);color:var(--muted)" id="dig-ts">Checking&hellip;</div>
+      <button class="btn" style="font-size:10px" onclick="triggerDigest()">&#8635; Refresh now</button>
     </div>
   </div>
-  <div class="card" id="dig-content"><div style="font-size:12px;color:var(--muted)">Loading digest…</div></div>
+  <div class="card" id="dig-content"><div style="font-size:12px;color:var(--muted)">Loading digest&hellip;</div></div>
 </div>
 </div>
 
-<!-- ════════ PANE: GRID MONITOR ════════ -->
+<!-- PANE: GRID MONITOR -->
 <div id="pane-grid" class="pane">
 <div class="main">
-  <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:3px">Karnataka Grid — Live</div>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:10px">KPTCL SLDC real-time data. Relevant context for BESS arbitrage timing and ancillary service windows.</div>
+  <div style="font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:3px">Karnataka Grid &mdash; Live</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:10px">KPTCL SLDC real-time data.</div>
   <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-    <div class="stale" style="margin-bottom:0" id="grid-stale"><div class="stale-dot" style="background:var(--muted)"></div>Connecting…</div>
-    <a href="https://kptclsldc.in/bescom.aspx" target="_blank" class="btn">BESCOM full page ↗</a>
-    <a href="https://kptclsldc.in/data1/BESCOM.jpg" target="_blank" class="btn">220kV live image ↗</a>
-    <button class="btn" onclick="initGrid()">↻ Refresh</button>
+    <div class="stale" style="margin-bottom:0" id="grid-stale"><div class="sdot" style="background:var(--muted)"></div>Connecting&hellip;</div>
+    <a href="https://kptclsldc.in/bescom.aspx" target="_blank" class="btn">BESCOM full page &#8599;</a>
+    <a href="https://kptclsldc.in/data1/BESCOM.jpg" target="_blank" class="btn">220kV live image &#8599;</a>
+    <button class="btn" onclick="initGrid()">&#8635; Refresh</button>
   </div>
-  <div class="grid-row4" style="margin-bottom:10px">
-    <div class="grid-tile"><div class="gt-lbl">Grid frequency</div><div><span class="gt-val" id="g-hz">--.-</span><span class="gt-unit">Hz</span></div><div style="font-size:11px;font-family:var(--mono);font-weight:600;margin-top:4px" id="g-hz-st">—</div></div>
-    <div class="grid-tile"><div class="gt-lbl">Karnataka total gen</div><div><span class="gt-val" id="g-gen">----</span><span class="gt-unit">MW</span></div><div style="font-size:11px;color:var(--muted);margin-top:3px" id="g-gen-sub">—</div></div>
-    <div class="grid-tile"><div class="gt-lbl">BESCOM actual load</div><div><span class="gt-val" id="g-bl">----</span><span class="gt-unit">MW</span></div><div style="font-size:11px;color:var(--muted);margin-top:3px" id="g-ui">—</div></div>
-    <div class="grid-tile"><div class="gt-lbl">NCEP renewables</div><div><span class="gt-val" id="g-ncep">----</span><span class="gt-unit">MW</span></div><div style="font-size:11px;color:var(--muted);margin-top:3px" id="g-ncep-sub">—</div></div>
+  <div class="g4" style="margin-bottom:10px">
+    <div class="gt"><div class="gtl">Grid frequency</div><div><span class="gtv" id="g-hz">--.-</span><span class="gtu">Hz</span></div><div style="font-size:11px;font-family:var(--mono);font-weight:600;margin-top:4px" id="g-hz-st">&mdash;</div></div>
+    <div class="gt"><div class="gtl">Karnataka total gen</div><div><span class="gtv" id="g-gen">----</span><span class="gtu">MW</span></div><div style="font-size:11px;color:var(--muted);margin-top:3px" id="g-gen-sub">&mdash;</div></div>
+    <div class="gt"><div class="gtl">BESCOM actual load</div><div><span class="gtv" id="g-bl">----</span><span class="gtu">MW</span></div><div style="font-size:11px;color:var(--muted);margin-top:3px" id="g-ui">&mdash;</div></div>
+    <div class="gt"><div class="gtl">NCEP renewables</div><div><span class="gtv" id="g-ncep">----</span><span class="gtu">MW</span></div><div style="font-size:11px;color:var(--muted);margin-top:3px" id="g-ncep-sub">&mdash;</div></div>
   </div>
-  <div class="osc-wrap"><canvas id="oscCanvas"></canvas></div>
+  <div class="osc-w"><canvas id="osc"></canvas></div>
   <div class="card" style="margin-top:10px;padding:0;overflow:hidden">
-    <table class="escom-t"><thead><tr><th>ESCOM</th><th>Scheduled MW</th><th>Actual MW</th><th>UI deviation</th><th>Signal</th></tr></thead>
-      <tbody id="escom-tbody"><tr><td colspan="5" style="color:var(--muted);padding:12px 8px">Loading…</td></tr></tbody>
+    <table class="escom-tbl"><thead><tr><th>ESCOM</th><th>Scheduled MW</th><th>Actual MW</th><th>UI deviation</th><th>Signal</th></tr></thead>
+      <tbody id="escom-tbody"><tr><td colspan="5" style="color:var(--muted);padding:12px 8px">Loading&hellip;</td></tr></tbody>
     </table>
   </div>
 </div>
 </div>
 
-<!-- ════════ GLOSSARY PANEL ════════ -->
-<div class="gls-overlay" id="gls-overlay" onclick="maybeCloseGlossary(event)">
-  <div class="gls-panel">
+<!-- GLOSSARY -->
+<div class="gls-ov" id="gls-ov" onclick="if(event.target===this)closeGlossary()">
+  <div class="gls-pnl">
     <div class="gls-hdr">
-      <div class="gls-title">📖 Key terms explained</div>
-      <button class="gls-close" onclick="closeGlossary()">✕</button>
+      <div class="gls-title">&#128218; Key terms explained</div>
+      <button class="gls-close" onclick="closeGlossary()">&#10005;</button>
     </div>
     <div class="gls-body">
-      <div class="gls-section-hdr">Grid &amp; electricity terms</div>
-      <div class="term"><div class="term-name">Grid headroom <span class="term-tag">MOST IMPORTANT</span></div><div class="term-def">How much spare electricity capacity the local substation has for new connections. If a substation is running at 90% of its maximum capacity, there is very little "headroom" — connecting a new high-power charger will be slow, expensive, or refused. At 55% loaded, there is plenty of headroom — new connections get processed quickly and cheaply.</div><div class="term-example">Example: Whitefield 220kV substation = 57% loaded → HIGH headroom → new 120kW charger connection: 4–6 weeks. Koramangala 66kV = 93% loaded → LOW headroom → new connection: 4–6 months + augmentation required.</div></div>
-      <div class="term"><div class="term-name">Loading %</div><div class="term-def">What percentage of a substation's maximum power capacity is currently being drawn. 60% loading = comfortable, room for new connections. Above 85% = constrained zone, new large connections face delays. Above 93% = effectively full, new HT connections are typically blocked.</div><div class="term-example">Think of it like a motorway: 60% capacity = traffic flows freely. 90% = slowdowns. 100% = gridlock, no new vehicles can join.</div></div>
-      <div class="term"><div class="term-name">DISCOM</div><div class="term-def">Distribution Company — the electricity utility that operates the wires and meters in your area. They set your tariff, process new connection applications, and approve or reject your load sanction. Your DISCOM is the first call for any EV charging or BESS project.</div><div class="term-example">Bengaluru: BESCOM. Mumbai: MSEDCL. Chennai: TANGEDCO. Hyderabad: TSSPDCL. Delhi: BSES / TPDDL.</div></div>
-      <div class="term"><div class="term-name">HT vs LT connection</div><div class="term-def">LT = Low Tension (below 1kV, typically up to ~100 kW). HT = High Tension (11kV or 33kV, for loads above 100 kW). Large EV charging hubs typically need an HT connection. HT connections take longer to approve, require a dedicated meter and substation, but have lower per-unit tariff.</div></div>
-      <div class="term"><div class="term-name">Demand charge</div><div class="term-def">A fixed monthly fee on your electricity bill based on your peak power demand in kW — separate from the energy (kWh) you consume. For large commercial and industrial users, demand charges can be 30–50% of the total electricity bill. BESS can reduce it by preventing demand spikes.</div><div class="term-example">If your factory peaks at 500 kW for just 15 minutes in a month, you pay the demand charge on 500 kW for the whole month.</div></div>
-      <div class="term"><div class="term-name">Round-trip efficiency (RTE)</div><div class="term-def">The fraction of energy you put into a battery that you can get back out. 90% RTE means for every 100 kWh stored, you recover 90 kWh — the other 10 kWh is lost as heat. Higher RTE = lower effective cost per kWh cycled through the battery.</div><div class="term-example">LFP cells: 92–96% RTE. NMC cells: 88–93% RTE. A 2% RTE difference on a 10 MWh battery over 1,500 cycles = ~300 MWh of energy lost.</div></div>
-      <div class="term"><div class="term-name">ToD pricing (Time of Day)</div><div class="term-def">An electricity tariff where the per-unit price changes based on time of day. Off-peak (10pm–6am) rates are significantly lower than peak (6pm–10pm) rates. Critical for BESS arbitrage: charge cheaply at night, discharge (or displace peak consumption) during expensive hours.</div></div>
-      <div class="gls-section-hdr" style="margin-top:4px">EV charging terms</div>
-      <div class="term"><div class="term-name">Utilisation %</div><div class="term-def">For a charging station: the percentage of total available charging time when a vehicle is actually plugged in and drawing power. 100% would mean the station is always fully occupied — impossible in practice. India's public stations averaged 15–35% utilisation in 2025. Higher utilisation = faster payback.</div><div class="term-example">A 4-gun, 18-hour station at 25% utilisation is effectively delivering the same energy as a 1-gun station running 18 hours at 100%.</div></div>
-      <div class="term"><div class="term-name">Breakeven utilisation</div><div class="term-def">The minimum utilisation % at which the station covers all its costs (energy + lease + opex + maintenance). Below this level, every hour costs money. Above this level, every hour generates profit. A critical sanity check before committing to a site.</div></div>
-      <div class="term"><div class="term-name">Charge point vs station</div><div class="term-def">A "station" is the physical installation. A "charge point" (or "gun") is each individual connector that can serve one vehicle at a time. A station can have 2, 4, or 8+ charge points. The calculator uses charge points as the unit of capacity.</div></div>
-      <div class="gls-section-hdr" style="margin-top:4px">Data &amp; coverage terms</div>
-      <div class="term"><div class="term-name">Coverage labels <span class="term-tag">HONESTY SYSTEM</span></div><div class="term-def">Every data point in this tool is explicitly labelled with its quality. You always know what you're working with.<br/><br/><span class="cov cov-live" data-note="Real-time KPTCL SLDC data."><span class="cd"></span>Live</span> — Real-time from KPTCL SLDC scraper (Bengaluru zones only, 5-min refresh).<br/><br/><span class="cov cov-verified" data-note="DISCOM-checked data."><span class="cd"></span>Verified</span> — Manually cross-referenced against DISCOM published loading schedules. Karnataka Tier 2.<br/><br/><span class="cov cov-partial" data-note="City-level aggregate."><span class="cd"></span>Partial</span> — City-level aggregate from DISCOM public data. No per-substation detail. Maharashtra, TN, Gujarat, Delhi, etc.<br/><br/><span class="cov cov-estimate" data-note="Secondary sources."><span class="cd"></span>Estimate</span> — Estimated from CEA state-wise capacity reports and secondary sources. Other states.</div></div>
-      <div class="term"><div class="term-name">Opportunity score (X/6)</div><div class="term-def">A shortlisting signal, not a financial verdict. Combines grid headroom (3 = high, 2 = medium, 1 = low) and market density (3 = underserved, 2 = moderate, 1 = saturated). Maximum 6/6. Does NOT include payback period, tariff, or any financial analysis. Use it to narrow down a long list of cities to 3–5 worth running the calculator on.</div></div>
+      <div class="gls-sh">Grid &amp; electricity</div>
+      <div class="term"><div class="term-name">Grid headroom <span class="term-tag">MOST IMPORTANT</span></div><div class="term-def">How much spare electricity capacity the local substation has for new connections. A substation at 90% capacity has very little headroom &mdash; connecting a high-power charger will be slow or refused. At 55%, plenty of headroom &mdash; new connections are fast.</div><div class="term-ex">Example: Whitefield 220kV = 57% loaded &rarr; HIGH headroom &rarr; new 120kW charger approved in 4&ndash;6 weeks. Koramangala 66kV = 93% &rarr; LOW headroom &rarr; 4&ndash;6 months + augmentation.</div></div>
+      <div class="term"><div class="term-name">Loading %</div><div class="term-def">Current demand as a percentage of the substation&rsquo;s maximum capacity. 60% = comfortable. 85%+ = constrained, delays likely. 93%+ = effectively full, new HT connections blocked.</div><div class="term-ex">Think of it like a motorway: 60% capacity = traffic flows. 90% = slowdowns. 100% = gridlock.</div></div>
+      <div class="term"><div class="term-name">DISCOM</div><div class="term-def">Distribution Company &mdash; the electricity utility operating wires and meters in your area. Sets your tariff and approves/rejects new connection applications.</div><div class="term-ex">Bengaluru: BESCOM. Mumbai: MSEDCL. Chennai: TANGEDCO. Hyderabad: TSSPDCL. Delhi: BSES/TPDDL.</div></div>
+      <div class="term"><div class="term-name">HT vs LT connection</div><div class="term-def">LT = Low Tension (below 1kV, up to ~100 kW). HT = High Tension (11kV+, above 100 kW). Large EV hubs need HT. HT takes longer to approve but has lower per-unit tariff.</div></div>
+      <div class="term"><div class="term-name">Demand charge</div><div class="term-def">A fixed monthly fee based on your peak power demand in kW &mdash; separate from energy consumed. For large users, 30&ndash;50% of total bill. BESS can reduce it by preventing demand spikes.</div><div class="term-ex">Peak at 500 kW for 15 minutes? You pay the demand charge on 500 kW for the whole month.</div></div>
+      <div class="term"><div class="term-name">Round-trip efficiency (RTE)</div><div class="term-def">Energy recovered / energy stored &times; 100. 90% RTE = for every 100 kWh stored, you recover 90 kWh. LFP cells: 92&ndash;96%. NMC: 88&ndash;93%.</div></div>
+      <div class="term"><div class="term-name">ToD pricing (Time of Day)</div><div class="term-def">Tariff where price changes by time of day. Off-peak (10pm&ndash;6am) rates much cheaper than peak (6pm&ndash;10pm). Critical for BESS arbitrage: charge cheap at night, save during expensive peak.</div></div>
+      <div class="gls-sh">EV charging</div>
+      <div class="term"><div class="term-name">Utilisation %</div><div class="term-def">% of total available charging time when a vehicle is actually charging. 100% impossible. India average 2025: 15&ndash;35% for public stations. Higher = faster payback.</div></div>
+      <div class="term"><div class="term-name">Breakeven utilisation</div><div class="term-def">Minimum utilisation % at which the station covers all costs. Below this = losing money every hour. Above this = profitable.</div></div>
+      <div class="gls-sh">Data &amp; coverage</div>
+      <div class="term"><div class="term-name">Coverage labels <span class="term-tag">HONESTY SYSTEM</span></div><div class="term-def"><strong>Live</strong> = real-time KPTCL SLDC (Bengaluru zones only, 5-min refresh).<br/><strong>Verified</strong> = manually cross-referenced against DISCOM published loading schedules. Karnataka Tier 2.<br/><strong>Partial</strong> = city-level aggregate from DISCOM public data. Maharashtra, TN, Gujarat, Delhi, etc.<br/><strong>Estimate</strong> = derived from CEA reports. Other states. Treat as directional only.</div></div>
+      <div class="term"><div class="term-name">Opportunity score (X/6)</div><div class="term-def">Shortlisting signal only. Combines headroom (3=high, 2=medium, 1=low) and competition (3=underserved, 2=moderate, 1=saturated). Does NOT include payback or financial analysis.</div></div>
     </div>
   </div>
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════════════════════════
-// NAVIGATION
-// ══════════════════════════════════════════════════════════════════════════════
-function showLanding(){ document.getElementById('landing').style.display=''; document.getElementById('nav-tabs').style.display='none'; document.querySelectorAll('.pane').forEach(p=>p.style.display='none'); }
-function hideLanding(){ document.getElementById('landing').style.display='none'; document.getElementById('nav-tabs').style.display='flex'; }
-function goHome(){ showLanding(); }
+"use strict";
 
-function showTab(tab, btn){
-  hideLanding();
-  document.querySelectorAll('.pane').forEach(p=>p.style.display='none');
-  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById('pane-'+tab).style.display='block';
-  if(btn) btn.classList.add('active');
-  else document.querySelector('[data-tab="'+tab+'"]')?.classList.add('active');
-  if(tab==='grid') initGrid();
-  if(tab==='explore'){ setTimeout(function(){ if(leafMap) leafMap.invalidateSize(); },80); }
-  if(tab==='policy'){ renderStateGrid(); loadPolicySchemes(); }
-}
+// ══ CORE STATE ══
+var allOpps = [];
+var leafMap = null;
+var mapMarkers = [];
+var curView = 'map';
+var prefillOpp = null;
+var gridInited = false;
+var oscId = null;
+var oscPhase = 0;
+var liveHz = 50.0;
+var curSM = 'tariff';
+var schemesLoaded = false;
+var stateGridLoaded = false;
 
-function enterExplore(){
-  showTab('explore', document.querySelector('[data-tab="explore"]'));
-  // Init map after pane is visible (timeout ensures layout is complete)
-  setTimeout(function(){
-    if(typeof L !== 'undefined'){
-      setView('map');
-      if(!leafMap){ initMap(); }
-      if(leafMap){ leafMap.invalidateSize(); renderMapMarkers(); }
-    } else {
-      setView('list');
-    }
-  }, 100);
-}
-function enterCalc(){    showTab('calc',    document.querySelector('[data-tab="calc"]')); }
-function enterIntel(){   showTab('intel',   document.querySelector('[data-tab="intel"]')); loadDigest(); }
-
-function showCtab(tab, btn){
-  document.querySelectorAll('.ctab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.ctab-pane').forEach(p=>p.style.display='none');
-  if(btn) btn.classList.add('active');
-  document.getElementById('ctab-'+tab).style.display='block';
-}
-
-function toggleFml(id){ const el=document.getElementById(id),btn=el.previousElementSibling; el.classList.toggle('show'); btn.textContent=el.classList.contains('show')?'▲ Hide formula':'▼ Show formula'; }
-function toggleHtr(){ const body=document.getElementById('htr-body'),arrow=document.getElementById('htr-arrow'); body.classList.toggle('open'); arrow.textContent=body.classList.contains('open')?'▲ collapse':'▼ expand'; }
-
-// ══════════════════════════════════════════════════════════════════════════════
-// GLOSSARY
-// ══════════════════════════════════════════════════════════════════════════════
-function openGlossary(){ document.getElementById('gls-overlay').classList.add('open'); }
-function closeGlossary(){ document.getElementById('gls-overlay').classList.remove('open'); }
-function maybeCloseGlossary(e){ if(e.target===document.getElementById('gls-overlay')) closeGlossary(); }
-
-// ══════════════════════════════════════════════════════════════════════════════
-// OPPORTUNITY EXPLORER
-// ══════════════════════════════════════════════════════════════════════════════
-let allOpps = [];
-let fState = {biz:'ev', state:'', tier:'', headroom:'', coverage:''};
-
-async function initExplorer(){
-  try{
-    const r = await fetch('/api/opportunities');
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const d = await r.json();
-    allOpps = d.opportunities;
-    const sfEl = document.getElementById('f-state');
-    d.all_states.forEach(function(s){ const o=document.createElement('option'); o.value=s; o.textContent=s; sfEl.appendChild(o); });
-    renderExplorer();
-  }catch(e){
-    console.error('initExplorer failed:', e);
-    const og = document.getElementById('opp-grid');
-    if(og) og.innerHTML='<div class="empty"><h3>Could not load opportunities</h3><p>'+e.message+'</p></div>';
-    const fc = document.getElementById('fcount');
-    if(fc) fc.textContent='Error';
+// ══ NAVIGATION — the only thing that matters ══
+function goHome() {
+  document.getElementById('landing').style.display = 'block';
+  document.getElementById('app-nav').style.display = 'none';
+  var panes = document.querySelectorAll('.pane');
+  for (var i = 0; i < panes.length; i++) {
+    panes[i].style.display = 'none';
   }
 }
 
-function setF(key, val){ fState[key]=val; if(curView==='map') renderMapMarkers(); else renderExplorer(); }
-function clearF(){ fState={biz:'ev',state:'',tier:'',headroom:'',coverage:''}; document.getElementById('f-biz').value='ev'; document.getElementById('f-state').value=''; document.getElementById('f-tier').value=''; document.getElementById('f-headroom').value=''; document.getElementById('f-cov').value=''; if(curView==='map') renderMapMarkers(); else renderExplorer(); }
+function goto(tab) {
+  // 1. Hide landing
+  document.getElementById('landing').style.display = 'none';
+  // 2. Show nav
+  document.getElementById('app-nav').style.display = 'flex';
+  // 3. Hide all panes
+  var panes = document.querySelectorAll('.pane');
+  for (var i = 0; i < panes.length; i++) {
+    panes[i].style.display = 'none';
+  }
+  // 4. Remove active from nav tabs
+  var navTabs = document.querySelectorAll('.nav-tab');
+  for (var i = 0; i < navTabs.length; i++) {
+    navTabs[i].classList.remove('active');
+  }
+  // 5. Show the target pane
+  var pane = document.getElementById('pane-' + tab);
+  if (pane) {
+    pane.style.display = 'block';
+  }
+  // 6. Activate nav tab
+  var activeTab = document.querySelector('.nav-tab[data-tab="' + tab + '"]');
+  if (activeTab) {
+    activeTab.classList.add('active');
+  }
+  // 7. Tab-specific init
+  if (tab === 'explore') {
+    setTimeout(function() { initMapSafe(); }, 150);
+  }
+  if (tab === 'grid') {
+    setTimeout(initGrid, 100);
+  }
+  if (tab === 'policy') {
+    loadPolicySchemes();
+    renderStateGrid();
+  }
+  if (tab === 'intel') {
+    loadDigest();
+  }
+}
 
-function renderExplorer(){
-  const biz=fState.biz||'ev';
-  let list=allOpps.filter(function(o){
-    if(fState.state && o.state!==fState.state) return false;
-    if(fState.tier && o.tier!=fState.tier) return false;
-    if(fState.coverage && o.coverage!==fState.coverage) return false;
-    if(fState.headroom && o[biz]?.headroom!==fState.headroom) return false;
+// ══ GLOSSARY ══
+function openGlossary()  { document.getElementById('gls-ov').classList.add('open'); }
+function closeGlossary() { document.getElementById('gls-ov').classList.remove('open'); }
+
+// ══ CALC SUB-TABS ══
+function showCtab(tab, btn) {
+  var panes = document.querySelectorAll('.ctab-pane');
+  for (var i = 0; i < panes.length; i++) {
+    panes[i].classList.remove('active');
+  }
+  var tabs = document.querySelectorAll('.ctab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.remove('active');
+  }
+  var pane = document.getElementById('ctab-' + tab);
+  if (pane) pane.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function toggleFml(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('show');
+  var btn = el.previousElementSibling;
+  if (btn) btn.textContent = el.classList.contains('show') ? '\\u25b2 Hide formula' : '\\u25bc Show formula';
+}
+
+function toggleHtr() {
+  var body = document.getElementById('htr-body');
+  var arrow = document.getElementById('htr-arrow');
+  if (!body) return;
+  body.classList.toggle('open');
+  if (arrow) arrow.textContent = body.classList.contains('open') ? '\\u25b2 collapse' : '\\u25bc expand';
+}
+
+// ══ EXPLORE — OPPORTUNITY DATA ══
+function applyFilters() {
+  var biz      = document.getElementById('f-biz')?.value      || 'ev';
+  var state    = document.getElementById('f-state')?.value    || '';
+  var tier     = document.getElementById('f-tier')?.value     || '';
+  var headroom = document.getElementById('f-headroom')?.value || '';
+  var cov      = document.getElementById('f-cov')?.value      || '';
+
+  var filtered = allOpps.filter(function(o) {
+    if (state    && o.state    !== state)               return false;
+    if (tier     && o.tier     != parseInt(tier))       return false;
+    if (cov      && o.coverage !== cov)                 return false;
+    if (headroom && o[biz] && o[biz].headroom !== headroom) return false;
     return true;
   });
-  list.sort(function(a,b){ return (b[biz]?.score||0)-(a[biz]?.score||0); });
-  document.getElementById('fcount').textContent=list.length+' opportunities';
-  if(!list.length){ document.getElementById('opp-grid').innerHTML='<div class="empty"><h3>No opportunities match these filters</h3><p>Try broadening the criteria or clearing filters.</p></div>'; return; }
-  document.getElementById('opp-grid').innerHTML=list.map(function(o){ return buildCard(o,biz); }).join('');
+
+  filtered.sort(function(a, b) {
+    var sa = a[biz] ? a[biz].score || 0 : 0;
+    var sb = b[biz] ? b[biz].score || 0 : 0;
+    return sb - sa;
+  });
+
+  var fc = document.getElementById('fcount');
+  if (fc) fc.textContent = filtered.length + ' opportunities';
+
+  if (curView === 'map') {
+    renderMapMarkers(filtered, biz);
+  } else {
+    renderCards(filtered, biz);
+  }
 }
 
-function buildCard(o, biz){
-  const bd=o[biz]||{}, score=bd.score||0, maxS=biz==='ev'?6:4;
-  const pct=Math.round(score/maxS*100), sc=pct>=66?'sp-hi':pct>=40?'sp-md':'sp-lo';
-  const h=bd.headroom||'medium', hC=h==='high'?'#15803D':h==='medium'?'#D97706':'#DC2626', hP={high:82,medium:52,low:22}[h]||50;
-  const den=bd.competition||'', dC=den==='underserved'?'#15803D':den==='moderate'?'#D97706':'#DC2626', dP={underserved:18,moderate:52,saturated:88}[den]||50;
-  const covCls='cov-'+o.coverage, tc='t'+(o.tier||2), tl=o.tier===1?'Tier 1 — metro':o.tier===2?'Tier 2':'Tier 3';
-  const stLine=o.city==='Bengaluru'?(bd.stations||0)+' stations/2km '+(bd.fast_dc?'('+bd.fast_dc+' DC fast)':''):(bd.stations||0)+' stations city';
-  const compRow=biz==='ev'&&den?'<div class="sig-row"><span class="sig-lbl">Competition</span><div class="sig-track"><div class="sig-fill" style="width:'+dP+'%;background:'+dC+'"></div></div><span class="sig-val" style="color:'+dC+'">'+den.toUpperCase()+'</span></div>':'';
-  const evalBiz=biz==='bess'?'dbess':'ev';
-  return '<div class="opp-card">'
-    +'<div class="opp-card-top"><div><div class="opp-loc">'+o.location+'</div><div class="opp-sub">'+o.city+(o.city!==o.location?' · ':' · ')+o.state+'</div>'
-    +'<div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px">'+stLine+'</div></div>'
-    +'<div class="score-pill '+sc+'" title="Opportunity score: '+score+'/'+maxS+'">'+score+'</div></div>'
-    +'<div class="opp-badges"><span class="tier-tag '+tc+'">'+tl+'</span>'
-    +'<span class="cov '+covCls+'" data-note="'+o.coverage_note+'"><span class="cd"></span>'+o.coverage_label+'</span></div>'
-    +'<div><div class="sig-row"><span class="sig-lbl">Grid headroom <span class="info" data-tip="How much spare capacity the local substation has. High = new connections are fast and easy. Low = delays or refusals likely.">?</span></span><div class="sig-track"><div class="sig-fill" style="width:'+hP+'%;background:'+hC+'"></div></div><span class="sig-val" style="color:'+hC+'">'+(h.toUpperCase())+' ('+bd.loading_pct+'%)</span></div>'+compRow+'</div>'
-    +'<div class="one-liner">'+bd.one_liner+'</div>'
-    +'<button class="eval-btn '+(biz==='bess'?'bess-btn':'')+'" onclick="evalEcon(\''+o.id+'\',\''+evalBiz+'\')">Evaluate the economics →</button>'
-    +'</div>';
+function clearFilters() {
+  var ids = ['f-biz','f-state','f-tier','f-headroom','f-cov'];
+  for (var i = 0; i < ids.length; i++) {
+    var el = document.getElementById(ids[i]);
+    if (el) el.value = i === 0 ? 'ev' : '';
+  }
+  applyFilters();
 }
 
-// ── Pre-fill calculator ──────────────────────────────────────────────────────
-let prefillOpp = null;
-function evalEcon(id, calcTab){
-  prefillOpp = allOpps.find(function(o){ return o.id===id; });
-  if(!prefillOpp) return;
-  showTab('calc', document.querySelector('[data-tab="calc"]'));
-  showCtab(calcTab, document.querySelectorAll('.ctab')[calcTab==='dbess'?1:0]);
-  const pb=document.getElementById('prefill-banner');
-  pb.style.display='flex';
-  document.getElementById('prefill-loc').textContent=prefillOpp.location+', '+prefillOpp.city+', '+prefillOpp.state;
-  document.getElementById('prefill-cov').innerHTML='<span class="cov cov-'+prefillOpp.coverage+'" data-note="'+prefillOpp.coverage_note+'"><span class="cd"></span>'+prefillOpp.coverage_label+'</span>';
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function clearPrefill(){ prefillOpp=null; document.getElementById('prefill-banner').style.display='none'; }
-
-// ══════════════════════════════════════════════════════════════════════════════
-// EV CONNECTOR
-// ══════════════════════════════════════════════════════════════════════════════
-const EVC={'ccs2-50':{kw:50,cap:12,tariff:6.00,label:'DC CCS2 50kW — LT-6(c)'},'ccs2-120':{kw:120,cap:22,tariff:6.00,label:'DC CCS2 120kW — LT-6(c)'},'ccs2-240':{kw:240,cap:45,tariff:5.80,label:'DC CCS2 240kW — HT-2(f)'},'gbt-60':{kw:60,cap:14,tariff:6.00,label:'DC GB/T 60kW — LT-6(c)'},'ac-7':{kw:7.2,cap:2.5,tariff:5.50,label:'AC 7.2kW — LT-6(a)'},'ac-22':{kw:22,cap:5.0,tariff:6.50,label:'AC 22kW — LT-6(b)'},'custom':{kw:60,cap:15,tariff:6.00,label:'Custom / Proprietary'}};
-function onConn(){
-  const sel=document.getElementById('ev-conn').value;
-  document.getElementById('ev-cust').style.display=sel==='custom'?'block':'none';
-  let cfg=EVC[sel]||EVC['ccs2-50'];
-  if(sel==='custom'){cfg.kw=+(document.getElementById('ev-ckw')?.value||60);cfg.tariff=+(document.getElementById('ev-ctariff')?.value||6.00);EVC['custom']=cfg;}
-  document.getElementById('ev-tariff').value=cfg.tariff.toFixed(2);
-  document.getElementById('ev-tariff-src').textContent=cfg.label;
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// CALCULATORS
-// ══════════════════════════════════════════════════════════════════════════════
-function calcEV(){
-  const sel=document.getElementById('ev-conn').value;
-  let cfg=EVC[sel]||EVC['ccs2-50'];
-  if(sel==='custom'){cfg={kw:+(document.getElementById('ev-ckw')?.value||60),cap:+(document.getElementById('ev-ccap')?.value||15),tariff:+(document.getElementById('ev-ctariff')?.value||6.00),label:'Custom'};EVC['custom']=cfg;}
-  const pts=+(document.getElementById('ev-pts').value),hrs=+(document.getElementById('ev-hrs').value),util=+(document.getElementById('ev-util').value)/100;
-  const lease=+(document.getElementById('ev-lease').value),retail=+(document.getElementById('ev-retail').value),tariff=+(document.getElementById('ev-tariff').value),opex=+(document.getElementById('ev-opex').value);
-  const capexRs=(cfg.cap+5)*pts*100000,rev=pts*hrs*util*cfg.kw*retail*30,ecost=pts*hrs*util*cfg.kw*tariff*30,maint=capexRs*0.02/12,net=rev-ecost-lease-opex-maint;
-  const pb=net>0?capexRs/net:Infinity,be=(lease+opex+maint)/((retail-tariff)*cfg.kw*hrs*pts*30)*100;
-  const fmtR=n=>n>=100000?(n/100000).toFixed(1)+'L':n>=1000?(n/1000).toFixed(1)+'k':Math.round(n).toString();
-  const pbTxt=isFinite(pb)?Math.round(pb)+' months ('+(Math.round(pb)/12).toFixed(1)+' yrs)':'Not profitable at these inputs';
-  const pbC=!isFinite(pb)||pb>60?'#DC2626':pb>36?'#D97706':'#15803D';
-  document.getElementById('ev-out').innerHTML=
-    '<div class="lbl" style="margin-bottom:10px;color:var(--ev)">Results</div>'
-    +'<div style="margin-bottom:14px"><div class="lbl" style="margin-bottom:4px">Payback period</div><div style="font-family:var(--mono);font-size:32px;font-weight:700;color:'+pbC+'">'+pbTxt+'</div></div>'
-    +'<div class="og2"><div class="og-tile"><div class="tl">Est. capex</div><div class="tv">Rs '+(capexRs/100000).toFixed(1)+'L</div></div><div class="og-tile"><div class="tl">Monthly revenue</div><div class="tv">Rs '+fmtR(rev)+'</div></div><div class="og-tile"><div class="tl">Monthly energy cost</div><div class="tv">Rs '+fmtR(ecost)+'</div></div><div class="og-tile"><div class="tl">Monthly net</div><div class="tv" style="color:'+(net>=0?'#15803D':'#DC2626')+'">'+(net>=0?'Rs ':'-Rs ')+fmtR(Math.abs(net))+'</div></div></div>'
-    +'<div class="lbl" style="margin-bottom:6px">Breakeven utilisation: '+be.toFixed(1)+'%</div>'
-    +'<div class="bsens-row"><span class="bsl">Your target</span><div class="bst"><div class="bsf" style="width:'+(util*100)+'%;background:'+(util*100>=be?'#16A34A':'#DC2626')+'"></div></div><span class="bsv">'+(util*100).toFixed(0)+'%</span></div>'
-    +'<div class="bsens-row"><span class="bsl">Breakeven</span><div class="bst"><div class="bsf" style="width:'+Math.min(100,be).toFixed(0)+'%;background:#D97706"></div></div><span class="bsv">'+be.toFixed(1)+'%</span></div>'
-    +'<button class="formula-btn" style="margin-top:9px" onclick="toggleFml(\'ev-fml\')">▼ Show formula</button>'
-    +'<div class="formula-box" id="ev-fml"><span class="fv">Revenue</span> = points × hrs/day × util × kW × retail × 30<br><span class="fv">Energy cost</span> = points × hrs/day × util × kW × tariff × 30<br><span class="fv">Net</span> = revenue − energy_cost − lease − opex − (capex × 2%/12)<br><span class="fv">Payback</span> = capex / monthly_net · <span class="fv">Breakeven util</span> = (lease+opex) / ((retail−tariff)×kW×hrs×pts×30) × 100</div>';
-}
-
-function calcDemandBESS(){
-  const peak=+(document.getElementById('dc-peak').value),rate=+(document.getElementById('dc-rate').value),bkw=+(document.getElementById('dc-bkw').value),capx=+(document.getElementById('dc-capex').value)*1e7;
-  const reduction=Math.min(bkw,peak*0.35),monthly=reduction*rate,pb=monthly>0?capx/monthly:Infinity;
-  const pbYrs=isFinite(pb)?(pb/12).toFixed(1):'\u221e';
-  const fmtR=n=>n>=1e7?(n/1e7).toFixed(2)+' Cr':n>=100000?(n/100000).toFixed(1)+'L':(n/1000).toFixed(1)+'k';
-  const rates=[rate*0.8,rate,rate*1.2],capxS=[capx*0.8,capx,capx*1.2];
-  const rows=capxS.map(function(cp){return '<tr><td class="rh">Rs '+(cp/1e7).toFixed(2)+' Cr</td>'+rates.map(function(r){const ps=reduction*r>0?cp/(reduction*r)/12:999,cls=ps<=4?'sg':ps<=7?'sa':'sr';return '<td class="'+cls+'">'+ps.toFixed(1)+'y</td>';}).join('')+'</tr>';}).join('');
-  document.getElementById('dc-out').innerHTML=
-    '<div class="lbl" style="margin-bottom:10px;color:var(--bess)">Results</div>'
-    +'<div style="margin-bottom:14px"><div class="lbl" style="margin-bottom:4px">Payback</div><div style="font-family:var(--mono);font-size:32px;font-weight:700;color:'+((pb/12)<=4?'#15803D':(pb/12)<=7?'#D97706':'#DC2626')+'">'+pbYrs+' years</div></div>'
-    +'<div class="og2"><div class="og-tile"><div class="tl">Peak reduction</div><div class="tv">'+reduction.toFixed(0)+' kW</div></div><div class="og-tile"><div class="tl">Monthly savings</div><div class="tv">Rs '+fmtR(monthly)+'</div></div><div class="og-tile"><div class="tl">Annual savings</div><div class="tv">Rs '+fmtR(monthly*12)+'</div></div><div class="og-tile"><div class="tl">Simple ROI/yr</div><div class="tv">'+(capx>0?(monthly*12/capx*100).toFixed(1):'—')+'%</div></div></div>'
-    +'<div class="lbl" style="margin-bottom:5px">Sensitivity table — payback years</div>'
-    +'<div style="font-size:11px;color:var(--muted);margin-bottom:5px">Rows: capex ±20% · Columns: demand charge ±20% · Green ≤4y · Amber 4–7y · Red >7y</div>'
-    +'<table class="sens-table"><thead><tr><th></th><th>Rs '+(rate*0.8).toFixed(0)+'/kVA</th><th>Rs '+rate+'/kVA (base)</th><th>Rs '+(rate*1.2).toFixed(0)+'/kVA</th></tr></thead><tbody>'+rows+'</tbody></table>'
-    +'<button class="formula-btn" style="margin-top:9px" onclick="toggleFml(\'dc-fml\')">▼ Show formula</button>'
-    +'<div class="formula-box" id="dc-fml"><span class="fvb">Peak reduction</span> = min(BESS_kW, facility_peak × 35%)<br><span class="fvb">Monthly savings</span> = peak_reduction × demand_charge_rate<br><span class="fvb">Payback</span> = capex / monthly_savings<br>Note: 35% cut is conservative. Actual depends on your load profile and BESS dispatch.</div>';
-}
-
-function calcSL(){
-  const nc=+(document.getElementById('sl-nc').value),sc=+(document.getElementById('sl-sc').value),ncyc=+(document.getElementById('sl-ncyc').value),scyc=+(document.getElementById('sl-scyc').value),nrte=+(document.getElementById('sl-nrte').value)/100,srte=+(document.getElementById('sl-srte').value)/100,acyc=+(document.getElementById('sl-acyc').value);
-  const ln=nc/(ncyc*nrte),ls=sc/(scyc*srte),disc=(ln-ls)/ln*100,cheaper=ls<ln;
-  const vc=cheaper?'#15803D':'#D97706',vbg=cheaper?'#ECFDF5':'#FFFBEB',vb=cheaper?'#16A34A':'#D97706';
-  document.getElementById('sl-out').innerHTML=
-    '<div class="lbl" style="margin-bottom:10px;color:var(--bess)">Results</div>'
-    +'<div style="margin-bottom:12px;padding:10px 13px;border-radius:7px;background:'+vbg+';border:1px solid '+vb+'"><div style="font-size:13px;font-weight:700;color:'+vc+'">'+(cheaper?'Second-life is cheaper on a levelized basis':'New battery is cheaper on a levelized basis')+'</div><div style="font-size:12px;color:var(--sub);margin-top:3px">Second-life is '+Math.abs(disc).toFixed(1)+'% '+(cheaper?'cheaper':'more expensive')+' per kWh cycled (levelized)</div></div>'
-    +'<div class="og2"><div class="og-tile" style="border-top:3px solid var(--bess)"><div class="tl">New — Rs/kWh cycled</div><div class="tv" style="font-size:20px">Rs '+ln.toFixed(2)+'</div><div style="font-size:10px;color:var(--muted)">'+ncyc.toLocaleString()+' cycles · '+(ncyc/acyc).toFixed(1)+' yrs</div></div><div class="og-tile" style="border-top:3px solid '+(cheaper?'#16A34A':'#DC2626')+'"><div class="tl">Second-life — Rs/kWh cycled</div><div class="tv" style="font-size:20px;color:'+vc+'">Rs '+ls.toFixed(2)+'</div><div style="font-size:10px;color:var(--muted)">'+scyc.toLocaleString()+' cycles · '+(scyc/acyc).toFixed(1)+' yrs</div></div></div>'
-    +'<div style="font-size:11px;color:var(--muted);margin-top:8px;padding:8px 10px;background:var(--s2);border-radius:5px">⚠ Second-life cycle life estimate carries significant uncertainty. A 20% reduction in remaining cycles changes the economics materially. Run this model with a conservative cycle count.</div>'
-    +'<button class="formula-btn" style="margin-top:9px" onclick="toggleFml(\'sl-fml\')">▼ Show formula</button>'
-    +'<div class="formula-box" id="sl-fml"><span class="fvb">Levelized cost</span> = acquisition_cost_Rs_per_kWh / (remaining_cycles × RTE)<br>Unit: Rs per kWh of useful energy delivered over battery lifetime. Normalizes across different cycle lives and efficiencies.</div>';
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// STATE MAP
-// ══════════════════════════════════════════════════════════════════════════════
-const SD={"Andhra Pradesh":{rate:6.20,avail:93,renew:42,ev:1240,discom:"APSPDCL / APEPDCL"},"Arunachal Pradesh":{rate:4.50,avail:78,renew:88,ev:45,discom:"APDCL"},"Assam":{rate:7.00,avail:80,renew:20,ev:180,discom:"APDCL"},"Bihar":{rate:6.50,avail:78,renew:12,ev:320,discom:"NBPDCL / SBPDCL"},"Chhattisgarh":{rate:5.80,avail:87,renew:32,ev:280,discom:"CSPDCL"},"Goa":{rate:4.50,avail:99,renew:22,ev:210,discom:"Goa Electricity Dept"},"Gujarat":{rate:6.20,avail:95,renew:48,ev:2100,discom:"DGVCL / MGVCL / PGVCL"},"Haryana":{rate:6.00,avail:91,renew:30,ev:890,discom:"DHBVN / UHBVN"},"Himachal Pradesh":{rate:4.20,avail:98,renew:85,ev:220,discom:"HPSEBL"},"Jharkhand":{rate:7.50,avail:82,renew:15,ev:190,discom:"JBVNL"},"Karnataka":{rate:6.72,avail:96,renew:62,ev:6096,discom:"BESCOM / HESCOM / MESCOM"},"Kerala":{rate:5.50,avail:97,renew:52,ev:780,discom:"KSEB"},"Madhya Pradesh":{rate:6.80,avail:90,renew:35,ev:650,discom:"MPPKVVCL"},"Maharashtra":{rate:9.10,avail:94,renew:28,ev:3200,discom:"MSEDCL / BEST"},"Manipur":{rate:4.80,avail:72,renew:25,ev:28,discom:"MSPDCL"},"Meghalaya":{rate:5.20,avail:75,renew:68,ev:32,discom:"MePDCL"},"Odisha":{rate:6.00,avail:89,renew:38,ev:420,discom:"TPSODL / TPCODL"},"Punjab":{rate:4.80,avail:93,renew:28,ev:650,discom:"PSPCL"},"Rajasthan":{rate:6.50,avail:88,renew:55,ev:980,discom:"JDVVNL / JVVNL"},"Sikkim":{rate:3.40,avail:99,renew:92,ev:45,discom:"Energy & Power Dept"},"Tamil Nadu":{rate:5.20,avail:91,renew:45,ev:2800,discom:"TANGEDCO"},"Telangana":{rate:6.80,avail:94,renew:38,ev:1100,discom:"TSSPDCL / TSNPDCL"},"Uttar Pradesh":{rate:6.00,avail:85,renew:22,ev:1200,discom:"UPPCL"},"West Bengal":{rate:8.50,avail:92,renew:8,ev:890,discom:"WBSEDCL / CESC"},"Delhi":{rate:4.50,avail:99,renew:12,ev:1850,discom:"BSES / TPDDL"},"Jammu and Kashmir":{rate:3.50,avail:85,renew:75,ev:120,discom:"JKPDCL"}};
-const MC={tariff:{k:'rate',lo:3.4,hi:9.1,cL:'#15803D',cH:'#B91C1C',fmt:v=>'Rs '+v.toFixed(2)},avail:{k:'avail',lo:70,hi:99,cL:'#B91C1C',cH:'#15803D',fmt:v=>v+'%'},renew:{k:'renew',lo:8,hi:92,cL:'#64748B',cH:'#15803D',fmt:v=>v+'%'},ev:{k:'ev',lo:18,hi:6096,cL:'#CBD5E1',cH:'#2563EB',fmt:v=>v>=1000?(v/1000).toFixed(1)+'k':String(v)}};
-let curSM='tariff';
-function mC(v,cfg){const t=Math.max(0,Math.min(1,(v-cfg.lo)/(cfg.hi-cfg.lo)));function hx(s){return[parseInt(s.slice(1,3),16),parseInt(s.slice(3,5),16),parseInt(s.slice(5,7),16)];}const[r1,g1,b1]=hx(cfg.cL),[r2,g2,b2]=hx(cfg.cH);return'rgb('+~~(r1+(r2-r1)*t)+','+~~(g1+(g2-g1)*t)+','+~~(b1+(b2-b1)*t)+')';}
-function setSM(m){curSM=m;document.querySelectorAll('.tgl').forEach(b=>b.classList.remove('active'));const btn=document.getElementById('sbtn-'+m);if(btn)btn.classList.add('active');renderStateGrid();}
-function renderStateGrid(){const grid=document.getElementById('state-grid');if(!grid)return;const cfg=MC[curSM];const entries=Object.entries(SD).sort((a,b)=>cfg.k==='rate'?a[1][cfg.k]-b[1][cfg.k]:b[1][cfg.k]-a[1][cfg.k]);grid.innerHTML=entries.map(function([n,d]){const v=d[cfg.k],c=mC(v,cfg),pct=Math.max(3,Math.min(100,(v-cfg.lo)/(cfg.hi-cfg.lo)*100)),isKA=n==='Karnataka';return'<div class="sc" style="border-left-color:'+c+';border-color:'+(isKA?'var(--mfg)':'var(--border)')+';" onclick="showSD(\''+n.replace(/'/g,"\\'")+'\')"><div class="sn2" style="color:'+(isKA?'var(--mfg)':'var(--text)')+'">'+n+'</div><div class="sv" style="color:'+c+'">'+cfg.fmt(v)+'</div><div style="height:3px;background:var(--s3);border-radius:2px;margin:3px 0;overflow:hidden"><div style="height:100%;width:'+pct.toFixed(0)+'%;background:'+c+'"></div></div><div class="smini"><span>Rs'+d.rate.toFixed(2)+'</span><span>RE'+d.renew+'%</span></div></div>';}).join('');}
-function showSD(name){const d=SD[name];if(!d)return;const all=Object.values(SD),avgR=(all.reduce((s,x)=>s+x.rate,0)/all.length).toFixed(2),avgA=Math.round(all.reduce((s,x)=>s+x.avail,0)/all.length),avgRE=Math.round(all.reduce((s,x)=>s+x.renew,0)/all.length),evRk=Object.entries(SD).sort((a,b)=>b[1].ev-a[1].ev).findIndex(([n])=>n===name)+1;document.getElementById('state-detail').innerHTML='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">'+name+'</div><div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:10px">'+d.discom+'</div><div style="font-size:11px;color:var(--muted);line-height:1.85">Tariff: <strong style="color:var(--text)">Rs '+d.rate.toFixed(2)+'/unit</strong> (avg Rs '+avgR+')<br>Grid availability: <strong>'+d.avail+'%</strong> (avg '+avgA+'%)<br>Renewables: <strong>'+d.renew+'%</strong> (rank #'+Object.entries(SD).sort((a,b)=>b[1].renew-a[1].renew).findIndex(([n])=>n===name)+1+')<br>EV stations: <strong>'+d.ev.toLocaleString()+'</strong> (rank #'+evRk+')<br>30 kWh charge: <strong>Rs '+(d.rate*30).toFixed(0)+'</strong> · Rs '+(d.rate*30/250).toFixed(1)+'/km</div>';}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// POLICY SCHEMES
-// ══════════════════════════════════════════════════════════════════════════════
-async function loadPolicySchemes(){
-  const el=document.getElementById('policy-schemes');
-  if(!el||el.dataset.loaded)return;
-  try{
-    const r=await fetch('/api/bess-schemes');if(!r.ok)throw new Error();
-    const d=await r.json();
-    el.innerHTML=(d.schemes||[]).slice(0,4).map(function(s){return'<div class="sc-card"><div class="sc-head"><div class="sc-name">'+s.name+'</div><span class="bdg bdg-warn">'+s.ministry+'</span></div><div class="sc-body"><strong>Benefit:</strong> '+s.benefit+'<br><strong>Min size:</strong> '+s.min_size_mwh+' MWh · <strong>Deadline:</strong> '+s.deadline+'</div><div style="display:flex;justify-content:space-between;margin-top:7px"><div style="font-size:10px;font-family:var(--mono);color:var(--muted)">'+s.source.slice(0,38)+'</div><a href="'+s.source_url+'" target="_blank" class="src">Source</a></div></div>';}).join('');
-    el.dataset.loaded='1';
-  }catch(e){el.innerHTML='<div style="font-size:12px;color:var(--muted)">Could not load schemes.</div>';}
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// WEEKLY DIGEST
-// ══════════════════════════════════════════════════════════════════════════════
-async function loadDigest(){
-  try{
-    const r=await fetch('/api/weekly-digest');if(!r.ok)throw new Error();
-    const d=await r.json();
-    const ts=document.getElementById('dig-ts');
-    if(ts) ts.textContent=d.last_updated?'Updated: '+new Date(d.last_updated).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Not yet run';
-    const cel=document.getElementById('dig-content');if(!cel)return;
-    if(!d.articles||!d.articles.length){cel.innerHTML='<div style="font-size:12px;color:var(--muted)">'+(d.error?'Feed error: '+d.error:'Digest runs every Sunday at 06:00 UTC.')+'</div>';return;}
-    const isLive=d.source==='pib_rss_live';
-    cel.innerHTML='<div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px">'
-      +'<span class="dig-source-tag '+(isLive?'':'fallback')+'">'+(isLive?'PIB LIVE':'CURATED')+'</span>'
-      +(isLive?'Source: PIB official RSS (MHI · MNRE · MoP) · Auto-refreshed every Sunday 06:00 UTC':'Curated verified policy list — shown when live PIB RSS is unavailable. Each item is verified and sourced.')
-      +'</div>'
-      +d.articles.map(function(a){
-        return '<div class="dig-item">'
-          +'<div class="dig-cat '+(a.category==='bess'?'dig-bess':'dig-ev')+'">'+a.category.toUpperCase()+'</div>'
-          +'<div style="flex:1"><a href="'+a.link+'" target="_blank" style="text-decoration:none;color:inherit"><div class="dig-title">'+a.title+'</div></a>'
-          +'<div class="dig-meta">'+(a.ministry||'')+(a.date?' · '+a.date:'')+'</div>'
-          +(a.source_note?'<div class="dig-snote">'+a.source_note+'</div>':'')
-          +'</div></div>';
-      }).join('');
-  }catch(e){console.warn('Digest:',e);}
-}
-
-async function triggerDigest(){
-  const btn=event.target;btn.textContent='Refreshing…';btn.disabled=true;
-  try{
-    await fetch('/api/trigger-digest',{method:'POST'});
-    await loadDigest();
-  }finally{btn.textContent='↻ Refresh now';btn.disabled=false;}
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// GRID MONITOR
-// ══════════════════════════════════════════════════════════════════════════════
-let oscId=null,oscPh=0,liveHz=50.0;
-function fCol(hz){return hz>=49.9&&hz<=50.1?'var(--ev)':hz>=49.7&&hz<=50.3?'var(--mfg)':'var(--red)';}
-function fSt(hz){if(hz>=49.9&&hz<=50.1)return'\u25cf Healthy';if(hz>=49.7&&hz<49.9)return'\u25b2 Under-frequency';if(hz>50.1&&hz<=50.3)return'\u25b2 Over-frequency';return hz<49.7?'\u26a0 Under-frequency':'\u26a0 Over-frequency';}
-function startOsc(){const c=document.getElementById('oscCanvas');function draw(){const W=c.offsetWidth,H=c.offsetHeight;c.width=W;c.height=H;if(!W||!H){oscId=requestAnimationFrame(draw);return;}const ctx=c.getContext('2d');ctx.fillStyle='#F0F9FF';ctx.fillRect(0,0,W,H);ctx.strokeStyle='rgba(0,0,0,.04)';ctx.lineWidth=.5;for(let x=0;x<W;x+=W/10){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}ctx.strokeStyle='rgba(0,0,0,.1)';ctx.setLineDash([3,5]);ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();ctx.setLineDash([]);const wc=liveHz>=49.9&&liveHz<=50.1?'#0D9488':liveHz>=49.7&&liveHz<=50.3?'#D97706':'#DC2626';ctx.strokeStyle=wc;ctx.lineWidth=2;const amp=H*.3;ctx.beginPath();for(let px=0;px<=W;px++){const t=px/W,y=H/2-Math.sin(t*Math.PI*7+oscPh)*amp-Math.sin(t*Math.PI*2.1+oscPh*.4)*amp*.07;px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);}ctx.stroke();ctx.fillStyle=wc;ctx.font='500 10px "IBM Plex Mono",monospace';ctx.fillText(liveHz.toFixed(2)+' Hz',9,13);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillText('50.00 Hz',W-68,H/2-4);oscPh-=.05;oscId=requestAnimationFrame(draw);}if(oscId)cancelAnimationFrame(oscId);draw();}
-let gridInited=false;
-async function initGrid(){if(!gridInited){startOsc();gridInited=true;}try{const r=await fetch('/api/grid-data');if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json(),gen=d.generation,dem=d.demand;liveHz=gen.frequency_hz||dem.frequency_hz||50.0;const fc=fCol(liveHz),el=id=>document.getElementById(id);el('g-hz').textContent=liveHz.toFixed(2);el('g-hz').style.color=fc;el('g-hz-st').textContent=fSt(liveHz);el('g-hz-st').style.color=fc;el('g-gen').textContent=(gen.total_generation_mw||0).toLocaleString();el('g-gen-sub').textContent='Own '+(gen.own_gen_mw||0).toLocaleString()+' + CGS '+(gen.cgs_mw||0).toLocaleString();const b=dem.bescom||{},ui=b.ui_mw||0;el('g-bl').textContent=(b.actual_mw||0).toLocaleString();el('g-ui').textContent=(ui>=0?'+':'')+ui+' MW UI';el('g-ui').style.color=ui>0?'var(--amber)':'var(--green)';const bn=(d.ncep.escom_ncep||[]).find(e=>e.escom==='BESCOM')||{};el('g-ncep').textContent=(bn.total_mw||0).toLocaleString();el('g-ncep-sub').textContent='Solar '+(bn.solar_mw||0)+' + Wind '+(bn.wind_mw||0)+' MW';const ts=gen.timestamp||dem.timestamp||'—';document.getElementById('grid-stale').innerHTML='<div class="stale-dot" style="background:var(--green)"></div>Live · <a href="https://kptclsldc.in" target="_blank">kptclsldc.in</a> · '+ts;const loads=dem.escom_loads||[],ECOL={BESCOM:'var(--mfg)',MESCOM:'var(--bess)',CESC:'var(--ev)',GESCOM:'#7C3AED',HESCOM:'#DB2777'};document.getElementById('escom-tbody').innerHTML=loads.map(function(e){const u=e.ui_mw||0,dir=u>50?'\u2191 Over-drawn':u<-50?'\u2193 Under-drawn':'\u2248 Balanced';return'<tr><td style="font-weight:700;color:'+(ECOL[e.escom]||'var(--text)')+'">'+e.escom+'</td><td>'+(e.schedule_mw||0).toLocaleString()+'</td><td>'+(e.actual_mw||0).toLocaleString()+'</td><td style="color:'+(u>=0?'#D97706':'#16A34A')+';font-weight:600">'+(u>=0?'+':'')+u+'</td><td style="font-size:11px;color:'+(u>50?'#D97706':u<-50?'#16A34A':'var(--muted)')+'">'+dir+'</td></tr>';}).join('');}catch(e){document.getElementById('grid-stale').innerHTML='<div class="stale-dot" style="background:var(--red)"></div>Grid data unavailable — <a href="https://kptclsldc.in/bescom.aspx" target="_blank">View on KPTCL SLDC</a>';}}
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// MAP — Leaflet India opportunity map
-// ══════════════════════════════════════════════════════════════════════════════
-let leafMap = null;
-let mapMarkers = [];
-let curView = 'map';
-let selectedOppId = null;
-
-function setView(v){
+function setView(v) {
   curView = v;
-  document.getElementById('explore-map-view').style.display  = v==='map'  ? 'grid'  : 'none';
-  document.getElementById('explore-list-view').style.display = v==='list' ? 'block' : 'none';
-  document.getElementById('vt-map').classList.toggle('active',  v==='map');
-  document.getElementById('vt-list').classList.toggle('active', v==='list');
-  if(v==='map' && leafMap){ setTimeout(function(){ leafMap.invalidateSize(); }, 50); }
-  if(v==='list'){ renderExplorer(); }
+  var mapEl  = document.getElementById('map-view');
+  var listEl = document.getElementById('list-view');
+  var mb = document.getElementById('vt-map');
+  var lb = document.getElementById('vt-list');
+  if (mapEl)  mapEl.style.display  = v === 'map'  ? 'grid'  : 'none';
+  if (listEl) listEl.style.display = v === 'list' ? 'block' : 'none';
+  if (mb) mb.classList.toggle('active', v === 'map');
+  if (lb) lb.classList.toggle('active', v === 'list');
+  if (v === 'map') {
+    setTimeout(function() {
+      if (leafMap) leafMap.invalidateSize();
+      applyFilters();
+    }, 80);
+  } else {
+    applyFilters();
+  }
 }
 
-function initMap(){
-  if(leafMap) return;
-  if(typeof L === 'undefined'){
-    console.warn('Leaflet not loaded — map unavailable, using list view');
+// ══ CARD RENDERING ══
+function scoreClass(score, max) {
+  var p = score / max;
+  return p >= 0.66 ? 'sp-hi' : p >= 0.40 ? 'sp-md' : 'sp-lo';
+}
+
+function covHtml(o) {
+  return '<span class="cov cov-' + o.coverage + '" data-note="' + o.coverage_note + '">' +
+         '<span class="cd"></span>' + o.coverage_label + '</span>';
+}
+
+function sigBar(pct, color, label, extra) {
+  return '<div class="sig-row">' +
+    '<span class="sig-lbl" style="font-family:var(--mono);font-size:10px;color:var(--muted);width:88px;flex-shrink:0">' + label + '</span>' +
+    '<div class="sig-bar"><div class="sig-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+    '<span class="sig-val" style="color:' + color + '">' + extra + '</span>' +
+    '</div>';
+}
+
+function renderCards(opps, biz) {
+  var grid = document.getElementById('opp-grid');
+  if (!grid) return;
+  if (!opps.length) {
+    grid.innerHTML = '<div class="empty-state"><h3>No opportunities match</h3><p>Try broadening filters or click Clear.</p></div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < opps.length; i++) {
+    var o  = opps[i];
+    var bd = o[biz] || {};
+    var score = bd.score || 0;
+    var maxS  = biz === 'ev' ? 6 : 4;
+    var sc    = scoreClass(score, maxS);
+    var h     = bd.headroom || 'medium';
+    var hc    = h === 'high' ? '#15803D' : h === 'medium' ? '#D97706' : '#DC2626';
+    var hp    = h === 'high' ? 82 : h === 'medium' ? 52 : 22;
+    var den   = bd.competition || '';
+    var dc    = den === 'underserved' ? '#15803D' : den === 'moderate' ? '#D97706' : '#DC2626';
+    var dp    = den === 'underserved' ? 18 : den === 'moderate' ? 52 : 88;
+    var tc    = 't' + (o.tier || 2);
+    var tl    = o.tier === 1 ? 'Tier 1' : o.tier === 2 ? 'Tier 2' : 'Tier 3';
+    var st    = o.city === 'Bengaluru' ? (bd.stations || 0) + ' stations/2km' : (bd.stations || 0) + ' stations city';
+    var eb    = biz === 'bess' ? 'bess' : '';
+
+    html += '<div class="opp-card">';
+    html += '<div class="oc-top"><div>';
+    html += '<div class="oc-loc">' + o.location + '</div>';
+    html += '<div class="oc-sub">' + o.state + ' &middot; ' + o.discom + '</div>';
+    html += '<div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px">' + st + '</div>';
+    html += '</div><div class="' + sc + ' sp">' + score + '</div></div>';
+    html += '<div class="oc-bdgs"><span class="tt ' + tc + '">' + tl + '</span>' + covHtml(o) + '</div>';
+    html += sigBar(hp, hc, 'Grid headroom', h.toUpperCase() + ' (' + bd.loading_pct + '%)');
+    if (biz === 'ev' && den) {
+      html += sigBar(dp, dc, 'Competition', den.toUpperCase());
+    }
+    html += '<div class="one-liner">' + (bd.one_liner || '') + '</div>';
+    html += '<button class="eval-btn ' + eb + '" onclick="evalEcon(\'' + o.id + '\',\'' + (biz==='bess'?'dbess':'ev') + '\')">';
+    html += 'Evaluate the economics &rarr;</button>';
+    html += '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function evalEcon(id, calcTab) {
+  prefillOpp = null;
+  for (var i = 0; i < allOpps.length; i++) {
+    if (allOpps[i].id === id) { prefillOpp = allOpps[i]; break; }
+  }
+  goto('calc');
+  showCtab(calcTab, document.querySelectorAll('.ctab')[calcTab === 'dbess' ? 1 : 0]);
+  var banner = document.getElementById('pf-banner');
+  if (banner && prefillOpp) {
+    banner.style.display = 'flex';
+    var loc = document.getElementById('pf-loc');
+    var cov = document.getElementById('pf-cov');
+    if (loc) loc.textContent = prefillOpp.location + ', ' + prefillOpp.city + ', ' + prefillOpp.state;
+    if (cov) cov.innerHTML = covHtml(prefillOpp);
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function clearPrefill() {
+  prefillOpp = null;
+  var banner = document.getElementById('pf-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+// ══ ASYNC INIT ══
+async function initExplorer() {
+  try {
+    var resp = await fetch('/api/opportunities');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var d = await resp.json();
+    allOpps = d.opportunities || [];
+
+    var sfEl = document.getElementById('f-state');
+    if (sfEl && d.all_states) {
+      d.all_states.forEach(function(s) {
+        var opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        sfEl.appendChild(opt);
+      });
+    }
+
+    var fc = document.getElementById('fcount');
+    if (fc) fc.textContent = allOpps.length + ' opportunities';
+
+    // Pre-render list view cards
+    renderCards(allOpps, 'ev');
+  } catch(e) {
+    console.error('initExplorer:', e);
+    var fc = document.getElementById('fcount');
+    if (fc) fc.textContent = 'Error loading data';
+  }
+}
+
+// ══ MAP (Leaflet) — only called when explore tab is visible ══
+function initMapSafe() {
+  if (typeof L === 'undefined') {
+    console.warn('Leaflet not loaded, using list view');
     setView('list');
     return;
   }
-  try{
-  leafMap = L.map('india-map', {
-    center: [20.5937, 78.9629],
-    zoom: 5,
-    zoomControl: true,
-    attributionControl: true,
-  });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 13,
-  }).addTo(leafMap);
-  }catch(mapErr){
-    console.warn('Leaflet map init failed:', mapErr);
-    leafMap = null;
-    setView('list');
-  }
-}
-
-function mrkColor(score, maxScore){
-  const p = score / maxScore;
-  if(p >= 0.66) return '#16A34A';
-  if(p >= 0.40) return '#D97706';
-  return '#DC2626';
-}
-
-function renderMapMarkers(){
-  if(!leafMap || typeof L === 'undefined') return;
-  const biz = fState.biz || 'ev';
-  // Clear existing markers
-  mapMarkers.forEach(function(m){ leafMap.removeLayer(m); });
-  mapMarkers = [];
-
-  const filtered = allOpps.filter(function(o){
-    if(fState.state && o.state !== fState.state) return false;
-    if(fState.tier && o.tier != fState.tier) return false;
-    if(fState.coverage && o.coverage !== fState.coverage) return false;
-    if(fState.headroom && o[biz]?.headroom !== fState.headroom) return false;
-    return true;
-  });
-
-  document.getElementById('fcount').textContent = filtered.length + ' opportunities';
-
-  filtered.forEach(function(o){
-    if(!o.lat || !o.lng) return;
-    const bd = o[biz] || {};
-    const score = bd.score || 0;
-    const maxS = biz === 'ev' ? 6 : 4;
-    const col = mrkColor(score, maxS);
-    const isLive = o.coverage === 'live';
-    const r = o.tier === 1 ? 9 : 7;
-
-    const m = L.circleMarker([o.lat, o.lng], {
-      radius: r,
-      fillColor: col,
-      color: '#ffffff',
-      weight: isLive ? 2.5 : 1.5,
-      opacity: 1,
-      fillOpacity: 0.88,
-    });
-
-    // Tooltip (hover)
-    m.bindTooltip(
-      '<div style="font-family:var(--sans);padding:2px 0">'
-      + '<div style="font-weight:700;font-size:12px">' + o.location + '</div>'
-      + '<div style="font-size:10px;color:#64748B">' + o.state + ' · ' + (o[biz]?.headroom||'').toUpperCase() + ' headroom</div>'
-      + '<div style="font-size:10px;margin-top:2px">Score: <strong>' + score + '/' + maxS + '</strong>'
-      + (isLive ? ' · <span style="color:#16A34A;font-weight:700">⬤ LIVE</span>' : '') + '</div>'
-      + '</div>',
-      { direction: 'top', offset: [0, -r-4], className: 'leaflet-tooltip-custom' }
-    );
-
-    m.on('click', function(){ showMapDetail(o, biz); selectedOppId = o.id; });
-    m.addTo(leafMap);
-    mapMarkers.push(m);
-
-    // Pulsing ring for live data
-    if(isLive){
-      const pulse = L.circleMarker([o.lat, o.lng], {
-        radius: r + 4,
-        fillColor: 'transparent',
-        color: col,
-        weight: 1,
-        opacity: 0.4,
-        fillOpacity: 0,
-        className: 'live-ring'
-      });
-      pulse.addTo(leafMap);
-      mapMarkers.push(pulse);
+  if (!leafMap) {
+    try {
+      leafMap = L.map('india-map', { center: [20.5937, 78.9629], zoom: 5, zoomControl: true });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '\\u00a9 <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 13
+      }).addTo(leafMap);
+    } catch(e) {
+      console.warn('Map init failed:', e);
+      leafMap = null;
+      setView('list');
+      return;
     }
+  }
+  try { leafMap.invalidateSize(); } catch(e) {}
+  applyFilters();
+}
+
+function mColor(score, max) {
+  var p = score / max;
+  return p >= 0.66 ? '#16A34A' : p >= 0.40 ? '#D97706' : '#DC2626';
+}
+
+function renderMapMarkers(opps, biz) {
+  if (!leafMap || typeof L === 'undefined') return;
+  for (var i = 0; i < mapMarkers.length; i++) {
+    try { leafMap.removeLayer(mapMarkers[i]); } catch(e) {}
+  }
+  mapMarkers = [];
+  if (!opps) { opps = allOpps; biz = biz || 'ev'; }
+
+  for (var i = 0; i < opps.length; i++) {
+    var o  = opps[i];
+    var bd = o[biz] || {};
+    if (!o.lat || !o.lng) continue;
+    var col    = mColor(bd.score || 0, biz === 'ev' ? 6 : 4);
+    var isLive = o.coverage === 'live';
+    var oId    = o.id;
+    var oTitle = o.location + ', ' + o.state;
+    var oScore = (bd.score || 0) + '/' + (biz === 'ev' ? 6 : 4);
+    var oH     = (bd.headroom || '').toUpperCase();
+    var liveStr = isLive ? ' \\u00b7 <span style="color:#15803D;font-weight:700">\\u25cf LIVE</span>' : '';
+
+    (function(op, col, isLive) {
+      var m = L.circleMarker([op.lat, op.lng], {
+        radius: op.tier === 1 ? 9 : 7,
+        fillColor: col, color: '#fff',
+        weight: isLive ? 2.5 : 1.5,
+        opacity: 1, fillOpacity: 0.88
+      });
+      m.bindTooltip(
+        '<div style="font-family:sans-serif;padding:2px 0">' +
+        '<div style="font-weight:700;font-size:12px">' + op.location + '</div>' +
+        '<div style="font-size:10px;color:#64748B">' + op.state + ' \\u00b7 ' + ((op[biz]||{}).headroom||'').toUpperCase() + '</div>' +
+        '<div style="font-size:10px;margin-top:2px">Score: <strong>' + ((op[biz]||{}).score||0) + '</strong>' + liveStr + '</div>' +
+        '</div>',
+        { direction: 'top', offset: [0, -12] }
+      );
+      m.on('click', function() { showMarkerDetail(op, biz); });
+      m.addTo(leafMap);
+      mapMarkers.push(m);
+
+      if (isLive) {
+        var pulse = L.circleMarker([op.lat, op.lng], {
+          radius: 14, fillColor: 'transparent', color: col, weight: 1, opacity: 0.35, fillOpacity: 0
+        });
+        pulse.addTo(leafMap);
+        mapMarkers.push(pulse);
+      }
+    })(o, col, isLive);
+  }
+}
+
+function showMarkerDetail(o, biz) {
+  var bd  = o[biz] || {};
+  var col = mColor(bd.score || 0, biz === 'ev' ? 6 : 4);
+  var maxS = biz === 'ev' ? 6 : 4;
+  var h    = bd.headroom || 'medium';
+  var hc   = h === 'high' ? '#15803D' : h === 'medium' ? '#D97706' : '#DC2626';
+  var hp   = h === 'high' ? 82 : h === 'medium' ? 52 : 22;
+  var den  = bd.competition || '';
+  var dc   = den === 'underserved' ? '#15803D' : den === 'moderate' ? '#D97706' : '#DC2626';
+  var dp   = den === 'underserved' ? 18 : den === 'moderate' ? 52 : 88;
+  var evalTab = biz === 'bess' ? 'dbess' : 'ev';
+  var score = bd.score || 0;
+  var scoreClass2 = score/maxS >= 0.66 ? '#DCFCE7' : score/maxS >= 0.4 ? '#FEF3C7' : '#FEE2E2';
+
+  var html = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">';
+  html += '<div><div style="font-family:var(--head);font-size:18px;font-weight:700;color:var(--text)">' + o.location + '</div>';
+  html += '<div style="font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:2px">' + o.state + ' \\u00b7 ' + o.discom + '</div></div>';
+  html += '<div style="width:44px;height:44px;border-radius:50%;background:' + scoreClass2 + ';display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0">';
+  html += '<div style="font-family:var(--mono);font-size:16px;font-weight:700;color:' + col + '">' + score + '</div>';
+  html += '<div style="font-size:9px;color:var(--muted)">/ ' + maxS + '</div></div></div>';
+
+  html += '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">';
+  html += '<span class="tt t' + (o.tier||2) + '">Tier ' + (o.tier||2) + '</span>';
+  html += covHtml(o);
+  if (o.coverage === 'live') html += '<span style="font-size:9px;font-weight:700;font-family:var(--mono);padding:2px 7px;background:#DCFCE7;color:#15803D;border-radius:3px">\\u25cf LIVE</span>';
+  html += '</div>';
+
+  html += '<div style="margin-bottom:10px">' + sigBar(hp, hc, 'Grid headroom', h.toUpperCase() + ' (' + bd.loading_pct + '%)');
+  if (biz === 'ev' && den) html += sigBar(dp, dc, 'Competition', den.toUpperCase());
+  html += '</div>';
+
+  html += '<div class="one-liner" style="margin-bottom:14px">' + (bd.one_liner || '') + '</div>';
+  html += '<button class="eval-btn ' + (biz==='bess'?'bess':'') + '" onclick="evalEcon(\'' + o.id + '\',\'' + evalTab + '\')">';
+  html += 'Evaluate the economics \\u2192</button>';
+
+  // Zones
+  if (o.zones && o.zones.length) {
+    html += '<div style="margin-top:14px"><div class="lbl" style="margin-bottom:8px">Key zones in ' + o.city + '</div>';
+    for (var i = 0; i < Math.min(o.zones.length, 3); i++) {
+      var z = o.zones[i];
+      var zc = z.opportunity_score >= 9 ? '#15803D' : z.opportunity_score >= 7 ? '#D97706' : '#64748B';
+      html += '<div style="background:var(--s2);border-radius:6px;border-left:3px solid ' + zc + ';padding:9px 11px;margin-bottom:6px">';
+      html += '<div style="display:flex;justify-content:space-between">';
+      html += '<div style="font-size:12px;font-weight:700;color:var(--text)">' + z.zone + '</div>';
+      html += '<div style="font-family:var(--mono);font-size:14px;font-weight:700;color:' + zc + '">' + z.opportunity_score + '/10</div></div>';
+      html += '<div style="font-size:11px;color:var(--muted)">' + z.reason + '</div></div>';
+    }
+    html += '</div>';
+  }
+
+  html += '<div style="margin-top:12px;font-size:10px;font-family:var(--mono);color:var(--dim);padding:8px 10px;background:var(--s2);border-radius:5px;line-height:1.6">' + o.coverage_note + '</div>';
+
+  var panel = document.getElementById('map-panel-content');
+  if (panel) panel.innerHTML = html;
+  if (leafMap) {
+    try { leafMap.setView([o.lat, o.lng], Math.max(leafMap.getZoom(), 9), { animate: true }); } catch(e) {}
+  }
+}
+
+// ══ CALCULATORS ══
+var EVC = {
+  'ccs2-50':  { kw:50,  cap:12,  tariff:6.00, label:'DC CCS2 50kW — LT-6(c)' },
+  'ccs2-120': { kw:120, cap:22,  tariff:6.00, label:'DC CCS2 120kW — LT-6(c)' },
+  'ccs2-240': { kw:240, cap:45,  tariff:5.80, label:'DC CCS2 240kW — HT-2(f)' },
+  'gbt-60':   { kw:60,  cap:14,  tariff:6.00, label:'DC GB/T 60kW — LT-6(c)' },
+  'ac-7':     { kw:7.2, cap:2.5, tariff:5.50, label:'AC 7.2kW — LT-6(a)' },
+  'ac-22':    { kw:22,  cap:5.0, tariff:6.50, label:'AC 22kW — LT-6(b)' },
+  'custom':   { kw:60,  cap:15,  tariff:6.00, label:'Custom / Proprietary' }
+};
+
+function onConn() {
+  var sel = document.getElementById('ev-conn').value;
+  document.getElementById('ev-cust').style.display = sel === 'custom' ? 'block' : 'none';
+  var cfg = EVC[sel] || EVC['ccs2-50'];
+  if (sel === 'custom') {
+    var kw = parseFloat(document.getElementById('ev-ckw').value) || 60;
+    var t  = parseFloat(document.getElementById('ev-ctariff').value) || 6.0;
+    cfg = { kw: kw, cap: 15, tariff: t, label: 'Custom' };
+    EVC['custom'] = cfg;
+  }
+  document.getElementById('ev-tariff').value = cfg.tariff.toFixed(2);
+  document.getElementById('ev-tariff-src').textContent = cfg.label;
+}
+
+function fmtRs(n) {
+  if (n >= 1e5) return 'Rs ' + (n/1e5).toFixed(1) + 'L';
+  if (n >= 1e3) return 'Rs ' + (n/1e3).toFixed(1) + 'k';
+  return 'Rs ' + Math.round(n);
+}
+
+function calcEV() {
+  var sel = document.getElementById('ev-conn').value;
+  var cfg = EVC[sel] || EVC['ccs2-50'];
+  if (sel === 'custom') {
+    cfg = { kw: parseFloat(document.getElementById('ev-ckw').value)||60, cap: parseFloat(document.getElementById('ev-ccap').value)||15, tariff: parseFloat(document.getElementById('ev-ctariff').value)||6.0, label:'Custom' };
+    EVC['custom'] = cfg;
+  }
+  var pts    = parseFloat(document.getElementById('ev-pts').value)    || 4;
+  var hrs    = parseFloat(document.getElementById('ev-hrs').value)    || 18;
+  var util   = parseFloat(document.getElementById('ev-util').value)   / 100 || 0.25;
+  var lease  = parseFloat(document.getElementById('ev-lease').value)  || 60000;
+  var retail = parseFloat(document.getElementById('ev-retail').value) || 18;
+  var tariff = parseFloat(document.getElementById('ev-tariff').value) || 6.0;
+  var opex   = parseFloat(document.getElementById('ev-opex').value)   || 25000;
+  var capex  = (cfg.cap + 5) * pts * 1e5;
+  var rev    = pts * hrs * util * cfg.kw * retail * 30;
+  var ecost  = pts * hrs * util * cfg.kw * tariff * 30;
+  var maint  = capex * 0.02 / 12;
+  var net    = rev - ecost - lease - opex - maint;
+  var pb     = net > 0 ? capex / net : Infinity;
+  var be     = (lease + opex + maint) / ((retail - tariff) * cfg.kw * hrs * pts * 30) * 100;
+  var pbTxt  = isFinite(pb) ? Math.round(pb) + ' months (' + (Math.round(pb)/12).toFixed(1) + ' yrs)' : 'Not profitable at these inputs';
+  var pbC    = !isFinite(pb)||pb>60 ? '#DC2626' : pb>36 ? '#D97706' : '#15803D';
+  var netC   = net >= 0 ? '#15803D' : '#DC2626';
+  var h = '<div class="lbl" style="margin-bottom:10px;color:var(--ev)">Results</div>';
+  h += '<div style="margin-bottom:14px"><div class="lbl" style="margin-bottom:4px">Payback period</div>';
+  h += '<div style="font-family:var(--mono);font-size:30px;font-weight:700;color:' + pbC + '">' + pbTxt + '</div></div>';
+  h += '<div class="og">';
+  h += '<div class="og-t"><div class="tl">Est. capex</div><div class="tv">Rs ' + (capex/1e5).toFixed(1) + 'L</div></div>';
+  h += '<div class="og-t"><div class="tl">Monthly revenue</div><div class="tv">' + fmtRs(rev) + '</div></div>';
+  h += '<div class="og-t"><div class="tl">Monthly energy cost</div><div class="tv">' + fmtRs(ecost) + '</div></div>';
+  h += '<div class="og-t"><div class="tl">Monthly net</div><div class="tv" style="color:' + netC + '">' + (net>=0?'':'-') + fmtRs(Math.abs(net)) + '</div></div></div>';
+  h += '<div class="lbl" style="margin-bottom:6px">Breakeven utilisation: ' + be.toFixed(1) + '%</div>';
+  h += '<div class="br"><span class="br-l">Your target</span><div class="br-t"><div class="br-f" style="width:' + (util*100) + '%;background:' + (util*100>=be?'#16A34A':'#DC2626') + '"></div></div><span class="br-v">' + (util*100).toFixed(0) + '%</span></div>';
+  h += '<div class="br"><span class="br-l">Breakeven</span><div class="br-t"><div class="br-f" style="width:' + Math.min(100,be).toFixed(0) + '%;background:#D97706"></div></div><span class="br-v">' + be.toFixed(1) + '%</span></div>';
+  h += '<button class="fml-btn" style="margin-top:9px" onclick="toggleFml(\'ev-fml\')">\\u25bc Show formula</button>';
+  h += '<div class="fml-box" id="ev-fml"><span class="fv">Revenue</span> = pts \\u00d7 hrs \\u00d7 util \\u00d7 kW \\u00d7 retail \\u00d7 30<br>';
+  h += '<span class="fv">Net</span> = rev \\u2212 energy_cost \\u2212 lease \\u2212 opex \\u2212 (capex\\u00d72%/12)<br>';
+  h += '<span class="fv">Payback</span> = capex / monthly_net<br>';
+  h += '<span class="fv">Breakeven util</span> = (lease+opex) / ((retail\\u2212tariff)\\u00d7kW\\u00d7hrs\\u00d7pts\\u00d730) \\u00d7 100</div>';
+  document.getElementById('ev-out').innerHTML = h;
+}
+
+function calcBESS() {
+  var peak  = parseFloat(document.getElementById('dc-peak').value)  || 500;
+  var rate  = parseFloat(document.getElementById('dc-rate').value)  || 120;
+  var bkw   = parseFloat(document.getElementById('dc-bkw').value)   || 150;
+  var capx  = parseFloat(document.getElementById('dc-capex').value) * 1e7 || 2.5e6;
+  var red   = Math.min(bkw, peak * 0.35);
+  var mSav  = red * rate;
+  var pb    = mSav > 0 ? capx / mSav : Infinity;
+  var pbY   = isFinite(pb) ? (pb/12).toFixed(1) : '\\u221e';
+  var pbC   = (pb/12) <= 4 ? '#15803D' : (pb/12) <= 7 ? '#D97706' : '#DC2626';
+  var rates = [rate*0.8, rate, rate*1.2];
+  var capxS = [capx*0.8, capx, capx*1.2];
+  var rows = '';
+  for (var r = 0; r < capxS.length; r++) {
+    rows += '<tr><td class="rh">Rs ' + (capxS[r]/1e7).toFixed(2) + ' Cr</td>';
+    for (var c = 0; c < rates.length; c++) {
+      var ps = red*rates[c] > 0 ? capxS[r]/(red*rates[c])/12 : 999;
+      var cls = ps <= 4 ? 'sg' : ps <= 7 ? 'sa' : 'sr';
+      rows += '<td class="' + cls + '">' + ps.toFixed(1) + 'y</td>';
+    }
+    rows += '</tr>';
+  }
+  var fmtC = function(n) { return n>=1e7?(n/1e7).toFixed(2)+' Cr':n>=1e5?(n/1e5).toFixed(1)+'L':(n/1e3).toFixed(1)+'k'; };
+  var h = '<div class="lbl" style="margin-bottom:10px;color:var(--bess)">Results</div>';
+  h += '<div style="margin-bottom:14px"><div class="lbl" style="margin-bottom:4px">Payback</div>';
+  h += '<div style="font-family:var(--mono);font-size:30px;font-weight:700;color:' + pbC + '">' + pbY + ' years</div></div>';
+  h += '<div class="og">';
+  h += '<div class="og-t"><div class="tl">Peak reduction</div><div class="tv">' + red.toFixed(0) + ' kW</div></div>';
+  h += '<div class="og-t"><div class="tl">Monthly savings</div><div class="tv">Rs ' + fmtC(mSav) + '</div></div>';
+  h += '<div class="og-t"><div class="tl">Annual savings</div><div class="tv">Rs ' + fmtC(mSav*12) + '</div></div>';
+  h += '<div class="og-t"><div class="tl">ROI / yr</div><div class="tv">' + (capx>0?(mSav*12/capx*100).toFixed(1):'\\u2014') + '%</div></div></div>';
+  h += '<div class="lbl" style="margin-bottom:5px">Sensitivity &mdash; payback years</div>';
+  h += '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">Rows: capex \\u00b120% \\u00b7 Columns: demand charge \\u00b120%</div>';
+  h += '<table class="sens-tbl"><thead><tr><th></th><th>Rs ' + (rate*0.8).toFixed(0) + '</th><th>Rs ' + rate + ' (base)</th><th>Rs ' + (rate*1.2).toFixed(0) + '</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  h += '<button class="fml-btn" style="margin-top:9px" onclick="toggleFml(\'dc-fml\')">\\u25bc Show formula</button>';
+  h += '<div class="fml-box" id="dc-fml"><span class="fvb">Peak reduction</span> = min(BESS_kW, facility_peak \\u00d7 35%)<br>';
+  h += '<span class="fvb">Monthly savings</span> = peak_reduction \\u00d7 demand_charge_rate<br>';
+  h += '<span class="fvb">Payback</span> = capex / monthly_savings</div>';
+  document.getElementById('dc-out').innerHTML = h;
+}
+
+function calcSL() {
+  var nc   = parseFloat(document.getElementById('sl-nc').value)   || 30000;
+  var sc   = parseFloat(document.getElementById('sl-sc').value)   || 15000;
+  var ncyc = parseFloat(document.getElementById('sl-ncyc').value) || 4000;
+  var scyc = parseFloat(document.getElementById('sl-scyc').value) || 1200;
+  var nrte = parseFloat(document.getElementById('sl-nrte').value) / 100 || 0.94;
+  var srte = parseFloat(document.getElementById('sl-srte').value) / 100 || 0.89;
+  var acyc = parseFloat(document.getElementById('sl-acyc').value) || 400;
+  var ln   = nc / (ncyc * nrte);
+  var ls   = sc / (scyc * srte);
+  var cheap = ls < ln;
+  var disc  = Math.abs((ln - ls) / ln * 100).toFixed(1);
+  var vc    = cheap ? '#15803D' : '#D97706';
+  var vbg   = cheap ? '#ECFDF5' : '#FFFBEB';
+  var vb    = cheap ? '#16A34A' : '#D97706';
+  var h = '<div class="lbl" style="margin-bottom:10px;color:var(--bess)">Results</div>';
+  h += '<div style="margin-bottom:12px;padding:10px 13px;border-radius:7px;background:' + vbg + ';border:1px solid ' + vb + '">';
+  h += '<div style="font-size:13px;font-weight:700;color:' + vc + '">' + (cheap ? 'Second-life is cheaper on a levelized basis' : 'New battery is cheaper on a levelized basis') + '</div>';
+  h += '<div style="font-size:12px;color:var(--sub);margin-top:3px">Second-life is ' + disc + '% ' + (cheap ? 'cheaper' : 'more expensive') + ' per kWh cycled</div></div>';
+  h += '<div class="og">';
+  h += '<div class="og-t" style="border-top:3px solid var(--bess)"><div class="tl">New \\u2014 Rs/kWh cycled</div><div class="tv" style="font-size:20px">Rs ' + ln.toFixed(2) + '</div><div style="font-size:10px;color:var(--muted)">' + ncyc.toLocaleString() + ' cycles \\u00b7 ' + (ncyc/acyc).toFixed(1) + ' yrs</div></div>';
+  h += '<div class="og-t" style="border-top:3px solid ' + vc + '"><div class="tl">Second-life \\u2014 Rs/kWh cycled</div><div class="tv" style="font-size:20px;color:' + vc + '">Rs ' + ls.toFixed(2) + '</div><div style="font-size:10px;color:var(--muted)">' + scyc.toLocaleString() + ' cycles \\u00b7 ' + (scyc/acyc).toFixed(1) + ' yrs</div></div></div>';
+  h += '<div style="font-size:11px;color:var(--muted);margin-top:8px;padding:8px 10px;background:var(--s2);border-radius:5px">\\u26a0 Second-life cycle life estimate carries significant uncertainty. A 20% reduction in remaining cycles changes economics materially.</div>';
+  document.getElementById('sl-out').innerHTML = h;
+}
+
+// ══ POLICY ══
+async function loadPolicySchemes() {
+  if (schemesLoaded) return;
+  schemesLoaded = true;
+  try {
+    var r = await fetch('/api/bess-schemes');
+    if (!r.ok) throw new Error();
+    var d = await r.json();
+    var html = '';
+    var schemes = d.schemes || [];
+    for (var i = 0; i < Math.min(schemes.length, 4); i++) {
+      var s = schemes[i];
+      html += '<div class="sc-card">';
+      html += '<div class="sc-head"><div class="sc-name">' + s.name + '</div><span class="bdg bdg-warn">' + s.ministry + '</span></div>';
+      html += '<div class="sc-body"><strong>Benefit:</strong> ' + s.benefit + '<br/><strong>Min size:</strong> ' + s.min_size_mwh + ' MWh &middot; <strong>Deadline:</strong> ' + s.deadline + '</div>';
+      html += '<div style="display:flex;justify-content:space-between;margin-top:7px"><div style="font-size:10px;font-family:var(--mono);color:var(--muted)">' + s.source.slice(0,38) + '</div><a href="' + s.source_url + '" target="_blank" class="src">Source</a></div>';
+      html += '</div>';
+    }
+    var el = document.getElementById('pol-schemes');
+    if (el) el.innerHTML = html;
+  } catch(e) {
+    var el = document.getElementById('pol-schemes');
+    if (el) el.innerHTML = '<div style="font-size:12px;color:var(--muted)">Could not load schemes.</div>';
+  }
+}
+
+var SD = {
+  "Andhra Pradesh":    {rate:6.20,avail:93,renew:42,ev:1240,discom:"APSPDCL / APEPDCL"},
+  "Arunachal Pradesh": {rate:4.50,avail:78,renew:88,ev:45,  discom:"APDCL"},
+  "Assam":             {rate:7.00,avail:80,renew:20,ev:180, discom:"APDCL"},
+  "Bihar":             {rate:6.50,avail:78,renew:12,ev:320, discom:"NBPDCL"},
+  "Chhattisgarh":      {rate:5.80,avail:87,renew:32,ev:280, discom:"CSPDCL"},
+  "Goa":               {rate:4.50,avail:99,renew:22,ev:210, discom:"Goa Electricity Dept"},
+  "Gujarat":           {rate:6.20,avail:95,renew:48,ev:2100,discom:"DGVCL / MGVCL / PGVCL"},
+  "Haryana":           {rate:6.00,avail:91,renew:30,ev:890, discom:"DHBVN / UHBVN"},
+  "Himachal Pradesh":  {rate:4.20,avail:98,renew:85,ev:220, discom:"HPSEBL"},
+  "Jharkhand":         {rate:7.50,avail:82,renew:15,ev:190, discom:"JBVNL"},
+  "Karnataka":         {rate:6.72,avail:96,renew:62,ev:6096,discom:"BESCOM / HESCOM / MESCOM"},
+  "Kerala":            {rate:5.50,avail:97,renew:52,ev:780, discom:"KSEB"},
+  "Madhya Pradesh":    {rate:6.80,avail:90,renew:35,ev:650, discom:"MPPKVVCL"},
+  "Maharashtra":       {rate:9.10,avail:94,renew:28,ev:3200,discom:"MSEDCL / BEST"},
+  "Manipur":           {rate:4.80,avail:72,renew:25,ev:28,  discom:"MSPDCL"},
+  "Meghalaya":         {rate:5.20,avail:75,renew:68,ev:32,  discom:"MePDCL"},
+  "Odisha":            {rate:6.00,avail:89,renew:38,ev:420, discom:"TPSODL"},
+  "Punjab":            {rate:4.80,avail:93,renew:28,ev:650, discom:"PSPCL"},
+  "Rajasthan":         {rate:6.50,avail:88,renew:55,ev:980, discom:"JDVVNL / JVVNL"},
+  "Sikkim":            {rate:3.40,avail:99,renew:92,ev:45,  discom:"Energy Dept"},
+  "Tamil Nadu":        {rate:5.20,avail:91,renew:45,ev:2800,discom:"TANGEDCO"},
+  "Telangana":         {rate:6.80,avail:94,renew:38,ev:1100,discom:"TSSPDCL"},
+  "Uttar Pradesh":     {rate:6.00,avail:85,renew:22,ev:1200,discom:"UPPCL"},
+  "West Bengal":       {rate:8.50,avail:92,renew:8, ev:890, discom:"WBSEDCL / CESC"},
+  "Delhi":             {rate:4.50,avail:99,renew:12,ev:1850,discom:"BSES / TPDDL"},
+  "Jammu and Kashmir": {rate:3.50,avail:85,renew:75,ev:120, discom:"JKPDCL"}
+};
+var MC = {
+  tariff:{k:'rate',lo:3.4,hi:9.1,cL:'#15803D',cH:'#B91C1C',fmt:function(v){return'Rs '+v.toFixed(2);}},
+  avail: {k:'avail',lo:70,hi:99, cL:'#B91C1C',cH:'#15803D',fmt:function(v){return v+'%';}},
+  renew: {k:'renew',lo:8, hi:92, cL:'#64748B',cH:'#15803D',fmt:function(v){return v+'%';}},
+  ev:    {k:'ev',   lo:18,hi:6096,cL:'#CBD5E1',cH:'#2563EB',fmt:function(v){return v>=1000?(v/1000).toFixed(1)+'k':String(v);}}
+};
+
+function mColor2(v, cfg) {
+  var t = Math.max(0, Math.min(1, (v - cfg.lo) / (cfg.hi - cfg.lo)));
+  function hx(s) { return [parseInt(s.slice(1,3),16), parseInt(s.slice(3,5),16), parseInt(s.slice(5,7),16)]; }
+  var c1 = hx(cfg.cL), c2 = hx(cfg.cH);
+  return 'rgb(' + ~~(c1[0]+(c2[0]-c1[0])*t) + ',' + ~~(c1[1]+(c2[1]-c1[1])*t) + ',' + ~~(c1[2]+(c2[2]-c1[2])*t) + ')';
+}
+
+function setSM(m) {
+  curSM = m;
+  document.querySelectorAll('.tgl').forEach(function(b) { b.classList.remove('active'); });
+  var btn = document.getElementById('sbtn-' + m);
+  if (btn) btn.classList.add('active');
+  renderStateGrid();
+}
+
+function renderStateGrid() {
+  var grid = document.getElementById('sg');
+  if (!grid) return;
+  var cfg = MC[curSM];
+  var entries = Object.entries(SD).sort(function(a, b) {
+    return cfg.k === 'rate' ? a[1][cfg.k] - b[1][cfg.k] : b[1][cfg.k] - a[1][cfg.k];
   });
+  var html = '';
+  for (var i = 0; i < entries.length; i++) {
+    var n = entries[i][0], d = entries[i][1];
+    var v   = d[cfg.k];
+    var c   = mColor2(v, cfg);
+    var pct = Math.max(3, Math.min(100, (v - cfg.lo) / (cfg.hi - cfg.lo) * 100));
+    var isKA = n === 'Karnataka';
+    html += '<div class="sc2" style="border-left-color:' + c + ';border-color:' + (isKA ? 'var(--mfg)' : 'var(--border)') + ';" onclick="showSD(\'' + n.replace(/'/g, "\\'") + '\')">';
+    html += '<div class="sn" style="color:' + (isKA ? 'var(--mfg)' : 'var(--text)') + '">' + n + '</div>';
+    html += '<div class="sv" style="color:' + c + '">' + cfg.fmt(v) + '</div>';
+    html += '<div style="height:3px;background:var(--s3);border-radius:2px;margin:3px 0;overflow:hidden"><div style="height:100%;width:' + pct.toFixed(0) + '%;background:' + c + '"></div></div>';
+    html += '<div class="sm"><span>Rs' + d.rate.toFixed(2) + '</span><span>RE' + d.renew + '%</span></div></div>';
+  }
+  grid.innerHTML = html;
 }
 
-function showMapDetail(o, biz){
-  biz = biz || fState.biz || 'ev';
-  const bd = o[biz] || {};
-  const score = bd.score || 0;
-  const maxS = biz === 'ev' ? 6 : 4;
-  const col = mrkColor(score, maxS);
-  const h = bd.headroom || 'medium';
-  const hC = h==='high'?'#15803D':h==='medium'?'#D97706':'#DC2626';
-  const hP = {high:82,medium:52,low:22}[h]||50;
-  const den = bd.competition || '';
-  const dC = den==='underserved'?'#15803D':den==='moderate'?'#D97706':'#DC2626';
-  const dP = {underserved:18,moderate:52,saturated:88}[den]||50;
-  const covCls = 'cov-' + o.coverage;
-  const tc = 't' + (o.tier||2);
-  const tl = o.tier===1?'Tier 1 — metro':o.tier===2?'Tier 2':'Tier 3';
-  const isLive = o.coverage==='live';
-  const evalTab = biz==='bess'?'dbess':'ev';
-
-  // Zones section
-  let zonesHtml = '';
-  if(o.zones && o.zones.length){
-    zonesHtml = '<div class="detail-zones"><div class="detail-zones-title">Key zones within ' + o.city + '</div>'
-      + o.zones.slice(0,3).map(function(z){
-          const zc = z.opportunity_score>=9?'#15803D':z.opportunity_score>=7?'#D97706':'#64748B';
-          return '<div class="dzone" style="border-left-color:'+zc+'">'
-            +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
-            +'<div><div class="dzone-name">'+z.zone+'</div><div class="dzone-sub">'+z.city+' · '+z.discom+'</div></div>'
-            +'<div class="dzone-score" style="color:'+zc+'">'+z.opportunity_score+'/10</div></div>'
-            +'<div class="dzone-reason">'+z.reason+'</div>'
-            +'<div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">'
-            +'<span style="font-size:9px;background:var(--s2);color:var(--muted);padding:1px 6px;border-radius:3px;font-family:var(--mono)">'+z.ev_demand+'</span>'
-            +'<span style="font-size:9px;background:var(--s2);color:var(--muted);padding:1px 6px;border-radius:3px;font-family:var(--mono)">'+z.power_reliability+'</span>'
-            +'<span style="font-size:9px;background:var(--s2);color:var(--muted);padding:1px 6px;border-radius:3px;font-family:var(--mono)">'+z.supply_voltage+'</span>'
-            +'</div></div>';
-        }).join('')
-      + '</div>';
-  }
-
-  // Corridors section
-  let corrHtml = '';
-  if(o.corridors && o.corridors.length){
-    corrHtml = '<div style="margin-top:14px"><div class="detail-zones-title">Highway corridors</div>'
-      + o.corridors.slice(0,2).map(function(c){
-          const oc = c.opportunity.includes('High')?'#15803D':c.opportunity.includes('Med')?'#D97706':'#64748B';
-          return '<div style="background:var(--s2);border-radius:6px;padding:9px 11px;margin-bottom:6px">'
-            +'<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px">'+c.name+'</div>'
-            +'<div style="font-size:10px;font-family:var(--mono);color:var(--muted)">'
-            +c.distance_km+'km · '+c.stations_existing+' stations · '+c.stations_per_100km.toFixed(1)+'/100km'
-            +' · <span style="color:'+oc+';font-weight:700">'+c.opportunity+'</span>'
-            +(c.gap_towns&&c.gap_towns.length?' · Gap: '+c.gap_towns.join(', '):'')
-            +'</div></div>';
-        }).join('')
-      + '</div>';
-  }
-
-  document.getElementById('map-detail-inner').innerHTML =
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">'
-    +'<div>'
-    +'<div style="font-family:var(--head);font-size:18px;font-weight:700;color:var(--text)">'+o.location+'</div>'
-    +'<div style="font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:2px">'+o.state+' · '+o.discom+'</div>'
-    +'</div>'
-    +'<div style="text-align:center;background:'+(score/maxS>=0.66?'#DCFCE7':score/maxS>=0.4?'#FEF3C7':'#FEE2E2')+';border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-direction:column">'
-    +'<div style="font-family:var(--mono);font-size:16px;font-weight:700;color:'+col+'">'+score+'</div>'
-    +'<div style="font-size:9px;color:var(--muted)">/ '+maxS+'</div>'
-    +'</div></div>'
-
-    +'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">'
-    +'<span class="tier-tag '+tc+'">'+tl+'</span>'
-    +'<span class="cov '+covCls+'" data-note="'+o.coverage_note+'"><span class="cd"></span>'+o.coverage_label+'</span>'
-    +(isLive?'<span style="font-size:9px;font-weight:700;font-family:var(--mono);padding:2px 7px;background:#DCFCE7;color:#15803D;border-radius:3px;display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:#15803D;display:inline-block"></span>LIVE DATA</span>':'')
-    +'</div>'
-
-    +'<div style="margin-bottom:10px">'
-    +'<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:10px">'
-    +'<span style="color:var(--muted);width:100px;flex-shrink:0;font-family:var(--mono)">Grid headroom</span>'
-    +'<div style="flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+hP+'%;background:'+hC+';border-radius:3px"></div></div>'
-    +'<span style="font-family:var(--mono);font-size:10px;font-weight:700;color:'+hC+';width:80px;text-align:right">'+h.toUpperCase()+' ('+bd.loading_pct+'%)</span></div>'
-    +(biz==='ev'&&den?'<div style="display:flex;align-items:center;gap:7px;font-size:10px"><span style="color:var(--muted);width:100px;flex-shrink:0;font-family:var(--mono)">Competition</span><div style="flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+dP+'%;background:'+dC+';border-radius:3px"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:700;color:'+dC+';width:80px;text-align:right">'+den.toUpperCase()+'</span></div>':'')
-    +'</div>'
-
-    +'<div style="font-size:11px;color:var(--sub);line-height:1.6;border-left:2px solid var(--border);padding-left:9px;margin-bottom:14px;font-style:italic">'+bd.one_liner+'</div>'
-
-    +'<button class="eval-btn '+(biz==='bess'?'bess-btn':'')+'" onclick="evalEcon(''+o.id+'',''+evalTab+'')">'
-    +'Evaluate the economics →</button>'
-
-    + zonesHtml + corrHtml
-
-    +'<div style="margin-top:14px;font-size:10px;font-family:var(--mono);color:var(--dim);line-height:1.7;padding:8px 10px;background:var(--s2);border-radius:5px">'
-    +o.coverage_note+'</div>';
-
-  // Pan map to this marker
-  if(leafMap) leafMap.setView([o.lat, o.lng], Math.max(leafMap.getZoom(), 9), {animate:true});
+function showSD(name) {
+  var d = SD[name];
+  if (!d) return;
+  var all = Object.values(SD);
+  var avgR = (all.reduce(function(s,x){return s+x.rate;},0)/all.length).toFixed(2);
+  var avgA = Math.round(all.reduce(function(s,x){return s+x.avail;},0)/all.length);
+  var avgRE = Math.round(all.reduce(function(s,x){return s+x.renew;},0)/all.length);
+  var evRk = Object.entries(SD).sort(function(a,b){return b[1].ev-a[1].ev;}).findIndex(function(e){return e[0]===name;}) + 1;
+  var el = document.getElementById('sd');
+  if (!el) return;
+  el.innerHTML = '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">' + name + '</div>'
+    + '<div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:10px">' + d.discom + '</div>'
+    + '<div style="font-size:11px;color:var(--muted);line-height:1.85">'
+    + 'Tariff: <strong style="color:var(--text)">Rs ' + d.rate.toFixed(2) + '/unit</strong> (avg Rs ' + avgR + ')<br/>'
+    + 'Grid: <strong>' + d.avail + '%</strong> (avg ' + avgA + '%)<br/>'
+    + 'Renewables: <strong>' + d.renew + '%</strong> (avg ' + avgRE + '%)<br/>'
+    + 'EV stations: <strong>' + d.ev.toLocaleString() + '</strong> (rank #' + evRk + ')<br/>'
+    + '30 kWh charge: <strong>Rs ' + (d.rate*30).toFixed(0) + '</strong> \\u00b7 Rs ' + (d.rate*30/250).toFixed(1) + '/km</div>';
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// BOOT
-// ══════════════════════════════════════════════════════════════════════════════
-// Start on landing. Fetch opportunities in background so explore tab is instant.
+// ══ DIGEST ══
+async function loadDigest() {
+  try {
+    var r = await fetch('/api/weekly-digest');
+    if (!r.ok) throw new Error();
+    var d = await r.json();
+    var tsEl = document.getElementById('dig-ts');
+    if (tsEl && d.last_updated) {
+      tsEl.textContent = 'Updated: ' + new Date(d.last_updated).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    }
+    var cEl = document.getElementById('dig-content');
+    if (!cEl) return;
+    if (!d.articles || !d.articles.length) {
+      cEl.innerHTML = '<div style="font-size:12px;color:var(--muted)">' + (d.error ? 'Feed error: ' + d.error : 'Digest runs every Sunday.') + '</div>';
+      return;
+    }
+    var isLive = d.source === 'pib_rss_live';
+    var html = '<div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px">';
+    html += '<span class="src-tag ' + (isLive ? 'src-live' : 'src-cur') + '">' + (isLive ? 'PIB LIVE' : 'CURATED') + '</span>';
+    html += isLive ? 'Source: PIB official RSS (MHI \\u00b7 MNRE \\u00b7 MoP)' : 'Verified curated articles \\u2014 shown when live RSS is unavailable';
+    html += '</div>';
+    for (var i = 0; i < d.articles.length; i++) {
+      var a = d.articles[i];
+      html += '<div class="dig-item">';
+      html += '<div class="dig-cat ' + (a.category === 'bess' ? 'dbs' : 'dev') + '">' + a.category.toUpperCase() + '</div>';
+      html += '<div style="flex:1"><a href="' + a.link + '" target="_blank" style="text-decoration:none;color:inherit"><div class="dig-title">' + a.title + '</div></a>';
+      html += '<div class="dig-meta">' + (a.ministry||'') + (a.date ? ' \\u00b7 ' + a.date : '') + '</div>';
+      if (a.source_note) html += '<div class="dig-snote">' + a.source_note + '</div>';
+      html += '</div></div>';
+    }
+    cEl.innerHTML = html;
+  } catch(e) { console.warn('Digest:', e); }
+}
+
+async function triggerDigest() {
+  var btn = event.target;
+  btn.textContent = 'Refreshing\\u2026';
+  btn.disabled = true;
+  try {
+    await fetch('/api/trigger-digest', { method: 'POST' });
+    await loadDigest();
+  } finally {
+    btn.textContent = '\\u21bb Refresh now';
+    btn.disabled = false;
+  }
+}
+
+// ══ GRID MONITOR ══
+function fCol(hz) { return hz>=49.9&&hz<=50.1 ? 'var(--ev)' : hz>=49.7&&hz<=50.3 ? 'var(--mfg)' : 'var(--red)'; }
+function fSt(hz) {
+  if (hz>=49.9&&hz<=50.1) return '\\u25cf Healthy';
+  if (hz>=49.7&&hz<49.9)  return '\\u25b2 Under-frequency';
+  if (hz>50.1&&hz<=50.3)  return '\\u25b2 Over-frequency';
+  return hz<49.7 ? '\\u26a0 Under-frequency' : '\\u26a0 Over-frequency';
+}
+
+function startOsc() {
+  var c = document.getElementById('osc');
+  if (!c) return;
+  function draw() {
+    var W = c.offsetWidth, H = c.offsetHeight;
+    c.width = W; c.height = H;
+    if (!W || !H) { oscId = requestAnimationFrame(draw); return; }
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = '#F0F9FF'; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle = 'rgba(0,0,0,.04)'; ctx.lineWidth = 0.5;
+    for (var x=0; x<W; x+=W/10) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    ctx.strokeStyle='rgba(0,0,0,.1)'; ctx.setLineDash([3,5]); ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke(); ctx.setLineDash([]);
+    var wc = liveHz>=49.9&&liveHz<=50.1 ? '#0D9488' : liveHz>=49.7&&liveHz<=50.3 ? '#D97706' : '#DC2626';
+    ctx.strokeStyle = wc; ctx.lineWidth = 2;
+    var amp = H*0.3; ctx.beginPath();
+    for (var px=0; px<=W; px++) {
+      var t = px/W, y = H/2 - Math.sin(t*Math.PI*7+oscPhase)*amp - Math.sin(t*Math.PI*2.1+oscPhase*0.4)*amp*0.07;
+      px === 0 ? ctx.moveTo(px,y) : ctx.lineTo(px,y);
+    }
+    ctx.stroke();
+    ctx.fillStyle = wc; ctx.font = '500 10px "IBM Plex Mono",monospace';
+    ctx.fillText(liveHz.toFixed(2) + ' Hz', 9, 13);
+    ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillText('50.00 Hz', W-68, H/2-4);
+    oscPhase -= 0.05;
+    oscId = requestAnimationFrame(draw);
+  }
+  if (oscId) cancelAnimationFrame(oscId);
+  draw();
+}
+
+async function initGrid() {
+  if (!gridInited) { startOsc(); gridInited = true; }
+  try {
+    var r = await fetch('/api/grid-data');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    var d = await r.json();
+    var gen = d.generation, dem = d.demand;
+    liveHz = gen.frequency_hz || dem.frequency_hz || 50.0;
+    var fc = fCol(liveHz);
+    function el(id) { return document.getElementById(id); }
+    el('g-hz').textContent = liveHz.toFixed(2); el('g-hz').style.color = fc;
+    el('g-hz-st').textContent = fSt(liveHz); el('g-hz-st').style.color = fc;
+    el('g-gen').textContent = (gen.total_generation_mw||0).toLocaleString();
+    el('g-gen-sub').textContent = 'Own ' + (gen.own_gen_mw||0).toLocaleString() + ' + CGS ' + (gen.cgs_mw||0).toLocaleString();
+    var b = dem.bescom || {}, ui = b.ui_mw || 0;
+    el('g-bl').textContent = (b.actual_mw||0).toLocaleString();
+    el('g-ui').textContent = (ui>=0?'+':'') + ui + ' MW UI';
+    el('g-ui').style.color = ui > 0 ? 'var(--mfg)' : 'var(--green)';
+    var bn = (d.ncep.escom_ncep||[]).find(function(e){return e.escom==='BESCOM';}) || {};
+    el('g-ncep').textContent = (bn.total_mw||0).toLocaleString();
+    el('g-ncep-sub').textContent = 'Solar ' + (bn.solar_mw||0) + ' + Wind ' + (bn.wind_mw||0) + ' MW';
+    var ts = gen.timestamp || dem.timestamp || '\\u2014';
+    el('grid-stale').innerHTML = '<div class="sdot" style="background:var(--green)"></div>Live \\u00b7 <a href="https://kptclsldc.in" target="_blank">kptclsldc.in</a> \\u00b7 ' + ts;
+    var loads = dem.escom_loads || [];
+    var ECOL = { BESCOM:'var(--mfg)', MESCOM:'var(--bess)', CESC:'var(--ev)', GESCOM:'#7C3AED', HESCOM:'#DB2777' };
+    var tbody = el('escom-tbody');
+    var rows = '';
+    for (var i=0; i<loads.length; i++) {
+      var e = loads[i], u = e.ui_mw||0;
+      var dir = u>50 ? '\\u2191 Over-drawn' : u<-50 ? '\\u2193 Under-drawn' : '\\u2248 Balanced';
+      rows += '<tr><td style="font-weight:700;color:' + (ECOL[e.escom]||'var(--text)') + '">' + e.escom + '</td>';
+      rows += '<td>' + (e.schedule_mw||0).toLocaleString() + '</td>';
+      rows += '<td>' + (e.actual_mw||0).toLocaleString() + '</td>';
+      rows += '<td style="color:' + (u>=0?'#D97706':'#16A34A') + ';font-weight:600">' + (u>=0?'+':'') + u + '</td>';
+      rows += '<td style="font-size:11px;color:' + (u>50?'#D97706':u<-50?'#16A34A':'var(--muted)') + '">' + dir + '</td></tr>';
+    }
+    tbody.innerHTML = rows;
+  } catch(e) {
+    var el2 = document.getElementById('grid-stale');
+    if (el2) el2.innerHTML = '<div class="sdot" style="background:var(--red)"></div>Grid data unavailable \\u2014 <a href="https://kptclsldc.in/bescom.aspx" target="_blank">View on KPTCL SLDC</a>';
+  }
+}
+
+// ══ BOOT ══
 initExplorer();
 loadDigest();
 </script>
