@@ -4,6 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>India Energy Site Intelligence</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -255,6 +257,36 @@ hr.div{border:none;border-top:1px solid var(--border);margin:18px 0}
 .escom-t td{padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--mono)}
 .escom-t tr:last-child td{border-bottom:none}
 .escom-t tr:hover td{background:var(--s2)}
+
+/* ── MAP EXPLORE LAYOUT ──────────────────────────────────────────────────── */
+.explore-layout{display:grid;grid-template-columns:1fr 390px;height:calc(100vh - 132px);overflow:hidden}
+.map-wrap{position:relative;height:100%}
+#india-map{height:100%;width:100%;background:#EFF6FF;z-index:1}
+.map-detail{height:100%;overflow-y:auto;border-left:1px solid var(--border);background:var(--s1)}
+.map-detail-inner{padding:16px 18px}
+.map-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:30px;color:var(--muted)}
+.map-placeholder h3{font-size:14px;font-weight:600;margin-bottom:6px;color:var(--sub)}
+.map-placeholder p{font-size:12px;line-height:1.6;max-width:240px}
+/* Leaflet overrides */
+.leaflet-container{font-family:var(--sans)!important}
+.leaflet-popup-content-wrapper{border-radius:8px!important;box-shadow:var(--shadow-md)!important;border:1px solid var(--border)!important}
+.leaflet-popup-content{margin:10px 13px!important;font-size:12px!important}
+/* Pulsing live dot */
+@keyframes pulse{0%{transform:scale(1);opacity:.9}70%{transform:scale(2.5);opacity:0}100%{transform:scale(1);opacity:0}}
+.live-pulse{width:10px;height:10px;border-radius:50%;background:#15803D;position:absolute;top:-5px;left:-5px;animation:pulse 2s infinite}
+/* View toggle */
+.view-toggle{display:flex;gap:0;background:var(--s2);border-radius:6px;padding:2px}
+.vt-btn{background:none;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-family:var(--mono);font-weight:600;color:var(--muted);cursor:pointer}
+.vt-btn.active{background:var(--s1);color:var(--ev);box-shadow:var(--shadow)}
+/* Detail card in panel */
+.detail-opp-card{background:var(--s2);border-radius:8px;padding:13px 15px;margin-bottom:12px}
+.detail-zones{margin-top:14px}
+.detail-zones-title{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.dzone{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--ev);border-radius:6px;padding:10px 12px;margin-bottom:6px}
+.dzone-name{font-size:12px;font-weight:700;color:var(--text)}
+.dzone-sub{font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:4px}
+.dzone-reason{font-size:11px;color:var(--muted);line-height:1.55}
+.dzone-score{float:right;font-family:var(--mono);font-size:14px;font-weight:700}
 </style>
 </head>
 <body>
@@ -321,6 +353,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:18px 0}
 
 <!-- ════════ PANE: EXPLORE ════════ -->
 <div id="pane-explore" class="pane">
+  <!-- Filter bar -->
   <div class="filter-bar">
     <select class="fsel" id="f-biz" onchange="setF('biz',this.value)">
       <option value="ev">EV Charging</option>
@@ -341,66 +374,65 @@ hr.div{border:none;border-top:1px solid var(--border);margin:18px 0}
       <option value="low">Low / constrained</option>
     </select>
     <select class="fsel" id="f-cov" onchange="setF('coverage',this.value)">
-      <option value="">All coverage levels</option>
+      <option value="">All coverage</option>
       <option value="live">Live data only</option>
       <option value="verified">Verified only</option>
     </select>
     <div class="filter-count" id="fcount">Loading…</div>
+    <div class="view-toggle" style="margin-left:8px">
+      <button class="vt-btn active" id="vt-map" onclick="setView('map')">🗺 Map</button>
+      <button class="vt-btn" id="vt-list" onclick="setView('list')">≡ List</button>
+    </div>
     <button class="clear-btn" onclick="clearF()">✕ Clear</button>
   </div>
-  <div class="main">
-    <!-- How to read -->
-    <div class="htr" id="htr">
-      <div class="htr-hdr" onclick="toggleHtr()">
-        <span>📖 How to read these cards — what do "grid headroom", "coverage badges" and the score mean?</span>
-        <span id="htr-arrow">▼ expand</span>
-      </div>
-      <div class="htr-body" id="htr-body">
-        <div class="htr-grid">
-          <div class="htr-item">
-            <div class="htr-term">Grid headroom <span style="font-size:9px;background:#DCFCE7;color:#15803D;padding:1px 5px;border-radius:3px;font-weight:700">KEY TERM</span></div>
-            <div class="htr-def">How much spare electricity capacity the local substation has. High headroom (substation &lt;65% loaded) = new connections are fast and easy. Low headroom (&gt;85% loaded) = new high-power connections face delays or refusals.</div>
-            <div style="font-size:10px;font-family:var(--mono);color:var(--ev);margin-top:5px">Example: Whitefield 220kV is 57% loaded — plenty of room for a new 120kW charger.</div>
+
+  <!-- MAP VIEW -->
+  <div id="explore-map-view" class="explore-layout">
+    <div class="map-wrap">
+      <div id="india-map"></div>
+      <!-- Legend -->
+      <div style="position:absolute;bottom:24px;left:12px;z-index:10;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:9px 12px;box-shadow:var(--shadow);font-size:11px">
+        <div style="font-weight:700;color:var(--sub);margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:.08em">Opportunity</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;align-items:center;gap:7px"><div style="width:12px;height:12px;border-radius:50%;background:#16A34A;border:2px solid #fff;box-shadow:0 0 0 1px #16A34A"></div><span style="color:var(--sub)">High (5–6/6)</span></div>
+          <div style="display:flex;align-items:center;gap:7px"><div style="width:12px;height:12px;border-radius:50%;background:#D97706;border:2px solid #fff;box-shadow:0 0 0 1px #D97706"></div><span style="color:var(--sub)">Medium (3–4/6)</span></div>
+          <div style="display:flex;align-items:center;gap:7px"><div style="width:12px;height:12px;border-radius:50%;background:#DC2626;border:2px solid #fff;box-shadow:0 0 0 1px #DC2626"></div><span style="color:var(--sub)">Low (1–2/6)</span></div>
+          <div style="display:flex;align-items:center;gap:7px;border-top:1px solid var(--border);padding-top:4px;margin-top:2px">
+            <div style="width:12px;height:12px;border-radius:50%;background:#16A34A;border:2px solid #fff;box-shadow:0 0 0 2px #16A34A,0 0 0 4px rgba(22,163,74,.25)"></div>
+            <span style="color:var(--sub)">Live data</span>
           </div>
-          <div class="htr-item">
-            <div class="htr-term">Loading % <span style="font-size:9px;background:#EFF6FF;color:#2563EB;padding:1px 5px;border-radius:3px;font-weight:700">KEY TERM</span></div>
-            <div class="htr-def">What percentage of the substation's maximum capacity is currently in use. 60% loading = comfortable. 85%+ = constrained zone. 93%+ = effectively full — new HT connections are blocked or deferred.</div>
-            <div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:5px">Koramangala 66kV runs at 93% — that's why EV hubs struggle to get approved there.</div>
-          </div>
-          <div class="htr-item">
-            <div class="htr-term">Competition density</div>
-            <div class="htr-def"><strong>Underserved:</strong> very few existing stations — the market is open.<br/><strong>Moderate:</strong> some competition but room for more.<br/><strong>Saturated:</strong> dense network already — new entrants face a crowded market.</div>
-          </div>
-          <div class="htr-item">
-            <div class="htr-term">Opportunity score (X/6)</div>
-            <div class="htr-def">A simple shortlisting signal. Combines grid headroom and market density. 6/6 = high headroom + underserved market (best case). 2/6 = constrained grid + saturated market. <strong>It does not include financial analysis</strong> — use the Calculator for that.</div>
-          </div>
-          <div class="htr-item">
-            <div class="htr-term">Coverage badges</div>
-            <div class="htr-def">
-              <span class="cov cov-live" style="margin-right:4px" data-note="Real-time KPTCL SLDC data. Bengaluru zones only."><span class="cd"></span>Live</span> — KPTCL SLDC real-time.<br/>
-              <span class="cov cov-verified" style="margin-right:4px" data-note="Cross-checked against DISCOM published loading schedules."><span class="cd"></span>Verified</span> — DISCOM-checked data.<br/>
-              <span class="cov cov-partial" style="margin-right:4px" data-note="City-level aggregate. No per-substation."><span class="cd"></span>Partial</span> — city aggregate only.<br/>
-              <span class="cov cov-estimate" data-note="Estimated from CEA/secondary sources."><span class="cd"></span>Estimate</span> — secondary sources. Directional only.
-            </div>
-          </div>
-          <div class="htr-item">
-            <div class="htr-term">DISCOM</div>
-            <div class="htr-def">Distribution Company — the electricity utility for your area. In Bengaluru: BESCOM. Mumbai: MSEDCL. Chennai: TANGEDCO. Your DISCOM sets your tariff and processes your new connection application.</div>
-          </div>
-        </div>
-        <div style="margin-top:12px;font-size:11px;color:var(--muted);padding:9px 12px;background:var(--s1);border-radius:6px;border:1px solid var(--border)">
-          Financial numbers (payback period, revenue, opex) are intentionally <strong>not shown here</strong>. The explorer's job is narrowing 70+ locations down to a shortlist of 3–5. Click "Evaluate the economics" on any card to run the full financial model for that location.
         </div>
       </div>
     </div>
-    <div id="opp-grid" class="opp-grid">
-      <div class="sk" style="height:210px;border-radius:10px"></div>
-      <div class="sk" style="height:210px;border-radius:10px"></div>
-      <div class="sk" style="height:210px;border-radius:10px"></div>
-      <div class="sk" style="height:210px;border-radius:10px"></div>
-      <div class="sk" style="height:210px;border-radius:10px"></div>
-      <div class="sk" style="height:210px;border-radius:10px"></div>
+    <!-- Detail panel -->
+    <div class="map-detail">
+      <div class="map-detail-inner" id="map-detail-inner">
+        <div class="map-placeholder">
+          <div style="font-size:36px;margin-bottom:14px">📍</div>
+          <h3>Click any marker to explore</h3>
+          <p>Each dot on the map is a city or zone. Click it to see grid headroom, competition data, and a button to evaluate the economics.</p>
+          <div style="margin-top:16px;font-size:11px;font-family:var(--mono);color:var(--dim);line-height:1.7;text-align:left;background:var(--s2);border-radius:6px;padding:10px 12px">
+            <strong style="color:var(--sub)">Green</strong> = high opportunity (good grid + open market)<br/>
+            <strong style="color:var(--muted)">Amber</strong> = worth investigating<br/>
+            <strong style="color:var(--muted)">Red</strong> = constrained grid or saturated market<br/>
+            <strong style="color:var(--ev)">Pulsing ring</strong> = live KPTCL SLDC data
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIST VIEW (hidden by default) -->
+  <div id="explore-list-view" style="display:none">
+    <div style="max-width:1280px;margin:0 auto;padding:16px 20px 60px">
+      <div id="opp-grid" class="opp-grid">
+        <div class="sk" style="height:200px;border-radius:10px"></div>
+        <div class="sk" style="height:200px;border-radius:10px"></div>
+        <div class="sk" style="height:200px;border-radius:10px"></div>
+        <div class="sk" style="height:200px;border-radius:10px"></div>
+        <div class="sk" style="height:200px;border-radius:10px"></div>
+        <div class="sk" style="height:200px;border-radius:10px"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -669,10 +701,17 @@ function showTab(tab, btn){
   if(btn) btn.classList.add('active');
   else document.querySelector('[data-tab="'+tab+'"]')?.classList.add('active');
   if(tab==='grid') initGrid();
+  if(tab==='explore'&&leafMap){ setTimeout(function(){ leafMap.invalidateSize(); },80); }
   if(tab==='policy'){ renderStateGrid(); loadPolicySchemes(); }
 }
 
-function enterExplore(){ showTab('explore', document.querySelector('[data-tab="explore"]')); }
+function enterExplore(){
+  showTab('explore', document.querySelector('[data-tab="explore"]'));
+  // Always start in map view
+  setView('map');
+  if(leafMap){ setTimeout(function(){ leafMap.invalidateSize(); renderMapMarkers(); }, 80); }
+  else if(allOpps.length){ initMap(); renderMapMarkers(); }
+}
 function enterCalc(){    showTab('calc',    document.querySelector('[data-tab="calc"]')); }
 function enterIntel(){   showTab('intel',   document.querySelector('[data-tab="intel"]')); loadDigest(); }
 
@@ -708,14 +747,16 @@ async function initExplorer(){
     const sfEl = document.getElementById('f-state');
     d.all_states.forEach(function(s){ const o=document.createElement('option'); o.value=s; o.textContent=s; sfEl.appendChild(o); });
     renderExplorer();
+    initMap();
+    renderMapMarkers();
   }catch(e){
     document.getElementById('opp-grid').innerHTML='<div class="empty"><h3>Could not load opportunities</h3><p>'+e.message+'</p></div>';
     document.getElementById('fcount').textContent='Error';
   }
 }
 
-function setF(key, val){ fState[key]=val; renderExplorer(); }
-function clearF(){ fState={biz:'ev',state:'',tier:'',headroom:'',coverage:''}; document.getElementById('f-biz').value='ev'; document.getElementById('f-state').value=''; document.getElementById('f-tier').value=''; document.getElementById('f-headroom').value=''; document.getElementById('f-cov').value=''; renderExplorer(); }
+function setF(key, val){ fState[key]=val; if(curView==='map') renderMapMarkers(); else renderExplorer(); }
+function clearF(){ fState={biz:'ev',state:'',tier:'',headroom:'',coverage:''}; document.getElementById('f-biz').value='ev'; document.getElementById('f-state').value=''; document.getElementById('f-tier').value=''; document.getElementById('f-headroom').value=''; document.getElementById('f-cov').value=''; if(curView==='map') renderMapMarkers(); else renderExplorer(); }
 
 function renderExplorer(){
   const biz=fState.biz||'ev';
@@ -906,6 +947,207 @@ function fSt(hz){if(hz>=49.9&&hz<=50.1)return'\u25cf Healthy';if(hz>=49.7&&hz<49
 function startOsc(){const c=document.getElementById('oscCanvas');function draw(){const W=c.offsetWidth,H=c.offsetHeight;c.width=W;c.height=H;if(!W||!H){oscId=requestAnimationFrame(draw);return;}const ctx=c.getContext('2d');ctx.fillStyle='#F0F9FF';ctx.fillRect(0,0,W,H);ctx.strokeStyle='rgba(0,0,0,.04)';ctx.lineWidth=.5;for(let x=0;x<W;x+=W/10){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}ctx.strokeStyle='rgba(0,0,0,.1)';ctx.setLineDash([3,5]);ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();ctx.setLineDash([]);const wc=liveHz>=49.9&&liveHz<=50.1?'#0D9488':liveHz>=49.7&&liveHz<=50.3?'#D97706':'#DC2626';ctx.strokeStyle=wc;ctx.lineWidth=2;const amp=H*.3;ctx.beginPath();for(let px=0;px<=W;px++){const t=px/W,y=H/2-Math.sin(t*Math.PI*7+oscPh)*amp-Math.sin(t*Math.PI*2.1+oscPh*.4)*amp*.07;px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);}ctx.stroke();ctx.fillStyle=wc;ctx.font='500 10px "IBM Plex Mono",monospace';ctx.fillText(liveHz.toFixed(2)+' Hz',9,13);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillText('50.00 Hz',W-68,H/2-4);oscPh-=.05;oscId=requestAnimationFrame(draw);}if(oscId)cancelAnimationFrame(oscId);draw();}
 let gridInited=false;
 async function initGrid(){if(!gridInited){startOsc();gridInited=true;}try{const r=await fetch('/api/grid-data');if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json(),gen=d.generation,dem=d.demand;liveHz=gen.frequency_hz||dem.frequency_hz||50.0;const fc=fCol(liveHz),el=id=>document.getElementById(id);el('g-hz').textContent=liveHz.toFixed(2);el('g-hz').style.color=fc;el('g-hz-st').textContent=fSt(liveHz);el('g-hz-st').style.color=fc;el('g-gen').textContent=(gen.total_generation_mw||0).toLocaleString();el('g-gen-sub').textContent='Own '+(gen.own_gen_mw||0).toLocaleString()+' + CGS '+(gen.cgs_mw||0).toLocaleString();const b=dem.bescom||{},ui=b.ui_mw||0;el('g-bl').textContent=(b.actual_mw||0).toLocaleString();el('g-ui').textContent=(ui>=0?'+':'')+ui+' MW UI';el('g-ui').style.color=ui>0?'var(--amber)':'var(--green)';const bn=(d.ncep.escom_ncep||[]).find(e=>e.escom==='BESCOM')||{};el('g-ncep').textContent=(bn.total_mw||0).toLocaleString();el('g-ncep-sub').textContent='Solar '+(bn.solar_mw||0)+' + Wind '+(bn.wind_mw||0)+' MW';const ts=gen.timestamp||dem.timestamp||'—';document.getElementById('grid-stale').innerHTML='<div class="stale-dot" style="background:var(--green)"></div>Live · <a href="https://kptclsldc.in" target="_blank">kptclsldc.in</a> · '+ts;const loads=dem.escom_loads||[],ECOL={BESCOM:'var(--mfg)',MESCOM:'var(--bess)',CESC:'var(--ev)',GESCOM:'#7C3AED',HESCOM:'#DB2777'};document.getElementById('escom-tbody').innerHTML=loads.map(function(e){const u=e.ui_mw||0,dir=u>50?'\u2191 Over-drawn':u<-50?'\u2193 Under-drawn':'\u2248 Balanced';return'<tr><td style="font-weight:700;color:'+(ECOL[e.escom]||'var(--text)')+'">'+e.escom+'</td><td>'+(e.schedule_mw||0).toLocaleString()+'</td><td>'+(e.actual_mw||0).toLocaleString()+'</td><td style="color:'+(u>=0?'#D97706':'#16A34A')+';font-weight:600">'+(u>=0?'+':'')+u+'</td><td style="font-size:11px;color:'+(u>50?'#D97706':u<-50?'#16A34A':'var(--muted)')+'">'+dir+'</td></tr>';}).join('');}catch(e){document.getElementById('grid-stale').innerHTML='<div class="stale-dot" style="background:var(--red)"></div>Grid data unavailable — <a href="https://kptclsldc.in/bescom.aspx" target="_blank">View on KPTCL SLDC</a>';}}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MAP — Leaflet India opportunity map
+// ══════════════════════════════════════════════════════════════════════════════
+let leafMap = null;
+let mapMarkers = [];
+let curView = 'map';
+let selectedOppId = null;
+
+function setView(v){
+  curView = v;
+  document.getElementById('explore-map-view').style.display  = v==='map'  ? 'grid'  : 'none';
+  document.getElementById('explore-list-view').style.display = v==='list' ? 'block' : 'none';
+  document.getElementById('vt-map').classList.toggle('active',  v==='map');
+  document.getElementById('vt-list').classList.toggle('active', v==='list');
+  if(v==='map' && leafMap){ setTimeout(function(){ leafMap.invalidateSize(); }, 50); }
+  if(v==='list'){ renderExplorer(); }
+}
+
+function initMap(){
+  if(leafMap) return;
+  leafMap = L.map('india-map', {
+    center: [20.5937, 78.9629],
+    zoom: 5,
+    zoomControl: true,
+    attributionControl: true,
+  });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 13,
+  }).addTo(leafMap);
+}
+
+function mrkColor(score, maxScore){
+  const p = score / maxScore;
+  if(p >= 0.66) return '#16A34A';
+  if(p >= 0.40) return '#D97706';
+  return '#DC2626';
+}
+
+function renderMapMarkers(){
+  if(!leafMap) return;
+  const biz = fState.biz || 'ev';
+  // Clear existing markers
+  mapMarkers.forEach(function(m){ leafMap.removeLayer(m); });
+  mapMarkers = [];
+
+  const filtered = allOpps.filter(function(o){
+    if(fState.state && o.state !== fState.state) return false;
+    if(fState.tier && o.tier != fState.tier) return false;
+    if(fState.coverage && o.coverage !== fState.coverage) return false;
+    if(fState.headroom && o[biz]?.headroom !== fState.headroom) return false;
+    return true;
+  });
+
+  document.getElementById('fcount').textContent = filtered.length + ' opportunities';
+
+  filtered.forEach(function(o){
+    if(!o.lat || !o.lng) return;
+    const bd = o[biz] || {};
+    const score = bd.score || 0;
+    const maxS = biz === 'ev' ? 6 : 4;
+    const col = mrkColor(score, maxS);
+    const isLive = o.coverage === 'live';
+    const r = o.tier === 1 ? 9 : 7;
+
+    const m = L.circleMarker([o.lat, o.lng], {
+      radius: r,
+      fillColor: col,
+      color: '#ffffff',
+      weight: isLive ? 2.5 : 1.5,
+      opacity: 1,
+      fillOpacity: 0.88,
+    });
+
+    // Tooltip (hover)
+    m.bindTooltip(
+      '<div style="font-family:var(--sans);padding:2px 0">'
+      + '<div style="font-weight:700;font-size:12px">' + o.location + '</div>'
+      + '<div style="font-size:10px;color:#64748B">' + o.state + ' · ' + (o[biz]?.headroom||'').toUpperCase() + ' headroom</div>'
+      + '<div style="font-size:10px;margin-top:2px">Score: <strong>' + score + '/' + maxS + '</strong>'
+      + (isLive ? ' · <span style="color:#16A34A;font-weight:700">⬤ LIVE</span>' : '') + '</div>'
+      + '</div>',
+      { direction: 'top', offset: [0, -r-4], className: 'leaflet-tooltip-custom' }
+    );
+
+    m.on('click', function(){ showMapDetail(o, biz); selectedOppId = o.id; });
+    m.addTo(leafMap);
+    mapMarkers.push(m);
+
+    // Pulsing ring for live data
+    if(isLive){
+      const pulse = L.circleMarker([o.lat, o.lng], {
+        radius: r + 4,
+        fillColor: 'transparent',
+        color: col,
+        weight: 1,
+        opacity: 0.4,
+        fillOpacity: 0,
+        className: 'live-ring'
+      });
+      pulse.addTo(leafMap);
+      mapMarkers.push(pulse);
+    }
+  });
+}
+
+function showMapDetail(o, biz){
+  biz = biz || fState.biz || 'ev';
+  const bd = o[biz] || {};
+  const score = bd.score || 0;
+  const maxS = biz === 'ev' ? 6 : 4;
+  const col = mrkColor(score, maxS);
+  const h = bd.headroom || 'medium';
+  const hC = h==='high'?'#15803D':h==='medium'?'#D97706':'#DC2626';
+  const hP = {high:82,medium:52,low:22}[h]||50;
+  const den = bd.competition || '';
+  const dC = den==='underserved'?'#15803D':den==='moderate'?'#D97706':'#DC2626';
+  const dP = {underserved:18,moderate:52,saturated:88}[den]||50;
+  const covCls = 'cov-' + o.coverage;
+  const tc = 't' + (o.tier||2);
+  const tl = o.tier===1?'Tier 1 — metro':o.tier===2?'Tier 2':'Tier 3';
+  const isLive = o.coverage==='live';
+  const evalTab = biz==='bess'?'dbess':'ev';
+
+  // Zones section
+  let zonesHtml = '';
+  if(o.zones && o.zones.length){
+    zonesHtml = '<div class="detail-zones"><div class="detail-zones-title">Key zones within ' + o.city + '</div>'
+      + o.zones.slice(0,3).map(function(z){
+          const zc = z.opportunity_score>=9?'#15803D':z.opportunity_score>=7?'#D97706':'#64748B';
+          return '<div class="dzone" style="border-left-color:'+zc+'">'
+            +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+            +'<div><div class="dzone-name">'+z.zone+'</div><div class="dzone-sub">'+z.city+' · '+z.discom+'</div></div>'
+            +'<div class="dzone-score" style="color:'+zc+'">'+z.opportunity_score+'/10</div></div>'
+            +'<div class="dzone-reason">'+z.reason+'</div>'
+            +'<div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">'
+            +'<span style="font-size:9px;background:var(--s2);color:var(--muted);padding:1px 6px;border-radius:3px;font-family:var(--mono)">'+z.ev_demand+'</span>'
+            +'<span style="font-size:9px;background:var(--s2);color:var(--muted);padding:1px 6px;border-radius:3px;font-family:var(--mono)">'+z.power_reliability+'</span>'
+            +'<span style="font-size:9px;background:var(--s2);color:var(--muted);padding:1px 6px;border-radius:3px;font-family:var(--mono)">'+z.supply_voltage+'</span>'
+            +'</div></div>';
+        }).join('')
+      + '</div>';
+  }
+
+  // Corridors section
+  let corrHtml = '';
+  if(o.corridors && o.corridors.length){
+    corrHtml = '<div style="margin-top:14px"><div class="detail-zones-title">Highway corridors</div>'
+      + o.corridors.slice(0,2).map(function(c){
+          const oc = c.opportunity.includes('High')?'#15803D':c.opportunity.includes('Med')?'#D97706':'#64748B';
+          return '<div style="background:var(--s2);border-radius:6px;padding:9px 11px;margin-bottom:6px">'
+            +'<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px">'+c.name+'</div>'
+            +'<div style="font-size:10px;font-family:var(--mono);color:var(--muted)">'
+            +c.distance_km+'km · '+c.stations_existing+' stations · '+c.stations_per_100km.toFixed(1)+'/100km'
+            +' · <span style="color:'+oc+';font-weight:700">'+c.opportunity+'</span>'
+            +(c.gap_towns&&c.gap_towns.length?' · Gap: '+c.gap_towns.join(', '):'')
+            +'</div></div>';
+        }).join('')
+      + '</div>';
+  }
+
+  document.getElementById('map-detail-inner').innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">'
+    +'<div>'
+    +'<div style="font-family:var(--head);font-size:18px;font-weight:700;color:var(--text)">'+o.location+'</div>'
+    +'<div style="font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:2px">'+o.state+' · '+o.discom+'</div>'
+    +'</div>'
+    +'<div style="text-align:center;background:'+(score/maxS>=0.66?'#DCFCE7':score/maxS>=0.4?'#FEF3C7':'#FEE2E2')+';border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-direction:column">'
+    +'<div style="font-family:var(--mono);font-size:16px;font-weight:700;color:'+col+'">'+score+'</div>'
+    +'<div style="font-size:9px;color:var(--muted)">/ '+maxS+'</div>'
+    +'</div></div>'
+
+    +'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">'
+    +'<span class="tier-tag '+tc+'">'+tl+'</span>'
+    +'<span class="cov '+covCls+'" data-note="'+o.coverage_note+'"><span class="cd"></span>'+o.coverage_label+'</span>'
+    +(isLive?'<span style="font-size:9px;font-weight:700;font-family:var(--mono);padding:2px 7px;background:#DCFCE7;color:#15803D;border-radius:3px;display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:#15803D;display:inline-block"></span>LIVE DATA</span>':'')
+    +'</div>'
+
+    +'<div style="margin-bottom:10px">'
+    +'<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:10px">'
+    +'<span style="color:var(--muted);width:100px;flex-shrink:0;font-family:var(--mono)">Grid headroom</span>'
+    +'<div style="flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+hP+'%;background:'+hC+';border-radius:3px"></div></div>'
+    +'<span style="font-family:var(--mono);font-size:10px;font-weight:700;color:'+hC+';width:80px;text-align:right">'+h.toUpperCase()+' ('+bd.loading_pct+'%)</span></div>'
+    +(biz==='ev'&&den?'<div style="display:flex;align-items:center;gap:7px;font-size:10px"><span style="color:var(--muted);width:100px;flex-shrink:0;font-family:var(--mono)">Competition</span><div style="flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+dP+'%;background:'+dC+';border-radius:3px"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:700;color:'+dC+';width:80px;text-align:right">'+den.toUpperCase()+'</span></div>':'')
+    +'</div>'
+
+    +'<div style="font-size:11px;color:var(--sub);line-height:1.6;border-left:2px solid var(--border);padding-left:9px;margin-bottom:14px;font-style:italic">'+bd.one_liner+'</div>'
+
+    +'<button class="eval-btn '+(biz==='bess'?'bess-btn':'')+'" onclick="evalEcon(''+o.id+'',''+evalTab+'')">'
+    +'Evaluate the economics →</button>'
+
+    + zonesHtml + corrHtml
+
+    +'<div style="margin-top:14px;font-size:10px;font-family:var(--mono);color:var(--dim);line-height:1.7;padding:8px 10px;background:var(--s2);border-radius:5px">'
+    +o.coverage_note+'</div>';
+
+  // Pan map to this marker
+  if(leafMap) leafMap.setView([o.lat, o.lng], Math.max(leafMap.getZoom(), 9), {animate:true});
+}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // BOOT

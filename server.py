@@ -477,6 +477,99 @@ CITY_DATA = {
     },
 }
 
+
+# ── City lat/lng lookup (for map rendering) ───────────────────────────────────
+CITY_LATLNG = {
+    # Karnataka
+    "Bengaluru":12.9716,"Bengaluru_lng":77.5946,
+    "Mysuru":12.2958,"Mysuru_lng":76.6394,
+    "Hubli-Dharwad":15.3647,"Hubli-Dharwad_lng":75.1240,
+    "Mangaluru":12.9141,"Mangaluru_lng":74.8560,
+    # Maharashtra
+    "Mumbai":19.0760,"Mumbai_lng":72.8777,
+    "Pune":18.5204,"Pune_lng":73.8567,
+    "Nagpur":21.1458,"Nagpur_lng":79.0882,
+    "Nashik":20.0059,"Nashik_lng":73.7898,
+    "Aurangabad":19.8762,"Aurangabad_lng":75.3433,
+    "Kolhapur":16.7050,"Kolhapur_lng":74.2433,
+    # Tamil Nadu
+    "Chennai":13.0827,"Chennai_lng":80.2707,
+    "Coimbatore":11.0168,"Coimbatore_lng":76.9558,
+    "Madurai":9.9252,"Madurai_lng":78.1198,
+    "Tiruchirappalli":10.7905,"Tiruchirappalli_lng":78.7047,
+    # Telangana
+    "Hyderabad":17.3850,"Hyderabad_lng":78.4867,
+    "Warangal":17.9784,"Warangal_lng":79.5941,
+    # Gujarat
+    "Ahmedabad":23.0225,"Ahmedabad_lng":72.5714,
+    "Surat":21.1702,"Surat_lng":72.8311,
+    "Vadodara":22.3072,"Vadodara_lng":73.1812,
+    "Rajkot":22.3039,"Rajkot_lng":70.8022,
+    # Rajasthan
+    "Jaipur":26.9124,"Jaipur_lng":75.7873,
+    "Jodhpur":26.2389,"Jodhpur_lng":73.0243,
+    "Udaipur":24.5854,"Udaipur_lng":73.7125,
+    # UP
+    "Lucknow":26.8467,"Lucknow_lng":80.9462,
+    "Kanpur":26.4499,"Kanpur_lng":80.3319,
+    "Agra":27.1767,"Agra_lng":78.0081,
+    "Varanasi":25.3176,"Varanasi_lng":82.9739,
+    # Delhi NCR
+    "New Delhi":28.6139,"New Delhi_lng":77.2090,
+    "Gurugram":28.4595,"Gurugram_lng":77.0266,
+    "Noida":28.5355,"Noida_lng":77.3910,
+    # West Bengal
+    "Kolkata":22.5726,"Kolkata_lng":88.3639,
+    "Siliguri":26.7271,"Siliguri_lng":88.3953,
+    "Durgapur":23.4800,"Durgapur_lng":87.3200,
+    # Haryana
+    "Faridabad":28.4089,"Faridabad_lng":77.3178,
+    # MP
+    "Indore":22.7196,"Indore_lng":75.8577,
+    "Bhopal":23.2599,"Bhopal_lng":77.4126,
+    "Gwalior":26.2183,"Gwalior_lng":78.1828,
+    # Punjab
+    "Ludhiana":30.9010,"Ludhiana_lng":75.8573,
+    "Amritsar":31.6340,"Amritsar_lng":74.8723,
+    # Uttarakhand
+    "Dehradun":30.3165,"Dehradun_lng":78.0322,
+    "Haridwar":29.9457,"Haridwar_lng":78.1642,
+    # Odisha
+    "Bhubaneswar":20.2961,"Bhubaneswar_lng":85.8245,
+    "Rourkela":22.2604,"Rourkela_lng":84.8536,
+    # Kerala
+    "Kochi":9.9312,"Kochi_lng":76.2673,
+    "Thiruvananthapuram":8.5241,"Thiruvananthapuram_lng":76.9366,
+    "Kozhikode":11.2588,"Kozhikode_lng":75.7804,
+    # AP
+    "Visakhapatnam":17.6868,"Visakhapatnam_lng":83.2185,
+    "Vijayawada":16.5062,"Vijayawada_lng":80.6480,
+    # Other states
+    "Patna":25.5941,"Patna_lng":85.1376,
+    "Ranchi":23.3441,"Ranchi_lng":85.3096,
+    "Raipur":21.2514,"Raipur_lng":81.6296,
+    "Guwahati":26.1445,"Guwahati_lng":91.7362,
+    "Shimla":31.1048,"Shimla_lng":77.1734,
+    "Panaji":15.4909,"Panaji_lng":73.8278,
+    "Jammu":32.7266,"Jammu_lng":74.8570,
+    "Srinagar":34.0837,"Srinagar_lng":74.7973,
+    "Agartala":23.8315,"Agartala_lng":91.2868,
+    "Aizawl":23.7307,"Aizawl_lng":92.7173,
+    "Dimapur":25.9083,"Dimapur_lng":93.7269,
+    "Imphal":24.8170,"Imphal_lng":93.9368,
+    "Gangtok":27.3389,"Gangtok_lng":88.6065,
+    "Itanagar":27.0844,"Itanagar_lng":93.6053,
+}
+
+def _get_latlng(city, state):
+    """Return (lat, lng) for a city. Falls back to state capital approximation."""
+    lat = CITY_LATLNG.get(city, None)
+    lng = CITY_LATLNG.get(city+"_lng", None)
+    if lat and lng:
+        return round(lat, 4), round(lng, 4)
+    # Fallback: centre of India
+    return 20.59, 78.96
+
 # ── EV zones data — all 30 states ─────────────────────────────────────────────
 # Detailed for 9 key states; summary-level for remaining 21.
 # Source: State EV policy portals, NH corridor data, DISCOM territory maps.
@@ -909,7 +1002,7 @@ def _one_liner_bess(loading_pct, headroom, coverage):
     return f"{base} — {c}"
 
 def _ev_card(loc, city, state, tier, discom, coverage, loading_pct, headroom, density, ev_stations,
-             fast_dc, zones, corridors, query_suffix):
+             fast_dc, zones, corridors, query_suffix, lat=20.59, lng=78.96):
     h_score = {"high":3,"medium":2,"low":1}[headroom]
     d_score = {"underserved":3,"moderate":2,"saturated":1}.get(density, 2)
     score   = h_score + d_score
@@ -925,6 +1018,7 @@ def _ev_card(loc, city, state, tier, discom, coverage, loading_pct, headroom, de
         "bess": {"score":bess_s,"headroom":headroom,"loading_pct":loading_pct,
                  "one_liner":_one_liner_bess(loading_pct,headroom,coverage),
                  "verdict":"VIABLE" if bess_s>=2 else "MARGINAL"},
+        "lat": lat, "lng": lng,
         "zones": zones, "corridors": corridors, "query": query_suffix,
     }
 
@@ -949,6 +1043,7 @@ def get_opportunities(
             ev_stations=ev.get("count_2km",0), fast_dc=ev.get("fast_dc_2km",0),
             zones=[], corridors=[],
             query_suffix=f"area={ss_key}&business={business}",
+            lat=ss["lat"], lng=ss["lng"],
         ))
 
     # ── City-level (from CITY_DATA) ──────────────────────────────────────────
@@ -962,6 +1057,7 @@ def get_opportunities(
                 cov = "partial"
             else:
                 cov = "estimate"
+            _lat, _lng = _get_latlng(cname, sname)
             cards.append(_ev_card(
                 loc=cname, city=cname, state=sname, tier=cd.get("tier",2),
                 discom=cd["discom"], coverage=cov,
@@ -969,6 +1065,7 @@ def get_opportunities(
                 density=cd["ev_density"], ev_stations=cd["ev_stations"], fast_dc=0,
                 zones=cd.get("zones",[]), corridors=cd.get("corridors",[]),
                 query_suffix=f"state={sname}&city={cname}&business={business}",
+                lat=_lat, lng=_lng,
             ))
 
     # ── Apply filters ────────────────────────────────────────────────────────
