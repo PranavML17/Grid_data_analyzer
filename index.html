@@ -546,6 +546,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
       <button class="vt-b"        id="vt-list" onclick="setView('list')">&#8801; List</button>
     </div>
     <button class="clr-btn" onclick="clearFilters()">&#10005; Clear</button>
+    <button class="clr-btn" id="station-toggle" onclick="toggleStations()"
+      style="border-color:#7C3AED;color:#7C3AED;display:none">
+      &#9679; Your stations (211)
+    </button>
   </div></div>
 
   <!-- MAP VIEW -->
@@ -853,6 +857,9 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
 
 <script>
 "use strict";
+
+// ══ STATION LAYER DATA ══
+var STATION_LOCS = [["Urapakkam",12.862405,80.064914],["Vidyaranyapura",13.080141,77.548127],["BK Circle",12.870676,77.583179],["80ft rd Indiranagar",12.969276,77.648315],["GM palya",12.972825,77.664407],["Isanpur",22.96618,72.603802],["Sant Nagar",28.740223,77.205124],["Dommasandra",12.889938,77.749531],["Aalivillage",28.517388,77.306624],["Hoodi Mahadevapura",12.9861,77.707919],["Madanaykahalli",13.056828,77.457798],["Noida Sec-65 : Bahlolpur",28.611278,77.400573],["Kolathur",13.121878,80.208481],["MoEVing",13.029691,77.534367],["Gurugram Sec- 71",28.409463,77.02742],["Noida Sec 135",28.499659,77.387909],["Ballabhgarh",28.338459,77.315129],["Laggere",13.000194,77.524408],["East Tambaram",12.919822,80.131371],["BG Road",12.897442,77.599291],["Seetharampalya",12.983977,77.711532],["Kumbalgodu",12.862538,77.461217],["Mandoli",28.679587,77.293943],["Gota",23.106624,72.540245],["Jigani",12.772095,77.6493],["Seegahalli",12.984082,77.432723],["Koramangala",12.944162,77.620737],["Ranhola",28.651453,77.027695],["Muradnagar",28.74884,77.490949],["Akshay Nagar",12.87572,77.616801],["Ittamadu",12.916443,77.54177],["Thoraipakkam",12.936906,80.230287],["Wilson Garden Hub",12.949859,77.602305],["Sarhaul",28.487077,77.073514],["Naraina",28.627697,77.13372],["Kalyan Nagar",13.027329,77.643605],["Medahalli",13.032368,77.717184],["Dasanpura",13.074655,77.435524],["Noida-Sector 65",28.617306,77.397556],["Sony World Signal",12.936917,77.628998],["Velachery",12.981934,80.213497],["Mayur Vihar",28.593919,77.297146],["Gaur City 1",28.59845,77.449463],["HSR",12.914587,77.639942],["Modi Nagar",28.858565,77.594362],["Kempapura",12.945692,77.674255],["Nangloi",28.658087,77.065407],["Vijay Nagar",28.651068,77.41816],["Navalur",12.818892,80.229389],["Noida Sector 81",28.547621,77.390877],["Kanakapura road",12.883334,77.549443],["Wimco Nagar Metro",13.179567,80.307283],["Kalkaji",28.531303,77.256276],["Ambattur",13.124434,80.166803],["Surajpur",28.516003,77.474915],["Sudama Nagar",12.95707,77.591876],["HRBR Layout",13.019559,77.653053],["Indiranagar -1",12.961461,77.637886],["Sona-Pali",28.37682,77.246173],["Poonamalle",13.043582,80.133739],["Mayur Vihar 2",28.592804,77.295662],["Lingarajapuram",13.015,77.632],["East Tambaram hub",12.919662,80.131373],["Dwarka Sector 12",28.59275,77.041626],["Sarhaul Sector 18",28.485636,77.071144],["Lithium Hub",12.983778,77.709556],["KR Puram",13.023948,77.715228],["Wazirpur Industrial Area",28.701136,77.165646],["Moriya",22.909,72.433],["ITPL",12.997804,77.71678],["Madhavaram",13.148602,80.222185],["Mundka",28.680077,77.045822],["Kudlu Gate",12.885357,77.64255],["Yeshwantpur",13.03027,77.53445],["E City-Phase 2",12.836588,77.678564],["Agara lake",12.920059,77.63724],["Sithlapakkam",12.883171,80.158253],["Begumpur",28.736397,77.07328],["Badarpur",28.488059,77.30525],["Faridabad- Sec 82",28.389278,77.35625],["Hoodi",12.98287,77.712129],["CWC Shahalam",22.998825,72.586709],["Channasandra",12.981054,77.769206],["Uttam nagar",28.634055,77.051815],["Jharsa - Sector 39",28.438436,77.050206],["Indirapuram",28.636286,77.353473],["Faridabad sec-15",28.395668,77.322484],["Nelmangala",13.095998,77.408523],["Chandapura",12.770057,77.701476],["Bellandur",12.940125,77.705763],["e^ park",12.839345,77.685157],["Nandgram",28.685833,77.416298],["Doddabanalli",13.021493,77.745098],["Escorts Mujesar",28.369883,77.315201],["Avadi",13.120053,80.0886],["Tilpata",28.555258,77.527802],["Redhills",13.198567,80.184372],["Kavi Nagar",28.666106,77.43397],["Nagalkeni",12.963642,80.130247],["Mohan Nagar",28.677719,77.396469],["Deepanjali nagar",12.953206,77.536157],["Chhatarpur",28.498118,77.180035],["Manesar Industial Area",28.3728,76.94846],["Jahangirpuri",28.726481,77.160313],["Rajajinagar",13.009771,77.554644],["Magadi Road",12.989144,77.505278],["RR Nagar",12.934262,77.517361],["Alipur",28.793224,77.146057],["East Vinod Nagar",28.62977,77.299355],["Sathanur",13.119525,77.631085],["Alapakkam",13.043604,80.16461],["Sarkhej",22.9848,72.49963],["Paschim vihar",28.671549,77.09731],["Dasna",28.688145,77.540977],["Nandini Layout",13.010904,77.528749],["Attibele",12.76913,77.770393],["Andrahalli",13.006786,77.486543],["YK Layout",13.008771,77.62774],["Timarpur",28.707942,77.225242],["Shivpuri",28.639161,77.429529],["Noida 62A",28.62199,77.353973],["Shela",23.013905,72.458943],["Karala Village",28.738295,77.039009],["Banashankari ll Stage",12.927714,77.565189],["Loni Bhopura Road",28.729065,77.330123],["Kengeri",12.9063,77.47415],["Indiranagar",12.979076,77.631058],["Pallikaranai",12.961097,80.18156],["Kapas Hera Estate",28.524702,77.085541],["Maduravoyal",13.06039,80.175435],["Doddabommasandra",13.058359,77.553957],["Rajaji nagar hub",12.997837,77.558882],["Begur",12.88189,77.637969],["Jalpura Gr Noida",28.549427,77.439377],["Surajpur Hub",28.507264,77.46516],["Soukya Road",12.986956,77.786611],["Singasandra",12.88035,77.646552],["Kadugodi",12.993611,77.756615],["TC palya",13.014877,77.709749],["Ramdev Chowk - Narela",28.858229,77.09312],["Chikkabegur",12.886141,77.638734],["Noida Sector 22",28.597586,77.348518],["Punjabi Bagh",28.675019,77.132216],["Powerpod Yeswanthpur",13.023251,77.541052],["Madhu Vihar",28.6354,77.3052],["Hennur",13.060591,77.65427],["Lal Kuan",28.632359,77.467018],["Virumbakkam",13.055855,80.181511],["Chitlapakkam",12.935154,80.139904],["Airport",13.180997,77.674919],["Rajiv Colony",28.446339,77.019348],["Gaur city 2",28.625043,77.425562],["Anjanapura",12.86073,77.548698],["Gazipur",28.635401,77.317139],["Selaiyur",12.894204,80.138438],["Narsinghpur",28.410721,76.991394],["Hebbal",13.042378,77.581637],["shakurpur",28.686955,77.146948],["Yelahanka New Town",13.094556,77.577632],["Noida sec 73",28.589606,77.383966],["Hesaraghatta",13.04942,77.507871],["Varthur",12.942187,77.747118],["Ashram Road",23.037,72.569],["Noida -44",28.556085,77.344257],["P&T Layout",13.060686,77.628761],["Soni ki Chawl",23.013108,72.64249],["Rajendra Palace",28.642781,77.176353],["Montra",13.112944,80.145935],["Rohini",28.701368,77.117317],["Dwarka Sec-10",28.57973,77.056578],["Jahangirpuri C Block",28.729487,77.171639],["HSR Sec-7",12.909412,77.636754],["Hero Honda Chowk",28.436146,77.009193],["Tannery Road",13.013332,77.612508],["Hoskote",13.074382,77.791365],["Naroda (Airport Rd)",23.078314,72.645027],["Mithapur chowk",28.500317,77.318169],["Sarjapur",12.90228,77.686198],["Guindy",13.007657,80.207514],["Dwarka - Sec10",28.579782,77.05685],["RT Nagar",13.0202,77.599828],["Avalahalli",12.87241,77.566909],["Faridabad Sector 20A",28.407878,77.309772],["Bamnoli",28.54538,77.033592],["Loni",28.704799,77.291342],["Banashankri OSM",12.913231,77.57304],["e^pump - Thirumazhisai",13.050693,80.101861],["Perambur",13.153347,80.256762],["Yelahanka",13.098525,77.574551],["Noida 62",28.628832,77.378777],["Noida 68",28.602821,77.392448],["Noida 67",28.608288,77.385182],["Thanisandra",13.08775,77.633417],["Rajarajeshwari nagar",12.926045,77.523425],["Faridabad Sec 36",28.479952,77.308197],["Medavakkam",12.918398,80.190114],["Jakkur",13.07335,77.61872],["Hauz Khas Village",28.554657,77.195968],["Chandkheda",23.1181,72.561419],["Greater Noida",28.538726,77.448542],["Sahibabad",28.655306,77.344978],["Domlur",12.957515,77.65943],["Ramesh Nagar",28.646626,77.133164],["Machohalli",12.997302,77.45406],["Kathwada",23.029285,72.690584],["Kapas Hera",28.518817,77.07757],["Gurugram -Sec 33",28.439491,77.014165],["Gujarat Cold Storage",23.022097,72.638759],["Aslali",22.909047,72.593354],["Ashok Vihar - Gurugram",28.491012,77.017477],["Narela",28.793224,77.146057]];
 
 // ══ CORE STATE ══
 var allOpps = [];
@@ -1162,6 +1169,7 @@ function initMapSafe() {
     }
   }
   try { leafMap.invalidateSize(); } catch(e) {}
+  loadStationLayer();
   applyFilters();
 }
 
@@ -1666,6 +1674,61 @@ async function initGrid() {
   } catch(e) {
     var el2 = document.getElementById('grid-stale');
     if (el2) el2.innerHTML = '<div class="sdot" style="background:var(--red)"></div>Grid data unavailable \\u2014 <a href="https://kptclsldc.in/bescom.aspx" target="_blank">View on KPTCL SLDC</a>';
+  }
+}
+
+
+// ══ STATION LAYER ══
+var stationMarkers = [];
+var stationsVisible = false;
+
+function loadStationLayer() {
+  if (!leafMap || typeof L === 'undefined') return;
+  if (stationMarkers.length > 0) return; // already loaded
+  var toggle = document.getElementById('station-toggle');
+  if (toggle) toggle.style.display = 'inline-flex';
+  for (var i = 0; i < STATION_LOCS.length; i++) {
+    var s = STATION_LOCS[i];
+    (function(name, lat, lng) {
+      var m = L.circleMarker([lat, lng], {
+        radius: 5,
+        fillColor: '#7C3AED',
+        color: '#fff',
+        weight: 1.5,
+        opacity: 1,
+        fillOpacity: 0.85,
+        className: 'station-dot'
+      });
+      m.bindTooltip(
+        '<div style="font-family:sans-serif;font-size:12px;font-weight:500">' + name + '</div>' +
+        '<div style="font-size:10px;color:#64748B">Exponent location</div>',
+        { direction: 'top', offset: [0, -8] }
+      );
+      stationMarkers.push(m);
+    })(s[0], s[1], s[2]);
+  }
+}
+
+function toggleStations() {
+  if (!leafMap || typeof L === 'undefined') return;
+  stationsVisible = !stationsVisible;
+  var toggle = document.getElementById('station-toggle');
+  if (stationsVisible) {
+    for (var i = 0; i < stationMarkers.length; i++) {
+      stationMarkers[i].addTo(leafMap);
+    }
+    if (toggle) {
+      toggle.style.background = '#7C3AED';
+      toggle.style.color = '#fff';
+    }
+  } else {
+    for (var i = 0; i < stationMarkers.length; i++) {
+      leafMap.removeLayer(stationMarkers[i]);
+    }
+    if (toggle) {
+      toggle.style.background = '';
+      toggle.style.color = '#7C3AED';
+    }
   }
 }
 
