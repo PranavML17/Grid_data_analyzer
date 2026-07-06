@@ -455,6 +455,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
   .ig input,.ig select{font-size:13px}
   .map-panel{height:100%;border-left:1px solid var(--border)}
 }
+.blr-tri-icon{background:transparent!important;border:none!important}
+.blr-tri-icon svg{display:block}
 </style>
 </head>
 <body>
@@ -552,7 +554,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
     </button>
     <button class="clr-btn" id="blr-toggle" onclick="toggleBlrUnavail()"
       style="border-color:#DC2626;color:#DC2626;display:none">
-      &#9679; Bengaluru unavailability (100)
+      &#9650; Bengaluru unavailability (100)
     </button>
   </div></div>
 
@@ -1748,6 +1750,21 @@ var BLR_COLORS = { red: '#DC2626', amber: '#D97706', green: '#16A34A' };
 var blrMarkers = [];
 var blrVisible = false;
 
+function blrTriIcon(cat, ambiguous) {
+  var col  = BLR_COLORS[cat] || '#64748B';
+  var size = cat === 'red' ? 22 : (cat === 'amber' ? 18 : 14);
+  var stroke = ambiguous ? '#94A3B8' : '#fff';
+  var dash   = ambiguous ? ' stroke-dasharray="2,2"' : '';
+  var svg = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24">' +
+    '<polygon points="12,2 22,21 2,21" fill="' + col + '" stroke="' + stroke + '" stroke-width="2"' + dash + '/></svg>';
+  return L.divIcon({
+    html: svg,
+    className: 'blr-tri-icon',
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2]
+  });
+}
+
 function loadBlrLayer() {
   if (!leafMap || typeof L === 'undefined') return;
   if (blrMarkers.length > 0) return; // already loaded
@@ -1757,16 +1774,7 @@ function loadBlrLayer() {
     var s = BLR_UNAVAIL_LOCS[i];
     (function(name, lat, lng, cat, pct, cid, ambiguous) {
       var col = BLR_COLORS[cat] || '#64748B';
-      var m = L.circleMarker([lat, lng], {
-        radius: cat === 'red' ? 8 : (cat === 'amber' ? 6.5 : 5),
-        fillColor: col,
-        color: ambiguous ? '#94A3B8' : '#fff',
-        weight: ambiguous ? 2 : 1.5,
-        dashArray: ambiguous ? '2,2' : null,
-        opacity: 1,
-        fillOpacity: cat === 'green' ? 0.6 : 0.88,
-        className: 'blr-dot'
-      });
+      var m = L.marker([lat, lng], { icon: blrTriIcon(cat, ambiguous) });
       var label = cat === 'red' ? 'Red \\u2014 frequently unavailable' : (cat === 'amber' ? 'Amber \\u2014 occasionally unavailable' : 'Green \\u2014 rarely unavailable');
       var warn = ambiguous
         ? '<div style="font-size:9px;color:#B45309;margin-top:3px;max-width:170px">charger_id reused elsewhere in source file \\u2014 attribution uncertain</div>'
